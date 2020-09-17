@@ -1,11 +1,11 @@
-package main.data.response;
+package main.data.response.base;
 
 import lombok.Data;
 
 import java.time.Instant;
 
 @Data
-abstract class ListResponse {
+public abstract class ListResponse {
     private String error = "";
     private long timestamp = Instant.now().toEpochMilli();
     private long total;
