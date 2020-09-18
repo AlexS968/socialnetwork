@@ -1,11 +1,23 @@
 package main.controller;
 
+import main.data.request.UserRequest;
+import main.data.response.FeedsResponse;
+import main.data.response.ProfileResponse;
+import main.model.Post;
+import main.repository.PostRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 public class DefaultController {
+
     @RequestMapping("/")
     public String index() {
         return "index";
@@ -15,4 +27,18 @@ public class DefaultController {
     public String redirectToIndex() {
         return "forward:/";
     }
+
+    //Заглушка логин
+    @PostMapping("/api/v1/auth/login")
+    public ResponseEntity<ProfileResponse> auth(@RequestBody UserRequest userRequest){
+        ProfileResponse response = new ProfileResponse(userRequest);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    //Заглушка профиль
+    @GetMapping("/api/v1/users/me")
+    public ResponseEntity<ProfileResponse> me() {
+        return new ResponseEntity<>(new ProfileResponse(), HttpStatus.OK);
+    }
+
 }
