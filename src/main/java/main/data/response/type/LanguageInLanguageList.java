@@ -1,9 +1,7 @@
 package main.data.response.type;
 
 import lombok.Data;
-import main.core.TextUtilities;
 import main.model.Language;
-import main.model.Post;
 
 @Data
 public class LanguageInLanguageList {

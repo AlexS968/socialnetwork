@@ -14,7 +14,7 @@ public class ApiPlatformController {
     private final LanguageServiceImpl languageService;
 
     @GetMapping("/languages")
-    public ResponseEntity<ListLanguageResponse> create(ListLanguageRequest request) {
+    public ResponseEntity<ListLanguageResponse> list(ListLanguageRequest request) {
         return ResponseEntity.ok(languageService.list(request));
     }
 }
