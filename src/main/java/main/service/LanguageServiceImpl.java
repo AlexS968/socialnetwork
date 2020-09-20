@@ -25,6 +25,7 @@ public class LanguageServiceImpl implements LanguageService {
         List<LanguageInLanguageList> languages = new ArrayList<>();
 
         Pageable pageable;
+        Page<Language> page;
 
         if (request.getItemPerPage() > 0) {
             pageable = new OffsetPageRequest(request.getOffset(), request.getItemPerPage(), Sort.unsorted());
@@ -32,11 +33,15 @@ public class LanguageServiceImpl implements LanguageService {
             pageable = Pageable.unpaged();
         }
 
-        Page<Language> page = languageRepository.findAll(pageable);
+        if (request.getLanguage() != null && !request.getLanguage().isEmpty()) {
+            page = languageRepository.findByTitleIgnoreCaseContaining(request.getLanguage(), pageable);
+        } else {
+            page = languageRepository.findAll(pageable);
+        }
 
-        page.forEach(l -> {
-            LanguageInLanguageList lead = new LanguageInLanguageList(l);
-            languages.add(lead);
+        page.forEach(i -> {
+            LanguageInLanguageList item = new LanguageInLanguageList(i);
+            languages.add(item);
         });
 
         ListLanguageResponse listLanguageResponse = new ListLanguageResponse(languages);
