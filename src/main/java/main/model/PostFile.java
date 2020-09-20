@@ -3,12 +3,11 @@ package main.model;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.time.Instant;
 
 @Entity
-@Table(name = "post_like")
+@Table(name = "post_file")
 @Data
-public class PostLike {
+public class PostFile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -19,10 +18,8 @@ public class PostLike {
     private Post post;
 
     @Column(nullable = false)
-    @OneToOne
-    @JoinColumn(name = "person_id")
-    private String person;
+    private String name;
 
     @Column(nullable = false)
-    private Instant time;
+    private String path;
 }
