@@ -26,7 +26,7 @@ public class BlockHistory {
     private Post post;
 
     @OneToOne
-    @JoinColumn(name = "person_id")
+    @JoinColumn(name = "comment_id")
     private PostComment comment;
 
     @Enumerated(EnumType.STRING)

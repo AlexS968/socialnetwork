@@ -16,6 +16,6 @@ public class Country {
     @Column(nullable = false)
     private String country;
 
-    @OneToMany(mappedBy = "country")
-    List<Person> people;
+    @OneToMany(mappedBy = "country", fetch = FetchType.LAZY)
+    private List<City> cities;
 }

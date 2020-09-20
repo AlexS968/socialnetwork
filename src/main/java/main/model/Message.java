@@ -18,7 +18,7 @@ public class Message {
 
     @Column(nullable = false)
     @ManyToOne
-    @JoinColumn(name = "person_id")
+    @JoinColumn(name = "author_id")
     private Person author;
 
     @Column(nullable = false)

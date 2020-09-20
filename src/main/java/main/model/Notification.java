@@ -26,7 +26,6 @@ public class Notification {
     @JoinColumn(name = "person_id")
     private Person receiver;
 
-    @Column(nullable = false)
     private int entityId;
 
     @Column(nullable = false)

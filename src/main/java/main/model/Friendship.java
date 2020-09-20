@@ -19,11 +19,11 @@ public class Friendship {
 
     @Column(nullable = false)
     @ManyToOne
-    @JoinColumn(name = "dst_person_id")
+    @JoinColumn(name = "src_person_id")
     private Person src;
 
     @Column(nullable = false)
     @ManyToOne
-    @JoinColumn(name = "src_person_id")
+    @JoinColumn(name = "dst_person_id")
     private Person dst;
 }

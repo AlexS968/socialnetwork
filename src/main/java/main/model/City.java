@@ -3,7 +3,6 @@ package main.model;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Entity
 @Table(name = "city")
@@ -16,6 +15,8 @@ public class City {
     @Column(nullable = false)
     private String city;
 
-    @OneToMany(mappedBy = "city")
-    List<Person> people;
+    @Column(nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "country_id")
+    private Country country;
 }

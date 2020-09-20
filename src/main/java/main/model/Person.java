@@ -66,10 +66,10 @@ public class Person {
     @Column(nullable = false, columnDefinition = "TINYINT")
     private boolean isBlocked = false;
 
-    @OneToMany(mappedBy = "person")
+    @OneToMany(mappedBy = "person", fetch = FetchType.LAZY)
     private List<BlockHistory> blockHistory;
 
-    @OneToMany(mappedBy = "author")
+    @OneToMany(mappedBy = "author", fetch = FetchType.LAZY)
     private List<Post> posts;
 
     @OneToMany(mappedBy = "receiver")
