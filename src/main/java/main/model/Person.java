@@ -5,6 +5,8 @@ import lombok.Data;
 import javax.persistence.*;
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "person")
@@ -38,8 +40,17 @@ public class Person {
     @Column(columnDefinition = "text")
     private String about;
 
-    private String town;
+    @Column
+    @ManyToOne
+    @JoinColumn(name = "country_id")
+    private Country country;
 
+    @Column
+    @ManyToOne
+    @JoinColumn(name = "city_id")
+    private City city;
+
+    @Column(name = "confirmation_code")
     private String confirmationCode;
 
     @Column(nullable = false, columnDefinition = "TINYINT")
@@ -49,8 +60,24 @@ public class Person {
     @Column(columnDefinition = "enum('ALL', 'FRIENDS')", nullable = false)
     private MessagesPermission messagesPermission;
 
+    @Column
     private Instant lastOnlineTime;
 
     @Column(nullable = false, columnDefinition = "TINYINT")
     private boolean isBlocked = false;
+
+    @OneToMany(mappedBy = "person")
+    private List<BlockHistory> blockHistory;
+
+    @OneToMany(mappedBy = "author")
+    private List<Post> posts;
+
+    @OneToMany(mappedBy = "receiver")
+    private List<Notification> notifications;
+
+    @OneToMany(mappedBy = "dst")
+    private Set<Friendship> requestFr;
+
+    @OneToMany(mappedBy = "src")
+    private Set<Friendship> sendFr;
 }
