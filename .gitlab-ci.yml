@@ -1,0 +1,20 @@
+stages:
+  - build
+  - deploy
+
+before_script:
+  - chmod +x mvnw
+
+build:
+  stage: build
+  script: ./mvnw package
+  artifacts:
+    paths:
+      - target/Network-1.0-SNAPSHOT.jar
+
+production:
+  stage: deploy
+  script:
+    - echo $TOKEN_SECRET
+  only:
+    - 10-ci-cd
