@@ -16,7 +16,6 @@ public class BlockHistory {
     @Column(nullable = false)
     private Instant time;
 
-    @Column(nullable = false)
     @ManyToOne
     @JoinColumn(name = "person_id")
     private Person person;

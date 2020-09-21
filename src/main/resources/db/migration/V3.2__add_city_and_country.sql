@@ -3,13 +3,13 @@ drop table if exists city;
 
 create table country (
     id integer not null auto_increment,
-    country integer not null,
+    country varchar(255) not null,
     primary key (id)
 );
 
 create table city (
     id integer not null auto_increment,
-    city integer not null,
+    city varchar(255) not null,
     country_id integer not null,
     primary key (id)
 );
