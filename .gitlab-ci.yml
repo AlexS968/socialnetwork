@@ -9,16 +9,15 @@ build:
   tags:
     - docker
   script:
-    - mvn package
-  artifacts:
-    paths:
-      - target/Network-1.0-SNAPSHOT.jar
+    - mvn clean package
+  only:
+    - 10-ci-cd
 
 production:
   stage: deploy
   tags:
     - docker
   script:
-    - echo $TOKEN_SECRET
+    - java -jar target/Network-1.0-SNAPSHOT.jar
   only:
     - 10-ci-cd
