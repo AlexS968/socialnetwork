@@ -9,7 +9,7 @@ build:
   tags:
     - docker
   script:
-    - docker version
+    - mvn -version
   artifacts:
     paths:
       - target/Network-1.0-SNAPSHOT.jar
