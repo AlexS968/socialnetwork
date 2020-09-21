@@ -19,6 +19,6 @@ production:
   tags:
     - docker
   script:
-    - java -jar /tmp/app.jar
+    - java -jar /tmp/app.jar --spring.datasource.password=$DB_PASSWORD
   only:
     - 10-ci-cd
