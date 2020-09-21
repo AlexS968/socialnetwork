@@ -9,7 +9,7 @@ build:
   tags:
     - docker
   script:
-    - mvn clean package
+    - mvn clean
   only:
     - 10-ci-cd
 
@@ -18,6 +18,6 @@ production:
   tags:
     - docker
   script:
-    - java -jar target/Network-1.0-SNAPSHOT.jar
+    - mvn spring-boot:run
   only:
     - 10-ci-cd
