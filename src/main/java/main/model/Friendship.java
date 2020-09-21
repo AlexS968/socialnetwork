@@ -13,17 +13,11 @@ public class Friendship {
     private int id;
 
     @Column(nullable = false)
-    @OneToOne
-    @JoinColumn(name = "status_id")
-    private FriendshipStatus status;
+    private int statusId;
 
     @Column(nullable = false)
-    @ManyToOne
-    @JoinColumn(name = "src_person_id")
-    private Person src;
+    private int srcPersonId;
 
     @Column(nullable = false)
-    @ManyToOne
-    @JoinColumn(name = "dst_person_id")
-    private Person dst;
+    private int dstPersonId;
 }

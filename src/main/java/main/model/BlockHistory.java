@@ -17,17 +17,11 @@ public class BlockHistory {
     private Instant time;
 
     @Column(nullable = false)
-    @ManyToOne
-    @JoinColumn(name = "person_id")
-    private Person person;
+    private int personId;
 
-    @OneToOne
-    @JoinColumn(name = "post_id")
-    private Post post;
+    private int postId;
 
-    @OneToOne
-    @JoinColumn(name = "comment_id")
-    private PostComment comment;
+    private int commentId;
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "enum('BLOCK', 'UNBLOCK')", nullable = false)

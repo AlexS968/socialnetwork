@@ -17,14 +17,10 @@ public class Message {
     private Instant time;
 
     @Column(nullable = false)
-    @ManyToOne
-    @JoinColumn(name = "author_id")
-    private Person author;
+    private int authorId;
 
     @Column(nullable = false)
-    @ManyToOne
-    @JoinColumn(name = "recipient_id")
-    private Person recipient;
+    private int recipientId;
 
     @Column(columnDefinition = "text")
     private String messageText;
