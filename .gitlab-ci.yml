@@ -18,6 +18,6 @@ production:
   tags:
     - docker
   script:
-    - mvn spring-boot:run
+    - mvn -e -X spring-boot:run
   only:
     - 10-ci-cd
