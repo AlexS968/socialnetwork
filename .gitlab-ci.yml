@@ -2,9 +2,6 @@ stages:
   - build
   - deploy
 
-before_script:
-  - chmod +x mvnw
-
 build:
   stage: build
   tags:
