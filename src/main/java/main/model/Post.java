@@ -17,7 +17,6 @@ public class Post {
     @Column(nullable = false)
     private Instant time;
 
-//    @Column(nullable = false)
     @ManyToOne
     @JoinColumn(name = "author_id")
     private Person author;
@@ -25,10 +24,10 @@ public class Post {
     @Column(nullable = false)
     private String title;
 
-    @Column(columnDefinition = "text", nullable = false)
+    @Column(name = "post_text", columnDefinition = "text")
     private String postText;
 
-    @Column(nullable = false, columnDefinition = "TINYINT")
+    @Column(name = "is_blocked", nullable = false, columnDefinition = "TINYINT")
     private boolean isBlocked = false;
 
     @ManyToMany(cascade = CascadeType.ALL)
