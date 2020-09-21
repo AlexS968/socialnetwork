@@ -13,15 +13,15 @@ public class PostLike {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(nullable = false)
+//    @Column(nullable = false)
     @ManyToOne
     @JoinColumn(name = "post_id")
     private Post post;
 
-    @Column(nullable = false)
+//    @Column(nullable = false)
     @OneToOne
     @JoinColumn(name = "person_id")
-    private String person;
+    private Person person;
 
     @Column(nullable = false)
     private Instant time;

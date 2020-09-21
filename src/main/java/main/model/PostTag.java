@@ -12,9 +12,9 @@ public class PostTag {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(nullable = false)
+    @Column(name = "post_id", nullable = false)
     private int postId;
 
-    @Column(nullable = false)
+    @Column(name = "tag_id", nullable = false)
     private int tagId;
 }

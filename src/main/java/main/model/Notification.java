@@ -13,7 +13,7 @@ public class Notification {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(nullable = false)
+//    @Column(nullable = false)
     @OneToOne
     @JoinColumn(name = "type_id")
     private NotificationType type;
@@ -21,8 +21,8 @@ public class Notification {
     @Column(nullable = false)
     private Instant sentTime;
 
-    @Column(nullable = false)
     @ManyToOne
+//    @Column(nullable = false)
     @JoinColumn(name = "person_id")
     private Person receiver;
 

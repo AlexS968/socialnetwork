@@ -40,12 +40,12 @@ public class Person {
     @Column(columnDefinition = "text")
     private String about;
 
-    @Column
+//    @Column
     @ManyToOne
     @JoinColumn(name = "country_id")
     private Country country;
 
-    @Column
+//    @Column
     @ManyToOne
     @JoinColumn(name = "city_id")
     private City city;

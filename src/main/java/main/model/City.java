@@ -15,7 +15,7 @@ public class City {
     @Column(nullable = false)
     private String city;
 
-    @Column(nullable = false)
+//    @Column(nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "country_id")
     private Country country;

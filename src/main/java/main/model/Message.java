@@ -16,12 +16,12 @@ public class Message {
     @Column(nullable = false)
     private Instant time;
 
-    @Column(nullable = false)
+//    @Column(nullable = false)
     @ManyToOne
     @JoinColumn(name = "author_id")
     private Person author;
 
-    @Column(nullable = false)
+//    @Column(nullable = false)
     @ManyToOne
     @JoinColumn(name = "recipient_id")
     private Person recipient;

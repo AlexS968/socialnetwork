@@ -12,17 +12,17 @@ public class Friendship {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(nullable = false)
+//    @Column(nullable = false)
     @OneToOne
     @JoinColumn(name = "status_id")
     private FriendshipStatus status;
 
-    @Column(nullable = false)
+//    @Column(nullable = false)
     @ManyToOne
     @JoinColumn(name = "src_person_id")
     private Person src;
 
-    @Column(nullable = false)
+//    @Column(nullable = false)
     @ManyToOne
     @JoinColumn(name = "dst_person_id")
     private Person dst;

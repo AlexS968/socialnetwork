@@ -17,7 +17,7 @@ public class Post {
     @Column(nullable = false)
     private Instant time;
 
-    @Column(nullable = false)
+//    @Column(nullable = false)
     @ManyToOne
     @JoinColumn(name = "person_id")
     private Person author;
