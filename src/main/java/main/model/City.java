@@ -12,10 +12,9 @@ public class City {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(nullable = false)
-    private String city;
+    @Column(name = "country_id", nullable = false)
+    private int countryId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "country_id")
-    private Country country;
+    @Column(nullable = false)
+    private String title;
 }
