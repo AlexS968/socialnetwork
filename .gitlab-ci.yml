@@ -9,7 +9,7 @@ build:
   tags:
     - docker
   script:
-    - mvn clean package
+    - mvn -Pprod clean package
     - cp target/Network-1.0-SNAPSHOT.jar /tmp/app.jar
   only:
     - 10-ci-cd
