@@ -7,13 +7,19 @@ before_script:
 
 build:
   stage: build
+  tags:
+    - docker
   script: ./mvnw package
   artifacts:
     paths:
       - target/Network-1.0-SNAPSHOT.jar
+  only:
+    - 10-ci-cd
 
 production:
   stage: deploy
+  tags:
+    - docker
   script:
     - echo $TOKEN_SECRET
   only:
