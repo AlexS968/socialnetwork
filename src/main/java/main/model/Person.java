@@ -41,7 +41,7 @@ public class Person {
     @Column(columnDefinition = "text")
     private String about;
 
-    private String town;
+    //private String town;
 
     private String confirmationCode;
 
