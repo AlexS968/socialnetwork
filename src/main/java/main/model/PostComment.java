@@ -28,7 +28,7 @@ public class PostComment {
 
 //    @Column(nullable = false)
     @ManyToOne
-    @JoinColumn(name = "person_id")
+    @JoinColumn(name = "author_id")
     private Person author;
 
     @Column(columnDefinition = "text")
