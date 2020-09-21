@@ -1,20 +1,20 @@
-image: maven:latest
+image: java:11
 
 stages:
   - build
   - deploy
 
+before_script:
+  - chmod +x mvnw
+
 build:
   stage: build
   tags:
     - docker
-  script:
-    - mvn -version
+  script: ./mvnw package
   artifacts:
     paths:
       - target/Network-1.0-SNAPSHOT.jar
-  only:
-    - 10-ci-cd
 
 production:
   stage: deploy
