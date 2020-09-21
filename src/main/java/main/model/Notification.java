@@ -14,17 +14,13 @@ public class Notification {
     private int id;
 
     @Column(nullable = false)
-    @OneToOne
-    @JoinColumn(name = "type_id")
-    private NotificationType type;
+    private int typeId;
 
     @Column(nullable = false)
     private Instant sentTime;
 
     @Column(nullable = false)
-    @ManyToOne
-    @JoinColumn(name = "person_id")
-    private Person receiver;
+    private int personId;
 
     private int entityId;
 

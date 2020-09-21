@@ -3,7 +3,6 @@ package main.model;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.time.Instant;
 
 @Entity
 @Table(name = "post_like")
@@ -14,15 +13,11 @@ public class PostLike {
     private int id;
 
     @Column(nullable = false)
-    @ManyToOne
-    @JoinColumn(name = "post_id")
-    private Post post;
+    private int postId;
 
     @Column(nullable = false)
-    @OneToOne
-    @JoinColumn(name = "person_id")
-    private String person;
+    private String name;
 
     @Column(nullable = false)
-    private Instant time;
+    private String path;
 }
