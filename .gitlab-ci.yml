@@ -9,7 +9,8 @@ build:
   stage: build
   tags:
     - docker
-  script: ./mvnw package
+  script:
+    - mvn -version
   artifacts:
     paths:
       - target/Network-1.0-SNAPSHOT.jar
