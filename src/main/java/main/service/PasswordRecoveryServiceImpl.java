@@ -27,7 +27,9 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
     public PasswordRecoveryResponse restorePassword(PasswordRecoveryRequest request) {
         Person person = personRepository.findByEmail(request.getEmail());
         if (person == null){
-            throw new UsernameNotFoundException(request.getEmail());
+            throw new BadRequestException(new ApiError(
+                    "invalid_request",
+                    "Такой email не зарегистрирован"));
         }
         String confirmationCode = RandomStringUtils.randomAlphanumeric(45);
         person.setConfirmationCode(confirmationCode);
