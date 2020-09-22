@@ -18,11 +18,11 @@ import java.time.ZoneOffset;
 
 @Service
 @AllArgsConstructor
-public class PasswordRecoveryServiceImpl {
-
+public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
     private final PersonRepository personRepository;
     private final JavaMailSender emailSender;
 
+    @Override
     public PasswordRecoveryResponse restorePassword(PasswordRecoveryRequest request) {
         Person person = personRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new BadRequestException(new ApiError(
