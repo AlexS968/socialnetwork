@@ -18,6 +18,6 @@ production:
     - docker
   script:
     - rm -rf /tmp/nohup_log.out
-    - setsid nohup java -jar /opt/network/prod/app.jar --spring.datasource.password=$DB_PASSWORD > /tmp/nohup_log.out &
+    - setsid java -jar /opt/network/prod/app.jar --spring.datasource.password=$DB_PASSWORD > /tmp/nohup_log.out &
   only:
     - 10-ci-cd
