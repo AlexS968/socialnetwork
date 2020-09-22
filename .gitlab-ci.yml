@@ -8,7 +8,6 @@ build:
     - docker
   script:
     - mvn -Pprod clean package
-    - pkill -u gitlab-runner -15 -f "java -jar /opt/network/prod/app.jar"
     - cp target/Network-1.0-SNAPSHOT.jar /opt/network/prod/app.jar
   only:
     - 10-ci-cd
