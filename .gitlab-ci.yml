@@ -7,11 +7,8 @@ build:
   tags:
     - docker
   script:
-    - echo $DB_PASSWORD
-    - echo $SUDO_PASSWORD
-    - whoami
     - mvn -Pprod clean package
-    - cp target/Network-1.0-SNAPSHOT.jar /tmp/app.jar
+    - cp target/Network-1.0-SNAPSHOT.jar /opt/network/prod/app.jar
   only:
     - 10-ci-cd
 
@@ -20,8 +17,6 @@ production:
   tags:
     - docker
   script:
-    - echo $DB_PASSWORD
-    - echo $SUDO_PASSWORD
     - java -jar /opt/network/prod/app.jar --spring.datasource.password=$DB_PASSWORD
   only:
     - 10-ci-cd
