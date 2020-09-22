@@ -9,6 +9,7 @@ build:
   script:
     - echo $DB_PASSWORD
     - echo $SUDO_PASSWORD
+    - whoami
     - mvn -Pprod clean package
     - cp target/Network-1.0-SNAPSHOT.jar /tmp/app.jar
   only:
