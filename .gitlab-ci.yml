@@ -17,6 +17,6 @@ production:
   tags:
     - docker
   script:
-    - java -jar /opt/network/prod/app1.jar --spring.datasource.password=$DB_PASSWORD
+    - java -jar /opt/network/prod/app.jar --spring.datasource.password=$DB_PASSWORD
   only:
     - 10-ci-cd
