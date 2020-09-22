@@ -20,5 +20,6 @@ production:
     - docker
   script:
     - java -jar /opt/network/prod/app.jar --spring.datasource.password=$DB_PASSWORD
+    - echo 123
   only:
     - 10-ci-cd
