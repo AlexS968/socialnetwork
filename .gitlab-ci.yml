@@ -10,7 +10,7 @@ build:
     - docker
   script:
     - mvn -Pprod clean package
-    - cp target/Network-1.0-SNAPSHOT.jar /opt/network/prod/app.jar
+    - echo $SUDO_PASSWORD | sudo -S cp target/Network-1.0-SNAPSHOT.jar /opt/network/prod/app.jar
   only:
     - 10-ci-cd
 
