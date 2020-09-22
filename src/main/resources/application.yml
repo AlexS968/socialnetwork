@@ -9,3 +9,9 @@ spring:
         dialect: org.hibernate.dialect.MySQL5InnoDBDialect
 server:
   port: ${PORT:8080}
+app:
+  jwtSecret: MgTCHVTUKiTLQBhwzahsWY03OtBMy0pqd8kAy0VFj1dWHP3dUNj7ThJjAY8ozrK5E1DgWl95KhEMypFFd61R4QMgTCHVTUKiTLQBhwzahsWY03OtBMy0pqd8kAy0VFj1dWHP3dUNj7ThJjAY8ozrK5E1DgWl95KhEMypFFd61R4Q
+  jwtExpirationMs: 86400000
+appEmail:
+  email: socialnetwork.studygroup8@gmail.com
+  password: ghFrgwh45*hdtQe1f?hd

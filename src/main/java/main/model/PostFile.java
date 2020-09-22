@@ -12,7 +12,6 @@ public class PostFile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-//    @Column(nullable = false)
     @ManyToOne
     @JoinColumn(name = "post_id")
     private Post post;

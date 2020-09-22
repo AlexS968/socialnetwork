@@ -108,11 +108,11 @@ public class FeedsResponse {
     }
 
     private CountryDto countryToCountryDto(Country country) {
-        return new CountryDto(country.getId(), country.getCountry());
+        return new CountryDto(country.getId(), country.getTitle());
     }
 
     private CityDto cityToCityDto(City city) {
-        return new CityDto(city.getId(), city.getCity());
+        return new CityDto(city.getId(), city.getTitle());
     }
 
     public String getError() {

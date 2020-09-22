@@ -10,5 +10,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface LanguageRepository extends CrudRepository<Language, Integer> {
     Page<Language> findAll(Pageable pageable);
+    Page<Language> findByTitleIgnoreCaseContaining(String title, Pageable pageable);
 }
 

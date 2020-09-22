@@ -1,6 +1,5 @@
 package main.controller;
 
-import main.data.request.UserRequest;
 import main.data.response.ProfileResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,13 +18,6 @@ public class DefaultController {
     @RequestMapping(method = {RequestMethod.OPTIONS, RequestMethod.GET}, value = "/**/{path:[^\\.]*}")
     public String redirectToIndex() {
         return "forward:/";
-    }
-
-    //Заглушка логин
-    @PostMapping("/api/v1/auth/login")
-    public ResponseEntity<ProfileResponse> auth(@RequestBody UserRequest userRequest){
-        ProfileResponse response = new ProfileResponse(userRequest);
-        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     //Заглушка профиль
