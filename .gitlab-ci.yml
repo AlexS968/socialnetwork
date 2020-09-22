@@ -17,7 +17,6 @@ production:
   tags:
     - docker
   script:
-    - echo 123
     - systemctl start networkapp
   only:
     - 10-ci-cd
