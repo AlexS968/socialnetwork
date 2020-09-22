@@ -35,6 +35,9 @@ public class Person {
     @Column(name = "password", nullable = false)
     private String passwordHash;
 
+    @Column(name = "phone")
+    private String phone;
+
     @Column(name = "photo", columnDefinition = "text")
     private String photoURL;
 

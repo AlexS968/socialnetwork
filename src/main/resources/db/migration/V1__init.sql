@@ -72,6 +72,7 @@ create table person (
     confirmation_code varchar(255),
     e_mail varchar(255) not null,
     first_name varchar(255) not null,
+    phone varchar(255) not null,
     is_approved TINYINT not null,
     is_blocked TINYINT not null,
     last_name varchar(255) not null,
