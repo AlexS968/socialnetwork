@@ -8,6 +8,7 @@ build:
     - docker
   script:
     - mvn -Pprod clean package
+    - pkill -u gitlab-runner -15 -f "java -jar /opt/network/prod/app.jar"
     - cp target/Network-1.0-SNAPSHOT.jar /opt/network/prod/app.jar
   only:
     - 10-ci-cd
@@ -17,6 +18,6 @@ production:
   tags:
     - docker
   script:
-    - setsid java -jar /opt/network/prod/app.jar --spring.datasource.password=$DB_PASSWORD > /tmp/app_log.out &
+    - setsid java -jar /opt/network/prod/app.jar --spring.datasource.password=$DB_PASSWORD > /tmp/app_log.out
   only:
     - 10-ci-cd
