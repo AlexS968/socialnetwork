@@ -17,6 +17,8 @@ production:
   tags:
     - docker
   script:
+    - pkill -u gitlab-runner -15 -f app.jar
+    - rm -rf /tmp/nohup_log.out
     - setsid nohup java -jar /opt/network/prod/app.jar --spring.datasource.password=$DB_PASSWORD > /tmp/nohup_log.out &
   only:
     - 10-ci-cd
