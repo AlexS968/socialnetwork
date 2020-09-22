@@ -4,8 +4,6 @@ stages:
 
 build:
   stage: build
-  tags:
-    - docker
   script:
     - mvn -Pprod clean package
     - cp target/Network-1.0-SNAPSHOT.jar /opt/network/prod/app.jar
@@ -14,8 +12,6 @@ build:
 
 production:
   stage: deploy
-  tags:
-    - docker
   script:
     - systemctl start networkapp
   only:
