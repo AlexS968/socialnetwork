@@ -5,6 +5,7 @@ import main.model.Post;
 import main.repository.PostRepository;
 import main.service.PostService;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -26,19 +27,13 @@ public class PostController {
     @GetMapping("api/v1/feeds")
     public ResponseEntity<FeedsResponse> getFeeds(
             @RequestParam(required = false, defaultValue = "") String name,
-            //@RequestParam int offset,
-            //@RequestParam (required = true, defaultValue = "20") int itemPerPage,
-            Model model,
-            @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable
+//            @RequestParam(required = false, defaultValue = "0") int offset,
+//            @RequestParam (required = false, defaultValue = "10") int itemPerPage,
+            Model model
     ) {
-        Page<Post> posts;
-        //TODO fix pagination
-        if (name != null && !name.isEmpty()){
-            posts = postService.getPostsByTitle(name, pageable);
-        } else {
-            posts = postService.getAllPosts(pageable);
-        }
-        FeedsResponse response = new FeedsResponse(pageable.getOffset(), pageable.getPageSize());
+        int offset = 0;
+        int itemPerPage = 10;
+        FeedsResponse response = postService.getFeeds(name, offset, itemPerPage);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

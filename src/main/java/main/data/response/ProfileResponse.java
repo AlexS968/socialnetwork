@@ -3,6 +3,7 @@ package main.data.response;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import main.data.dto.PersonDto;
 import main.data.request.UserRequest;
+import main.model.MessagesPermission;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -28,7 +29,7 @@ public class ProfileResponse {
         personDto.setPhone("815323213");
         personDto.setPhoto("/static/img/user/1.jpg");
         personDto.setAbout("Посадил дерево");
-        personDto.setMessagesPermission("ALL");
+        personDto.setMessagesPermission(MessagesPermission.ALL);
         personDto.setLastOnlineTime(LocalDateTime.now().toEpochSecond(ZoneOffset.UTC));
         personDto.setIsBlocked(false);
 
@@ -47,7 +48,7 @@ public class ProfileResponse {
         personDto.setPhone("815323213");
         personDto.setPhoto("https://..../dfas.jpg");
         personDto.setAbout("Посадил дерево");
-        personDto.setMessagesPermission("ALL");
+        personDto.setMessagesPermission(MessagesPermission.ALL);
         personDto.setLastOnlineTime(LocalDateTime.now().toEpochSecond(ZoneOffset.UTC));
         personDto.setIsBlocked(false);
     }

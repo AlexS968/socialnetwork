@@ -1,7 +1,10 @@
 package main.data.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import main.model.MessagesPermission;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -20,28 +23,29 @@ public class PostDto {
     private List<CommentDto> comments;
 
     public PostDto(){
-        id = 1;
-        time = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
-
-        author = new PersonDto();
-        author.setId(1);
-        author.setFirstName("Петр");
-        author.setLastName("Петрович");
-        author.setRegDate(LocalDateTime.now().toEpochSecond(ZoneOffset.UTC));
-        author.setBirthDate(LocalDateTime.now().toEpochSecond(ZoneOffset.UTC));
-        author.setEmail("dsf@dfsa.ru");
-        author.setPhone("815323213");
-        author.setPhoto("/static/img/user/1.jpg");
-        author.setAbout("Посадил дерево");
-        author.setMessagesPermission("ALL");
-        author.setLastOnlineTime(LocalDateTime.now().toEpochSecond(ZoneOffset.UTC));
-        author.setIsBlocked(false);
-
-        title = "Первый пост";
-        postText = "Текст поста";
-        likes = 20;
-        comments = new ArrayList<>();
-        comments.add(new CommentDto());
+//        id = 1;
+//        time = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
+//        time = Instant.now();
+//
+//        author = new PersonDto();
+//        author.setId(1);
+//        author.setFirstName("Петр");
+//        author.setLastName("Петрович");
+//        author.setRegDate(Instant.now(););
+//        author.setBirthDate(Instant.now(););
+//        author.setEmail("dsf@dfsa.ru");
+//        author.setPhone("815323213");
+//        author.setPhoto("/static/img/user/1.jpg");
+//        author.setAbout("Посадил дерево");
+//        author.setMessagesPermission(MessagesPermission.ALL);
+//        author.setLastOnlineTime(Instant.now(););
+//        author.setIsBlocked(false);
+//
+//        title = "Первый пост";
+//        postText = "Текст поста";
+//        likes = 20;
+//        comments = new ArrayList<>();
+//        comments.add(new CommentDto());
 
     }
 

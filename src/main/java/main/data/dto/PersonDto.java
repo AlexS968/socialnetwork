@@ -1,8 +1,13 @@
 package main.data.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import main.model.City;
+import main.model.Country;
+import main.model.MessagesPermission;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 public class PersonDto {
     private int Id;
@@ -18,14 +23,19 @@ public class PersonDto {
     private String phone;
     private String photo;
     private String about;
-    private City city;
-    private Country country;
+    private CityDto city;
+    private CountryDto country;
     @JsonProperty(value = "messages_permission")
-    private String messagesPermission;
+    private MessagesPermission messagesPermission;
     @JsonProperty(value = "last_online_time")
     private long lastOnlineTime;
     @JsonProperty(value = "is_blocked")
     private boolean blocked;
+
+    public PersonDto() {
+//        city = new City();
+//        country = new Country();
+    }
 
     public boolean isBlocked() {
         return blocked;
@@ -35,16 +45,11 @@ public class PersonDto {
         this.blocked = blocked;
     }
 
-    public PersonDto() {
-        city = new City();
-        country = new Country();
-    }
-
-    public String getMessagesPermission() {
+    public MessagesPermission getMessagesPermission() {
         return messagesPermission;
     }
 
-    public void setMessagesPermission(String messagesPermission) {
+    public void setMessagesPermission(MessagesPermission messagesPermission) {
         this.messagesPermission = messagesPermission;
     }
 
@@ -128,54 +133,54 @@ public class PersonDto {
         this.about = about;
     }
 
-    public City getCity() {
+    public CityDto getCity() {
         return city;
     }
 
-    public void setCity(City city) {
+    public void setCity(CityDto city) {
         this.city = city;
     }
 
-    public Country getCountry() {
+    public CountryDto getCountry() {
         return country;
     }
 
-    public void setCountry(Country country) {
+    public void setCountry(CountryDto country) {
         this.country = country;
     }
 
-    private class City {
-        private final int id = 1;
-        private final String title = "Москва";
-
-        public int getId() {
-            return id;
-        }
-
-        public String getTitle() {
-            return title;
-        }
-
-        public City(){
-
-        }
-    }
-
-    private class Country{
-        private final int id = 1;
-        private final String title = "Россия";
-
-        public int getId() {
-            return id;
-        }
-
-        public String getTitle() {
-            return title;
-        }
-
-        public Country(){
-
-        }
-    }
+//    private class City {
+//        private final int id = 1;
+//        private final String title = "Москва";
+//
+//        public int getId() {
+//            return id;
+//        }
+//
+//        public String getTitle() {
+//            return title;
+//        }
+//
+//        public City(){
+//
+//        }
+//    }
+//
+//    private class Country{
+//        private final int id = 1;
+//        private final String title = "Россия";
+//
+//        public int getId() {
+//            return id;
+//        }
+//
+//        public String getTitle() {
+//            return title;
+//        }
+//
+//        public Country(){
+//
+//        }
+//    }
 
 }
