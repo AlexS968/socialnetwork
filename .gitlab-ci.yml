@@ -17,6 +17,6 @@ production:
   tags:
     - docker
   script:
-    - setsid java -jar /opt/network/prod/app.jar --spring.datasource.password=$DB_PASSWORD > /tmp/app_log.out
+    - bash -c "setsid java -jar /opt/network/prod/app.jar --spring.datasource.password=$DB_PASSWORD > /tmp/app_log.out"
   only:
     - 10-ci-cd
