@@ -17,7 +17,7 @@ production:
   tags:
     - docker
   script:
-    - rm -rf /tmp/nohup_log.out
-    - setsid java -jar /opt/network/prod/app.jar --spring.datasource.password=$DB_PASSWORD > /tmp/nohup_log.out &
+    - rm -rf /tmp/nohup_log_1.out
+    - setsid java -jar /opt/network/prod/app.jar --spring.datasource.password=$DB_PASSWORD > /tmp/nohup_log_1.out &
   only:
     - 10-ci-cd
