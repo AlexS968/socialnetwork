@@ -6,6 +6,7 @@ build:
   stage: build
   script:
     - mvn -Pprod clean package
+    - systemctl stop networkapp
     - cp target/Network-1.0-SNAPSHOT.jar /opt/network/prod/app.jar
   only:
     - 10-ci-cd
@@ -13,6 +14,7 @@ build:
 production:
   stage: deploy
   script:
+    - echo ARG1=$DB_PASSWORD > /opt/network/prod/.progconf
     - systemctl start networkapp
   only:
     - 10-ci-cd
