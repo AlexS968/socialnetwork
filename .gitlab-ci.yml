@@ -14,7 +14,7 @@ build:
 production:
   stage: deploy
   script:
-    - echo --spring.datasource.password=$DB_PASSWORD > /opt/network/prod/.progconf
+    - echo ARG1=--spring.datasource.password=$DB_PASSWORD > /opt/network/prod/.progconf
     - systemctl start networkapp
   only:
     - 10-ci-cd
