@@ -15,3 +15,6 @@ create table city (
 );
 
 alter table city add constraint fk_city_country_id foreign key (country_id) references country (id);
+alter table person drop town;
+alter table person add column city_id integer;
+alter table person add column country_id integer;
