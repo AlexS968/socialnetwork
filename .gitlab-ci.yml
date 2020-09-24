@@ -16,7 +16,7 @@ production:
   script:
     - echo ARG1=--spring.datasource.url=$PROD_DB_URL > /opt/network/prod/.progconf
     - echo ARG2=--app.jwtSecret=$PROD_JWT_SECRET >> /opt/network/prod/.progconf
-    - echo ARG3=--server.port=8080 >> /opt/network/prod/.progconf
+    - echo ARG3=--server.port=$PROD_PORT >> /opt/network/prod/.progconf
     - systemctl start networkapp
   only:
     - master
@@ -28,14 +28,14 @@ build_dev:
     - systemctl stop networkapp_dev
     - cp target/Network-1.0-SNAPSHOT.jar /opt/network/dev/app.jar
   only:
-    - 10-ci-cd
+    - dev
 
 production_dev:
   stage: deploy
   script:
     - echo ARG1=--spring.datasource.url=$DEV_DB_URL > /opt/network/dev/.progconf
     - echo ARG2=--app.jwtSecret=$DEV_JWT_SECRET >> /opt/network/dev/.progconf
-    - echo ARG3=--server.port=9000 >> /opt/network/dev/.progconf
+    - echo ARG3=--server.port=$DEV_PORT >> /opt/network/dev/.progconf
     - systemctl start networkapp_dev
   only:
-    - 10-ci-cd
+    - dev
