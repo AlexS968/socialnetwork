@@ -15,8 +15,8 @@ production:
   stage: deploy
   script:
     - echo ARG1=--spring.datasource.url=$PROD_DB_URL > /opt/network/prod/.progconf
-    - echo ARG2=--app.jwtSecret=$PROD_JWT_SECRET > /opt/network/prod/.progconf
-    - echo ARG3=--server.port=8080 > /opt/network/prod/.progconf
+    - echo ARG2=--app.jwtSecret=$PROD_JWT_SECRET >> /opt/network/prod/.progconf
+    - echo ARG3=--server.port=8080 >> /opt/network/prod/.progconf
     - systemctl start networkapp
   only:
     - 10-ci-cd
