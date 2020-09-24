@@ -20,10 +20,10 @@ public class DefaultController {
         return "forward:/";
     }
 
-    //Заглушка профиль
-    @GetMapping("/api/v1/users/me")
-    public ResponseEntity<ProfileResponse> me() {
-        return new ResponseEntity<>(new ProfileResponse(), HttpStatus.OK);
-    }
+//    //Заглушка профиль
+//    @GetMapping("/api/v1/users/me")
+//    public ResponseEntity<ProfileResponse> me() {
+//        return new ResponseEntity<>(new ProfileResponse(), HttpStatus.OK);
+//    }
 
 }
