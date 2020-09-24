@@ -21,6 +21,7 @@ import java.time.ZoneOffset;
 @AllArgsConstructor
 public class RegistrationService {
     private final PersonRepository personRepository;
+    private final CryptoService cryptoService;
     public RegistrationResponse registrationNewPerson(RegistrationRequest request){
         if (personRepository.findByEmail(request.getEmail()) != null) {
             throw new BadRequestException(new ApiError(
@@ -42,7 +43,7 @@ public class RegistrationService {
         }
         Person person = new Person();
         person.setEmail(request.getEmail());
-        person.setPasswordHash(String.valueOf(request.getPasswd1().hashCode()));
+        person.setPasswordHash(String.valueOf(cryptoService.encode(request.getPasswd1())));
         person.setFirstName(request.getFirstName());
         person.setLastName(request.getLastName());
         person.setRegDate(Instant.now());
