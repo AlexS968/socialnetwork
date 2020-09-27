@@ -49,6 +49,7 @@ public class RegistrationService {
         person.setRegDate(Instant.now());
         person.setMessagesPermission(MessagesPermission.ALL);
         person.setPhone("+71238492");
+        person.setLastOnlineTime(Instant.now());
         personRepository.save(person);
         return new RegistrationResponse(
                 "",

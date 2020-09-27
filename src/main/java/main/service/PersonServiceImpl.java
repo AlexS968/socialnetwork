@@ -29,7 +29,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -55,8 +54,6 @@ public class PersonServiceImpl implements UserDetailsService {
     }
 
     public LoginResponse login(LoginRequest request) {
-
-        System.out.println("---------encoded " + new BCryptPasswordEncoder().encode("12345678"));
 
         Authentication authentication
                 = authenticationManager.authenticate(
