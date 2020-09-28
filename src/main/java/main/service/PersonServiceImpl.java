@@ -89,7 +89,6 @@ public class PersonServiceImpl implements UserDetailsService {
     }
 
     public MeProfileUpdateResponse putMe(MeProfileRequest updatedCurrentPerson) {
-
         Person personUpdated = personRepository.findById(getCurrentPerson().getId());
         personUpdated.setLastName(updatedCurrentPerson.getLastName());
         personUpdated.setFirstName(updatedCurrentPerson.getFirstName());
@@ -100,10 +99,8 @@ public class PersonServiceImpl implements UserDetailsService {
         //personUpdated.setPhotoURL(updatedCurrentPerson.getPhotoURL());
         //personUpdated.setMessagesPermission(updatedCurrentPerson.getMessagesPermission());
 
-        Country countryUpdated = countryRepository
-            .findByCountryTitle(updatedCurrentPerson.getCountry());
-        City cityUpdated = cityRepository
-            .findByCityTitleAndCountryId(updatedCurrentPerson.getCity(), countryUpdated.getId());
+        Country countryUpdated = countryRepository.findById(Integer.parseInt(updatedCurrentPerson.getCountry()));
+        City cityUpdated = cityRepository.findById(Integer.parseInt(updatedCurrentPerson.getCity()));
 
         personUpdated.setCountry(countryUpdated);
         personUpdated.setCity(cityUpdated);

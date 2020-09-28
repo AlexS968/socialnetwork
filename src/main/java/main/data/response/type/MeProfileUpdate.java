@@ -1,9 +1,10 @@
 package main.data.response.type;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 import main.model.MessagesPermission;
 import main.model.Person;
-
+@Data
 public class MeProfileUpdate {
 
   // из request
