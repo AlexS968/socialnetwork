@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CountryRepository extends PagingAndSortingRepository<Country, Integer> {
+    Country findById(int countryId);
     Page<Country> findAll(Pageable pageable);
     Page<Country> findByTitleIgnoreCaseContaining(String title, Pageable pageable);
 
