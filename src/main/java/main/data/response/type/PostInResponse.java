@@ -1,10 +1,12 @@
 package main.data.response.type;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import main.model.Post;
+import main.model.PostType;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -24,6 +26,8 @@ public class PostInResponse {
     private boolean isBlocked;
     private int likes;
     private List<CommentInResponse> comments;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private PostType type;
 
     public PostInResponse(Post post) {
         id = post.getId();

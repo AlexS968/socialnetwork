@@ -22,4 +22,11 @@ public class ProfileController {
         return postService.addNewPost(id, request);
     }
 
+    @GetMapping("{id}/wall")
+    public ResponseEntity<?> showPersonWall(
+        @PathVariable int id
+    ){
+        return postService.showWall(id);
+    }
+
 }

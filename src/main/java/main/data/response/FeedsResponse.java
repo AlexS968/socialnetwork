@@ -28,7 +28,13 @@ public class FeedsResponse extends ListResponse {
         postsList = new ArrayList<>();
 
         for (Post item : posts.getContent()) {
-            postsList.add(new PostInResponse(item));
+            PostInResponse postInResponse = new PostInResponse(item);
+            if (item.getTime().isBefore(Instant.now())) {
+                postInResponse.setType(PostType.POSTED);
+            } else {
+                postInResponse.setType(PostType.QUEUED);
+            }
+            postsList.add(postInResponse);
         }
     }
 }
