@@ -8,5 +8,5 @@ public interface PasswordService {
 
     InfoResponse restorePassword(PasswordRecoveryRequest request);
 
-    InfoResponse setPassword(PasswordSetRequest request);
+    InfoResponse setPassword(PasswordSetRequest request, String referer);
 }
