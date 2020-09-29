@@ -6,7 +6,7 @@ build:
   stage: build
   script:
     - mvn -Pprod clean package
-    - systemctl stop networkapp
+    - sudo systemctl stop networkapp
     - cp target/Network-1.0-SNAPSHOT.jar /opt/network/prod/app.jar
   only:
     - master
@@ -17,7 +17,7 @@ production:
     - echo ARG1=--spring.datasource.url=$PROD_DB_URL > /opt/network/prod/.progconf
     - echo ARG2=--app.jwtSecret=$PROD_JWT_SECRET >> /opt/network/prod/.progconf
     - echo ARG3=--server.port=$PROD_PORT >> /opt/network/prod/.progconf
-    - systemctl start networkapp
+    - sudo systemctl start networkapp
   only:
     - master
 
