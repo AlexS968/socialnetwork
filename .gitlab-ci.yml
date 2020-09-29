@@ -25,6 +25,7 @@ build_dev:
   stage: build
   script:
     - mvn -Pprod clean package
+    - whoami
     - systemctl stop networkapp_dev
     - cp target/Network-1.0-SNAPSHOT.jar /opt/network/dev/app.jar
   only:
