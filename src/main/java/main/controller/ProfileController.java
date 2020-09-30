@@ -16,10 +16,11 @@ public class ProfileController {
     @PostMapping("/{id}/wall")
     public ResponseEntity<?> addPostToWall(
             @PathVariable int id,
-            @RequestBody PostRequest request
+            @RequestBody PostRequest request,
+            @RequestParam(name = "publish_date", required = false) Long pubDate
             ){
 
-        return postService.addNewPost(id, request);
+        return postService.addNewPost(id, request, pubDate);
     }
 
     @GetMapping("{id}/wall")

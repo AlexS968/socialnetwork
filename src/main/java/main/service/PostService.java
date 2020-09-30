@@ -41,7 +41,7 @@ public class PostService {
         return new FeedsResponse(posts);
     }
 
-    public ResponseEntity<?> addNewPost(Integer personId, PostRequest request) {
+    public ResponseEntity<?> addNewPost(Integer personId, PostRequest request, Long pubDate) {
         //TODO добавить проверку авторизации
         //return new ResponseEntity<>(new ApiError("invalid_request", "Неавторизованный пользователь"), HttpStatus.UNAUTHORIZED);
         Optional<Person> personOptional = personRepository.findById(personId);
@@ -54,7 +54,7 @@ public class PostService {
                     new ApiError("invalid_request", "Профиль пользователя не заполнен")
             );
         }
-        Post post = savePost(null, request, person);
+        Post post = savePost(null, request, person, pubDate);
         PostResponse response = new PostResponse();
         try {
             response = postResponseMapper(post);
@@ -82,11 +82,12 @@ public class PostService {
         return result;
     }
 
-    private Post savePost(Post post, PostRequest postData, Person person) {
+    private Post savePost(Post post, PostRequest postData, Person person, Long pubDate) {
         final Post postToSave = (post == null) ? new Post() : post;
+        final Instant postTime = pubDate == null ? Instant.now() : Instant.ofEpochMilli(pubDate);
         postToSave.setTitle(postData.getTitle());
         postToSave.setPostText(postData.getPostText());
-        postToSave.setTime(Instant.now());
+        postToSave.setTime(postTime);
         postToSave.setAuthor(person);
         return repository.save(postToSave);
     }
