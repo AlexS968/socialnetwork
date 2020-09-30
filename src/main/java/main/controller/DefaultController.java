@@ -16,11 +16,4 @@ public class DefaultController {
     public String redirectToIndex() {
         return "forward:/";
     }
-
-//    //Заглушка профиль
-//    @GetMapping("/api/v1/users/me")
-//    public ResponseEntity<ProfileResponse> me() {
-//        return new ResponseEntity<>(new ProfileResponse(), HttpStatus.OK);
-//    }
-
 }
