@@ -16,6 +16,7 @@ import main.repository.PostRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -30,7 +31,7 @@ public class PostService {
     private final PersonRepository personRepository;
 
     public FeedsResponse getFeeds(String name, int offset, int limit) {
-        Pageable pageable = PageRequest.of(offset / limit, limit);
+        Pageable pageable = PageRequest.of(offset / limit, limit, Sort.by("time").descending());
         Page<Post> posts;
         if (name != null && !name.isEmpty()) {
             posts = repository.findByTitle(name, pageable);
@@ -120,11 +121,11 @@ public class PostService {
         int offset = 0;
         int limit = 10;
 
-        Pageable pageable = PageRequest.of(offset / limit, limit);
+        Pageable pageable = PageRequest.of(offset / limit, limit, Sort.by("time").descending());
 
-        Page<Post> posts2 = repository.findByAuthor(person, pageable);
+        Page<Post> posts = repository.findByAuthor(person, pageable);
 
-        FeedsResponse result = new FeedsResponse(posts2);
+        FeedsResponse result = new FeedsResponse(posts);
 
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
