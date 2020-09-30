@@ -7,9 +7,16 @@ import main.data.response.RegistrationResponse;
 import main.data.response.type.DataMessage;
 import main.exception.BadRequestException;
 import main.exception.apierror.ApiError;
+import main.model.City;
+import main.model.Country;
 import main.model.MessagesPermission;
 import main.model.Person;
+import main.repository.CityRepository;
+import main.repository.CountryRepository;
 import main.repository.PersonRepository;
+import org.springframework.data.domain.Pageable;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -22,6 +29,9 @@ import java.time.ZoneOffset;
 public class RegistrationService {
     private final PersonRepository personRepository;
     private final CryptoService cryptoService;
+    private final CountryRepository countryRepository;
+    private final CityRepository cityRepository;
+    private final JavaMailSender emailSender;
     public RegistrationResponse registrationNewPerson(RegistrationRequest request){
         if (personRepository.findByEmail(request.getEmail()) != null) {
             throw new BadRequestException(new ApiError(
@@ -48,8 +58,21 @@ public class RegistrationService {
         person.setLastName(request.getLastName());
         person.setRegDate(Instant.now());
         person.setMessagesPermission(MessagesPermission.ALL);
-        person.setPhone("+71238492");
+        person.setPhone("Не установлен");
+        Pageable pageable = Pageable.unpaged();
+        person.setCity(cityRepository.findByCountryId(1,pageable).getContent().get(0));
+        person.setCountry(countryRepository.findById(1).get());
         personRepository.save(person);
+
+
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(request.getEmail());
+        message.setSubject("Успещная регистрация");
+        message.setText("Вы успешно зарегестрированы в социальной сети");
+        emailSender.send(message);
+
+
         return new RegistrationResponse(
                 "",
                 LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
