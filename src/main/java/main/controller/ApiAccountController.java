@@ -22,7 +22,7 @@ public class ApiAccountController {
     public ResponseEntity<InfoResponse> set(
             @RequestHeader(name = "Referer") String referer,
             @RequestBody PasswordSetRequest request) {
-        return ResponseEntity.ok(passwordService.setPassword(request,referer));
+        return ResponseEntity.ok(passwordService.setPassword(request, referer));
     }
 
     @PutMapping(value = "/password/recovery")

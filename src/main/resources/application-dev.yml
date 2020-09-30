@@ -5,3 +5,5 @@ spring:
     password: 1234567
   jpa:
     show-sql: true
+
+link: "http://localhost:8080/change-password"
