@@ -27,8 +27,8 @@ public class MeProfileRequest {
   // private MessagesPermission messagesPermission;
 
 
-  private String city;
-  private String country;
+  private int city;
+  private int country;
 
 
 }

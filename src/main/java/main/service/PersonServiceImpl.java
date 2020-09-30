@@ -29,6 +29,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -99,8 +100,8 @@ public class PersonServiceImpl implements UserDetailsService {
         //personUpdated.setPhotoURL(updatedCurrentPerson.getPhotoURL());
         //personUpdated.setMessagesPermission(updatedCurrentPerson.getMessagesPermission());
 
-        Country countryUpdated = countryRepository.findById(Integer.parseInt(updatedCurrentPerson.getCountry()));
-        City cityUpdated = cityRepository.findById(Integer.parseInt(updatedCurrentPerson.getCity()));
+        Country countryUpdated = countryRepository.findById(updatedCurrentPerson.getCountry());
+        City cityUpdated = cityRepository.findById(updatedCurrentPerson.getCity());
 
         personUpdated.setCountry(countryUpdated);
         personUpdated.setCity(cityUpdated);

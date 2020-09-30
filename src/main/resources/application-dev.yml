@@ -7,3 +7,6 @@ spring:
     show-sql: true
 
 link: "http://localhost:8080/change-password"
+
+upload:
+  path: "C:/Users/vitta/Desktop/Storage"
