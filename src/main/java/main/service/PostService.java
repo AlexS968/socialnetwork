@@ -87,7 +87,7 @@ public class PostService {
         final Instant postTime = pubDate == null ? Instant.now() : Instant.ofEpochMilli(pubDate);
         postToSave.setTitle(postData.getTitle());
         postToSave.setPostText(postData.getPostText());
-        postToSave.setTime(postTime.plusSeconds(2400L));
+        postToSave.setTime(postTime);
         postToSave.setAuthor(person);
         return repository.save(postToSave);
     }
