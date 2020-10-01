@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Date;
 
 
 @Service
@@ -62,16 +63,17 @@ public class RegistrationService {
         Pageable pageable = Pageable.unpaged();
         person.setCity(cityRepository.findByCountryId(1,pageable).getContent().get(0));
         person.setCountry(countryRepository.findById(1).get());
+        person.setAbout("");
+        Date birthDate = new Date();
+        birthDate.setTime(Instant.now().toEpochMilli());
+        person.setBirthDate(birthDate);
         personRepository.save(person);
-
-
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(request.getEmail());
-        message.setSubject("Успещная регистрация");
+        message.setSubject("Успешная регистрация");
         message.setText("Вы успешно зарегестрированы в социальной сети");
         emailSender.send(message);
-
 
         return new RegistrationResponse(
                 "",
