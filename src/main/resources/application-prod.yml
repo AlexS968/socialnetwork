@@ -5,4 +5,4 @@ spring:
 link: "http://zerone.network:9000/change-password"
 
 upload:
-  path:  "/home/gitlab-runner/photos"
+  path:  "/home/jvmapps/photos"
