@@ -27,7 +27,7 @@ public class Post {
     @Column(name = "post_text", columnDefinition = "text")
     private String postText;
 
-    @Column(name = "is_blocked", nullable = false, columnDefinition = "TINYINT")
+    @Column(name = "is_blocked", nullable = false, columnDefinition = "TINYINT DEFAULT false")
     private boolean isBlocked = false;
 
     @ManyToMany(cascade = CascadeType.ALL)
