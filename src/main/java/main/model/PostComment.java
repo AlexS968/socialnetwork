@@ -16,13 +16,17 @@ public class PostComment {
     @Column(nullable = false)
     private Instant time;
 
-    @Column(nullable = false)
-    private int postId;
+    @ManyToOne
+    @JoinColumn(name = "post_id")
+    private Post post;
 
-    private int parentId;
+    @ManyToOne
+    @JoinColumn(name = "parent_id")
+    private PostComment parent;
 
-    @Column(nullable = false)
-    private int authorId;
+    @ManyToOne
+    @JoinColumn(name = "author_id")
+    private Person author;
 
     @Column(columnDefinition = "text")
     private String commentText;

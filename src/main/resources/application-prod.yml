@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/network_prod?serverTimezone=UTC
+
+link: "http://zerone.network:9000/change-password"
+
+upload:
+  path:  "/home/jvmapps/photos"

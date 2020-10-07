@@ -16,11 +16,13 @@ public class Message {
     @Column(nullable = false)
     private Instant time;
 
-    @Column(nullable = false)
-    private int authorId;
+    @ManyToOne
+    @JoinColumn(name = "author_id")
+    private Person author;
 
-    @Column(nullable = false)
-    private int recipientId;
+    @ManyToOne
+    @JoinColumn(name = "recipient_id")
+    private Person recipient;
 
     @Column(columnDefinition = "text")
     private String messageText;

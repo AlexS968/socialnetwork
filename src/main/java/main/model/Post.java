@@ -16,14 +16,15 @@ public class Post {
     @Column(nullable = false)
     private Instant time;
 
-    @Column(nullable = false)
-    private int authorId;
+    @ManyToOne
+    @JoinColumn(name = "author_id")
+    private Person author;
 
     private String title;
 
-    @Column(columnDefinition = "text")
+    @Column(name = "post_text", columnDefinition = "text")
     private String postText;
 
-    @Column(nullable = false, columnDefinition = "TINYINT")
+    @Column(name = "is_blocked", nullable = false, columnDefinition = "TINYINT DEFAULT false")
     private boolean isBlocked = false;
 }

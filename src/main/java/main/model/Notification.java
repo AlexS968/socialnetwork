@@ -13,15 +13,18 @@ public class Notification {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(nullable = false)
-    private int typeId;
+    @OneToOne
+    @JoinColumn(name = "type_id")
+    private NotificationType type;
 
-    @Column(nullable = false)
+    @Column(name = "sent_time", nullable = false)
     private Instant sentTime;
 
-    @Column(nullable = false)
-    private int personId;
+    @ManyToOne
+    @JoinColumn(name = "person_id")
+    private Person receiver;
 
+    @Column(name = "entity_id")
     private int entityId;
 
     @Column(nullable = false)
