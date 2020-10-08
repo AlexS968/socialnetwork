@@ -62,7 +62,7 @@ public class RegistrationService {
         person.setPhone("Не установлен");
         Pageable pageable = Pageable.unpaged();
         person.setCity(cityRepository.findByCountryId(1,pageable).getContent().get(0));
-        person.setCountry(countryRepository.findById(1).get());
+        person.setCountry(countryRepository.findById(1));
         person.setAbout("");
         Date birthDate = new Date();
         birthDate.setTime(Instant.now().toEpochMilli());
