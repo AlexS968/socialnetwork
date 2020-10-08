@@ -20,9 +20,13 @@ public class BlockHistory {
     @JoinColumn(name = "person_id")
     private Person person;
 
-    private int postId;
+    @OneToOne
+    @JoinColumn(name = "post_id")
+    private Post post;
 
-    private int commentId;
+    @OneToOne
+    @JoinColumn(name = "comment_id")
+    private PostComment comment;
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "enum('BLOCK', 'UNBLOCK')", nullable = false)

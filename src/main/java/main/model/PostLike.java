@@ -3,6 +3,7 @@ package main.model;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.time.Instant;
 
 @Entity
 @Table(name = "post_like")
@@ -21,5 +22,5 @@ public class PostLike {
     private Person person;
 
     @Column(nullable = false)
-    private String path;
+    private Instant time;
 }
