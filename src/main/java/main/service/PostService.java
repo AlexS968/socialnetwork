@@ -5,13 +5,16 @@ import main.data.request.PostRequest;
 import main.data.response.FeedsResponse;
 import main.data.response.PostDeleteResponse;
 import main.data.response.PostResponse;
+import main.data.response.type.CommentInResponse;
 import main.data.response.type.PostDelete;
 import main.data.response.type.PostInResponse;
 import main.exception.BadRequestException;
 import main.exception.apierror.ApiError;
 import main.model.Person;
 import main.model.Post;
+import main.model.PostComment;
 import main.repository.PersonRepository;
+import main.repository.PostCommentRepository;
 import main.repository.PostRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,13 +25,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 public class PostService {
     private final PostRepository repository;
     private final PersonRepository personRepository;
+    private final PostCommentRepository commentRepository;
 
     public FeedsResponse getFeeds(String name, int offset, int limit) {
         Pageable pageable = PageRequest.of(offset / limit, limit, Sort.by("time").descending());
@@ -39,7 +47,12 @@ public class PostService {
             posts = repository.findAll(pageable);
         }
 
-        return new FeedsResponse(posts);
+        Set<Integer> list = posts.getContent().stream().map(Post::getId).collect(Collectors.toSet());
+        List<PostComment> comments = commentRepository.getCommentsByList(list);
+        List<CommentInResponse> commentsList = comments.stream().map(CommentInResponse::new)
+                .collect(Collectors.toList());
+
+        return new FeedsResponse(posts, commentsList);
     }
 
     public ResponseEntity<?> addNewPost(Integer personId, PostRequest request, Long pubDate) {
@@ -78,7 +91,7 @@ public class PostService {
 
         result.setError("ok");
         result.setTimestamp(Instant.now().toEpochMilli());
-        result.setData(new PostInResponse(post));
+        result.setData(new PostInResponse(post, new ArrayList<>()));
 
         return result;
     }
@@ -125,7 +138,12 @@ public class PostService {
 
         Page<Post> posts = repository.findByAuthor(person, pageable);
 
-        FeedsResponse result = new FeedsResponse(posts);
+        Set<Integer> list = posts.getContent().stream().map(Post::getId).collect(Collectors.toSet());
+        List<PostComment> comments = commentRepository.getCommentsByList(list);
+        List<CommentInResponse> commentsList = comments.stream().map(CommentInResponse::new)
+                .collect(Collectors.toList());
+
+        FeedsResponse result = new FeedsResponse(posts, commentsList);
 
         return new ResponseEntity<>(result, HttpStatus.OK);
     }

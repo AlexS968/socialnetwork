@@ -22,19 +22,14 @@ public class PostController {
             @RequestParam(required = false, defaultValue = "0") int offset,
             @RequestParam (required = false, defaultValue = "10") int itemPerPage
     ) {
-        FeedsResponse response = new FeedsResponse();
-        try {
-            response = postService.getFeeds(name, offset, itemPerPage);
-        } catch (BadRequestException ex) {
-            throw new BadRequestException(new ApiError("invalid_request", "Bad request"));
-        }
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.ok(postService.getFeeds(name, offset, itemPerPage));
     }
 
     @DeleteMapping("/post/{id}")
     public ResponseEntity<?> deletePost(@PathVariable Integer id){
         return postService.delPost(id);
     }
+
+
 
 }

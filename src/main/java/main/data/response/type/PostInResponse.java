@@ -6,11 +6,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import main.model.Post;
+import main.model.PostComment;
 import main.model.PostType;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor
@@ -29,7 +31,7 @@ public class PostInResponse {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private PostType type;
 
-    public PostInResponse(Post post) {
+    public PostInResponse(Post post, List<CommentInResponse> commentsList) {
         id = post.getId();
         time = post.getTime();
         author = new MeProfile(post.getAuthor());
@@ -37,6 +39,8 @@ public class PostInResponse {
         postText = post.getPostText();
         isBlocked = post.isBlocked();
         likes = post.getLikes() != null ? post.getLikes().size() : 0;
-        comments = new ArrayList<>();
+        comments = commentsList.stream()
+                .filter(commentInResponse -> commentInResponse.getPostId() == id)
+                .collect(Collectors.toList());
     }
 }
