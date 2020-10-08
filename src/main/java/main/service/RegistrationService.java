@@ -11,7 +11,12 @@ import main.model.City;
 import main.model.Country;
 import main.model.MessagesPermission;
 import main.model.Person;
+import main.repository.CityRepository;
+import main.repository.CountryRepository;
 import main.repository.PersonRepository;
+import org.springframework.data.domain.Pageable;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -25,6 +30,9 @@ import java.util.Date;
 public class RegistrationService {
     private final PersonRepository personRepository;
     private final CryptoService cryptoService;
+    private final CountryRepository countryRepository;
+    private final CityRepository cityRepository;
+    private final JavaMailSender emailSender;
     public RegistrationResponse registrationNewPerson(RegistrationRequest request){
         if (personRepository.findByEmail(request.getEmail()) != null) {
             throw new BadRequestException(new ApiError(
@@ -51,24 +59,22 @@ public class RegistrationService {
         person.setLastName(request.getLastName());
         person.setRegDate(Instant.now());
         person.setMessagesPermission(MessagesPermission.ALL);
-        /*=============ЗАГЛУШКА=============*/
-        person.setPhone("+71238492");
-        person.setLastOnlineTime(Instant.now());
+        person.setPhone("Не установлен");
+        Pageable pageable = Pageable.unpaged();
+        person.setCity(cityRepository.findByCountryId(1,pageable).getContent().get(0));
+        person.setCountry(countryRepository.findById(1));
         person.setAbout("");
         Date birthDate = new Date();
         birthDate.setTime(Instant.now().toEpochMilli());
         person.setBirthDate(birthDate);
-        City city = new City();
-        city.setId(9);
-        city.setTitle("Buenos Aires");
-        city.setCountryId(28);
-        person.setCity(city);
-        Country country = new Country();
-        country.setId(28);
-        country.setTitle("Аргентина");
-        person.setCountry(country);
-        /*=============КОНЕЦ ЗАГЛУШКИ============*/
         personRepository.save(person);
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(request.getEmail());
+        message.setSubject("Успешная регистрация");
+        message.setText("Вы успешно зарегестрированы в социальной сети");
+        emailSender.send(message);
+
         return new RegistrationResponse(
                 "",
                 LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
