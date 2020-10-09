@@ -45,11 +45,11 @@ public class Person {
     private String about;
 
     @ManyToOne
-    @JoinColumn(name = "country_id")
+    @JoinColumn(name = "country_id", referencedColumnName = "id")
     private Country country;
 
     @ManyToOne
-    @JoinColumn(name = "city_id")
+    @JoinColumn(name = "city_id", referencedColumnName = "id")
     private City city;
 
     @Column(name = "confirmation_code")
@@ -62,7 +62,7 @@ public class Person {
     @Column(name = "messages_permission", columnDefinition = "enum('ALL', 'FRIENDS')", nullable = false)
     private MessagesPermission messagesPermission;
 
-    @Column(name = "")
+    @Column(name = "last_online_time")
     private Instant lastOnlineTime;
 
     @Column(name = "is_blocked", nullable = false, columnDefinition = "TINYINT")

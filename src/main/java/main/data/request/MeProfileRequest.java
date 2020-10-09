@@ -19,13 +19,9 @@ public class MeProfileRequest {
   private String phone;
 
   @JsonProperty("photo_id")
-  private String photoURL;  // <-----заменить на айди в персон photoURL в response photo
+  private String photoURL;
 
   private String about;
-
-  // @JsonProperty("messages_permission") // <----- не приходит в реквесте
-  // private MessagesPermission messagesPermission;
-
 
   private int city;
   private int country;

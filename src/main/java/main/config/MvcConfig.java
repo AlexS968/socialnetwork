@@ -12,13 +12,11 @@ public class MvcConfig implements WebMvcConfigurer {
   String uploadPath;
 
   @Override
-  public void addResourceHandlers(ResourceHandlerRegistry registry){
+  public void addResourceHandlers(ResourceHandlerRegistry registry) {
     registry.addResourceHandler("/img/**").
-             addResourceLocations("file:///" + uploadPath + "/");
-         // .addResourceLocations("добавить путь на деплое");
+        addResourceLocations("file:///" + uploadPath + "/");
 
 
-
-}
+  }
 
 }

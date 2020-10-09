@@ -7,8 +7,6 @@ import main.data.response.RegistrationResponse;
 import main.data.response.type.DataMessage;
 import main.exception.BadRequestException;
 import main.exception.apierror.ApiError;
-import main.model.City;
-import main.model.Country;
 import main.model.MessagesPermission;
 import main.model.Person;
 import main.repository.CityRepository;

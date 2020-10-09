@@ -6,13 +6,9 @@ import main.model.MessagesPermission;
 import main.model.Person;
 
 @Data
-public class MeProfile {
+public class PersonInPersonList {
 
   private int id;
-
-  private CityList city;
-
-  private CountryList country;
 
   @JsonProperty("first_name")
   private String firstName;
@@ -31,6 +27,10 @@ public class MeProfile {
   private String photo;
   private String about;
 
+  private CityList city;
+
+  private CountryList country;
+
   @JsonProperty("messages_permission")
   private MessagesPermission messagesPermission;
 
@@ -40,7 +40,7 @@ public class MeProfile {
   @JsonProperty("is_blocked")
   private boolean isBlocked;
 
-  public MeProfile(Person person) {
+  public PersonInPersonList(Person person) {
     this.firstName = person.getFirstName();
     this.lastName = person.getLastName();
     this.email = person.getEmail();
@@ -49,7 +49,7 @@ public class MeProfile {
     this.id = person.getId();
     this.photo = person.getPhotoURL();
     this.lastOnlineTime =
-            person.getLastOnlineTime() != null ? person.getLastOnlineTime().toEpochMilli() : 0;
+        person.getLastOnlineTime() != null ? person.getLastOnlineTime().toEpochMilli() : 0;
     this.regDate = person.getRegDate() != null ? person.getRegDate().toEpochMilli() : 0;
     this.birthDate = person.getBirthDate() != null ? person.getBirthDate().getTime() : 0;
     this.city = new CityList(person.getCity());
@@ -57,7 +57,5 @@ public class MeProfile {
     this.phone = person.getPhone();
     this.isBlocked = person.isBlocked();
   }
+
 }
-
-
-

@@ -4,11 +4,11 @@ import lombok.Data;
 import main.model.Country;
 
 @Data
-public class CountryInCountryList {
+public class CountryList {
     private int id;
     private String title;
 
-    public CountryInCountryList(Country country) {
+    public CountryList(Country country) {
         id = country.getId();
         title = country.getTitle();
     }
