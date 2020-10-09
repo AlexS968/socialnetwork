@@ -35,15 +35,12 @@ import java.time.Instant;
 @Service
 @AllArgsConstructor
 public class PersonServiceImpl implements UserDetailsService {
+
     private final PersonRepository personRepository;
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
-
-    @Autowired
-    private CityRepository cityRepository;
-
-    @Autowired
-    private CountryRepository countryRepository;
+    private final CityRepository cityRepository;
+    private final CountryRepository countryRepository;
 
     @Override
     public UserDetails loadUserByUsername(String email) {
@@ -100,9 +97,6 @@ public class PersonServiceImpl implements UserDetailsService {
         personUpdated.setPhone(updatedCurrentPerson.getPhone());
         personUpdated.setAbout(updatedCurrentPerson.getAbout());
 
-        //personUpdated.setPhotoURL(updatedCurrentPerson.getPhotoURL());
-        //personUpdated.setMessagesPermission(updatedCurrentPerson.getMessagesPermission());
-
         Country countryUpdated = countryRepository.findById(updatedCurrentPerson.getCountry());
         City cityUpdated = cityRepository.findById(updatedCurrentPerson.getCity());
 
@@ -116,6 +110,7 @@ public class PersonServiceImpl implements UserDetailsService {
         response.setData(updatedPerson);
         return response;
     }
+
 
     public InfoResponse deleteMe() {
 
@@ -131,6 +126,6 @@ public class PersonServiceImpl implements UserDetailsService {
 
     private Person getCurrentPerson() {
         return ((PersonPrincipal) SecurityContextHolder.getContext().
-            getAuthentication().getPrincipal()).getPerson();
+                getAuthentication().getPrincipal()).getPerson();
     }
 }
