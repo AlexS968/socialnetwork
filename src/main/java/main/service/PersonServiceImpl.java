@@ -77,12 +77,13 @@ public class PersonServiceImpl implements UserDetailsService {
         return new Response<>(new ResponseMessage("ok"));
     }
 
+
     public MeProfileResponse getMe() {
 
         Person person = getCurrentPerson();
 
-        MeProfileResponse response = new MeProfileResponse(); //+ поля тайм стем эрор
-        MeProfile profile = new MeProfile(person); //+ поля из персон
+        MeProfileResponse response = new MeProfileResponse();
+        MeProfile profile = new MeProfile(person);
 
         response.setData(profile);
         return response;
@@ -110,7 +111,6 @@ public class PersonServiceImpl implements UserDetailsService {
         response.setData(updatedPerson);
         return response;
     }
-
 
     public InfoResponse deleteMe() {
 
