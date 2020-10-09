@@ -30,6 +30,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+
 @Service
 @AllArgsConstructor
 public class PersonServiceImpl implements UserDetailsService {
@@ -65,6 +67,11 @@ public class PersonServiceImpl implements UserDetailsService {
 
         PersonInLogin personInLogin = new PersonInLogin(personPrincipal.getPerson());
         personInLogin.setToken(jwt);
+
+        Person currentPerson = personPrincipal.getPerson();
+        currentPerson.setLastOnlineTime(Instant.now());
+
+        personRepository.save(currentPerson);
 
         return new Response<>(personInLogin);
     }
