@@ -1,6 +1,11 @@
 package main.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.List;
@@ -8,6 +13,7 @@ import java.util.List;
 @Entity
 @Table(name = "tag")
 @Data
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Tag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,9 +22,7 @@ public class Tag {
     @Column(nullable = false)
     private String tag;
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "post2tag",
-            joinColumns = {@JoinColumn(name = "tag_id")},
-            inverseJoinColumns = {@JoinColumn(name = "post_id")})
-    private List<Post> postsByTag;
+    @JsonManagedReference
+    @OneToMany(mappedBy = "tag", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostTag> posts;
 }

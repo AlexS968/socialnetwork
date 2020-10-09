@@ -1,6 +1,8 @@
 package main.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Data;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.Instant;
@@ -71,6 +73,8 @@ public class Person {
     @OneToMany(mappedBy = "person", fetch = FetchType.LAZY)
     private List<BlockHistory> blockHistory;
 
+    @ToString.Exclude
+    @JsonBackReference
     @OneToMany(mappedBy = "author", fetch = FetchType.LAZY)
     private List<Post> posts;
 

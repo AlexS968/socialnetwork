@@ -23,7 +23,7 @@ public class ProfileController {
         return postService.addNewPost(id, request, pubDate);
     }
 
-    @GetMapping("{id}/wall")
+    @GetMapping("/{id}/wall")
     public ResponseEntity<?> showPersonWall(
         @PathVariable int id
     ){
