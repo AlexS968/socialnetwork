@@ -4,13 +4,17 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
-import main.data.response.base.ListResponse;
 import main.data.response.type.PostInResponse;
 import main.model.Post;
 import org.springframework.data.domain.Page;
 
 @Data
-public class ListPostsResponse extends ListResponse {
+public class ListPostsResponse {
+  private String error = "";
+  private long timestamp = Instant.now().toEpochMilli();
+  private long total;
+  private int offset;
+  private int perPage;
 
   private List<PostInResponse> data = new ArrayList<>();
 

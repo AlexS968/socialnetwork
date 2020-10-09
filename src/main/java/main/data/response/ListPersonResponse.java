@@ -5,13 +5,17 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
-import main.data.response.base.ListResponse;
 import main.data.response.type.PersonInPersonList;
 import main.model.Person;
 import org.springframework.data.domain.Page;
 
 @Data
-public class ListPersonResponse extends ListResponse {
+public class ListPersonResponse {
+  private String error = "";
+  private long timestamp = Instant.now().toEpochMilli();
+  private long total;
+  private int offset;
+  private int perPage;
   @JsonProperty(value = "data")
   private List<PersonInPersonList> data = new ArrayList<>();
 

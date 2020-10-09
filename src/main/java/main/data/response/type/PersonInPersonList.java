@@ -2,8 +2,6 @@ package main.data.response.type;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import main.data.response.type.CityInCityList;
-import main.data.response.type.CountryInCountryList;
 import main.model.MessagesPermission;
 import main.model.Person;
 
@@ -29,9 +27,9 @@ public class PersonInPersonList {
   private String photo;
   private String about;
 
-  private CityInCityList city;
+  private CityList city;
 
-  private CountryInCountryList country;
+  private CountryList country;
 
   @JsonProperty("messages_permission")
   private MessagesPermission messagesPermission;
@@ -54,8 +52,8 @@ public class PersonInPersonList {
         person.getLastOnlineTime() != null ? person.getLastOnlineTime().toEpochMilli() : 0;
     this.regDate = person.getRegDate() != null ? person.getRegDate().toEpochMilli() : 0;
     this.birthDate = person.getBirthDate() != null ? person.getBirthDate().getTime() : 0;
-    this.city = new CityInCityList(person.getCity());
-    this.country = new CountryInCountryList(person.getCountry());
+    this.city = new CityList(person.getCity());
+    this.country = new CountryList(person.getCountry());
     this.phone = person.getPhone();
     this.isBlocked = person.isBlocked();
   }
