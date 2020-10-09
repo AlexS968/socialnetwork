@@ -2,7 +2,6 @@ package main.data.response.type;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import main.model.Country;
 import main.model.Dialog;
 
 @Data

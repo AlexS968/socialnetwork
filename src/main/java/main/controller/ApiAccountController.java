@@ -5,7 +5,6 @@ import main.data.request.PasswordRecoveryRequest;
 import main.data.request.PasswordSetRequest;
 import main.data.request.RegistrationRequest;
 import main.data.response.InfoResponse;
-import main.data.response.PasswordRecoveryResponse;
 import main.data.response.RegistrationResponse;
 import main.service.PasswordServiceImpl;
 import main.service.RegistrationService;

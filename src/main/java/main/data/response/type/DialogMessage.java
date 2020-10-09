@@ -5,8 +5,6 @@ import lombok.Data;
 import main.model.Message;
 import main.model.ReadStatus;
 
-import java.time.Instant;
-
 @Data
 public class DialogMessage {
     private int id;

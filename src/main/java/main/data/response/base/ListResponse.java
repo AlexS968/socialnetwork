@@ -2,7 +2,6 @@ package main.data.response.base;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import main.data.response.type.DialogList;
 
 import java.time.Instant;
 import java.util.List;

@@ -2,8 +2,6 @@ package main.controller;
 
 import lombok.AllArgsConstructor;
 import main.data.request.LoginRequest;
-import main.data.response.LoginResponse;
-import main.data.response.LogoutResponse;
 import main.data.response.base.Response;
 import main.data.response.type.ResponseMessage;
 import main.data.response.type.PersonInLogin;

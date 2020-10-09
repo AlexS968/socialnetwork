@@ -9,8 +9,6 @@ import main.data.response.type.DialogList;
 import main.data.response.type.DialogMessage;
 import main.data.response.type.DialogNew;
 
-import java.util.List;
-
 public interface DialogService {
     ListResponse<DialogList> list(ListRequest request);
     Response<DialogNew> add(DialogAddRequest request);
