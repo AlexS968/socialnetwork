@@ -20,7 +20,6 @@ import main.model.Person;
 import main.repository.CityRepository;
 import main.repository.CountryRepository;
 import main.repository.PersonRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -57,10 +56,13 @@ public class PersonServiceImpl implements UserDetailsService {
                         new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
                 );
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtils.generateJwtToken(authentication);
+    Authentication authentication
+        = authenticationManager.authenticate(
+        new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+    );
 
-        PersonPrincipal personPrincipal = (PersonPrincipal) authentication.getPrincipal();
+    SecurityContextHolder.getContext().setAuthentication(authentication);
+    String jwt = jwtUtils.generateJwtToken(authentication);
 
         PersonInLogin personInLogin = new PersonInLogin(personPrincipal.getPerson());
         personInLogin.setToken(jwt);
@@ -80,52 +82,54 @@ public class PersonServiceImpl implements UserDetailsService {
 
     public MeProfileResponse getMe() {
 
-        Person person = getCurrentPerson();
+  public MeProfileResponse getMe() {
 
-        MeProfileResponse response = new MeProfileResponse();
-        MeProfile profile = new MeProfile(person);
+    Person person = getCurrentPerson();
 
-        response.setData(profile);
-        return response;
+    MeProfileResponse response = new MeProfileResponse();
+    MeProfile profile = new MeProfile(person);
 
-    }
+    response.setData(profile);
+    return response;
 
-    public MeProfileUpdateResponse putMe(MeProfileRequest updatedCurrentPerson) {
-        Person personUpdated = personRepository.findById(getCurrentPerson().getId());
-        personUpdated.setLastName(updatedCurrentPerson.getLastName());
-        personUpdated.setFirstName(updatedCurrentPerson.getFirstName());
-        personUpdated.setBirthDate(updatedCurrentPerson.getBirthDate());
-        personUpdated.setPhone(updatedCurrentPerson.getPhone());
-        personUpdated.setAbout(updatedCurrentPerson.getAbout());
+  }
 
-        Country countryUpdated = countryRepository.findById(updatedCurrentPerson.getCountry());
-        City cityUpdated = cityRepository.findById(updatedCurrentPerson.getCity());
+  public MeProfileUpdateResponse putMe(MeProfileRequest updatedCurrentPerson) {
+    Person personUpdated = personRepository.findById(getCurrentPerson().getId());
+    personUpdated.setLastName(updatedCurrentPerson.getLastName());
+    personUpdated.setFirstName(updatedCurrentPerson.getFirstName());
+    personUpdated.setBirthDate(updatedCurrentPerson.getBirthDate());
+    personUpdated.setPhone(updatedCurrentPerson.getPhone());
+    personUpdated.setAbout(updatedCurrentPerson.getAbout());
 
-        personUpdated.setCountry(countryUpdated);
-        personUpdated.setCity(cityUpdated);
+    Country countryUpdated = countryRepository.findById(updatedCurrentPerson.getCountry());
+    City cityUpdated = cityRepository.findById(updatedCurrentPerson.getCity());
 
-        personRepository.save(personUpdated);
+    personUpdated.setCountry(countryUpdated);
+    personUpdated.setCity(cityUpdated);
 
-        MeProfileUpdate updatedPerson = new MeProfileUpdate(personUpdated);
-        MeProfileUpdateResponse response = new MeProfileUpdateResponse();
-        response.setData(updatedPerson);
-        return response;
-    }
+    personRepository.save(personUpdated);
 
-    public InfoResponse deleteMe() {
+    MeProfileUpdate updatedPerson = new MeProfileUpdate(personUpdated);
+    MeProfileUpdateResponse response = new MeProfileUpdateResponse();
+    response.setData(updatedPerson);
+    return response;
+  }
 
-        int id = getCurrentPerson().getId();
-        personRepository.deleteById(id);
+  public InfoResponse deleteMe() {
 
-        InfoInResponse info = new InfoInResponse("ok");
-        InfoResponse response = new InfoResponse();
-        response.setData(info);
-        return response;
+    int id = getCurrentPerson().getId();
+    personRepository.deleteById(id);
 
-    }
+    InfoInResponse info = new InfoInResponse("ok");
+    InfoResponse response = new InfoResponse();
+    response.setData(info);
+    return response;
 
-    private Person getCurrentPerson() {
-        return ((PersonPrincipal) SecurityContextHolder.getContext().
-                getAuthentication().getPrincipal()).getPerson();
-    }
+  }
+
+  private Person getCurrentPerson() {
+    return ((PersonPrincipal) SecurityContextHolder.getContext().
+        getAuthentication().getPrincipal()).getPerson();
+  }
 }

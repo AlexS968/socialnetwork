@@ -8,34 +8,34 @@ import main.model.Person;
 @Data
 public class MeProfile {
 
-    private int id;
+  private int id;
 
     private CityList city;
 
     private CountryList country;
 
-    @JsonProperty("first_name")
-    private String firstName;
+  @JsonProperty("first_name")
+  private String firstName;
 
-    @JsonProperty("last_name")
-    private String lastName;
+  @JsonProperty("last_name")
+  private String lastName;
 
-    @JsonProperty("reg_date")
-    private long regDate;
+  @JsonProperty("reg_date")
+  private long regDate;
 
-    @JsonProperty("birth_date")
-    private long birthDate;
+  @JsonProperty("birth_date")
+  private long birthDate;
 
-    private String email;
-    private String phone;
-    private String photo;
-    private String about;
+  private String email;
+  private String phone;
+  private String photo;
+  private String about;
 
-    @JsonProperty("messages_permission")
-    private MessagesPermission messagesPermission;
+  @JsonProperty("messages_permission")
+  private MessagesPermission messagesPermission;
 
-    @JsonProperty("last_online_time")
-    private long lastOnlineTime;
+  @JsonProperty("last_online_time")
+  private long lastOnlineTime;
 
   @JsonProperty("is_blocked")
   private boolean isBlocked;
@@ -57,6 +57,7 @@ public class MeProfile {
       this.isBlocked = person.isBlocked();
     }
   }
+}
 
 
 

@@ -1,5 +1,6 @@
 package main.repository;
 
+import java.util.Optional;
 import main.model.Country;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -9,10 +10,12 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CountryRepository extends PagingAndSortingRepository<Country, Integer> {
-    Country findById(int countryId);
-    Page<Country> findAll(Pageable pageable);
-    Page<Country> findByTitleIgnoreCaseContaining(String title, Pageable pageable);
 
-    @Query(nativeQuery = true, value = "select * from country where country.title = :countryTitle")
-    Country findByCountryTitle(String countryTitle);
+  Country findById(int countryId);
+
+  Page<Country> findAll(Pageable pageable);
+
+  Page<Country> findByTitleIgnoreCaseContaining(String title, Pageable pageable);
+
+  Optional<Country> findByTitle(String title);
 }
