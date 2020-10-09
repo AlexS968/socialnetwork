@@ -19,7 +19,7 @@ public class Dialog {
     private Person primaryRecipient;
 
     @Column(name = "primary_recipient_id", insertable = false, updatable = false)
-    private int primaryRecipientId;
+    private Integer primaryRecipientId;
 
     @ToString.Exclude
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)

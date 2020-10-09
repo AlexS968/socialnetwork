@@ -8,9 +8,7 @@ import main.data.request.DialogMessageRequest;
 import main.data.request.ListRequest;
 import main.data.response.base.ListResponse;
 import main.data.response.base.Response;
-import main.data.response.type.DialogList;
-import main.data.response.type.DialogMessage;
-import main.data.response.type.DialogNew;
+import main.data.response.type.*;
 import main.model.Dialog;
 import main.model.Message;
 import main.model.Person;
@@ -53,10 +51,32 @@ public class DialogServiceImpl implements DialogService {
 
         page.forEach(i -> {
             DialogList item = new DialogList(i);
+
+            item.setUnreadCount(messageRepository.countByReadStatusAndAuthor_idNotAndDialog_id(
+                    ReadStatus.SENT,
+                    currentUser.getPerson().getId(),
+                    item.getId()
+            ));
+
+            Message lastMessage = messageRepository.findTopByDialog_idOrderByTimeDesc(item.getId());
+            if (lastMessage != null) {
+                DialogMessage dialogMessage = new DialogMessage(
+                        lastMessage,
+                        lastMessage.getAuthor().getId() == currentUser.getPerson().getId()
+                );
+
+                item.setLastMessage(dialogMessage);
+            }
+
             dialogs.add(item);
         });
 
-        return new ListResponse<>(dialogs);
+        return new ListResponse<>(
+                dialogs,
+                page.getTotalElements(),
+                request.getOffset(),
+                request.getItemPerPage()
+        );
     }
 
     @Override
@@ -126,6 +146,33 @@ public class DialogServiceImpl implements DialogService {
             messages.add(item);
         });
 
-        return new ListResponse<>(messages);
+        return new ListResponse<>(
+                messages,
+                page.getTotalElements(),
+                request.getOffset(),
+                request.getItemPerPage()
+        );
+    }
+
+    @Override
+    public Response<ResponseCount> countUnreadedMessage() {
+        PersonPrincipal currentUser = (PersonPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        long count = messageRepository.countByReadStatusAndAuthor_idNotAndDialog_persons_id(
+                ReadStatus.SENT,
+                currentUser.getPerson().getId(),
+                currentUser.getPerson().getId()
+        );
+
+        return new Response<>(new ResponseCount(count));
+    }
+
+    @Override
+    public Response<ResponseMessage> setReadMessage(int messageId) {
+        Message message = messageRepository.findById(messageId);
+        message.setReadStatus(ReadStatus.READ);
+        messageRepository.save(message);
+
+        return new Response<>(new ResponseMessage("ok"));
     }
 }

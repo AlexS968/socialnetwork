@@ -8,7 +8,9 @@ import main.model.Dialog;
 public class DialogList {
     private int id;
     @JsonProperty("unread_count")
-    private int unreadCount;
+    private long unreadCount;
+    @JsonProperty("last_message")
+    private DialogMessage lastMessage;
 
     public DialogList(Dialog dialog) {
         id = dialog.getId();

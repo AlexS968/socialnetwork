@@ -6,9 +6,7 @@ import main.data.request.DialogMessageRequest;
 import main.data.request.ListRequest;
 import main.data.response.base.ListResponse;
 import main.data.response.base.Response;
-import main.data.response.type.DialogList;
-import main.data.response.type.DialogMessage;
-import main.data.response.type.DialogNew;
+import main.data.response.type.*;
 import main.service.DialogServiceImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -40,8 +38,22 @@ public class ApiDialogController {
     @GetMapping("/{dialogId}/messages")
     public ResponseEntity<ListResponse<DialogMessage>> listMessage(
             @PathVariable int dialogId,
-            @RequestBody ListRequest request
+            ListRequest request
     ) {
+        System.out.println(dialogId);
         return ResponseEntity.ok(dialogService.listMessage(dialogId, request));
+    }
+
+    @GetMapping("/unreaded")
+    public ResponseEntity<Response<ResponseCount>> countUnreaded() {
+        return ResponseEntity.ok(dialogService.countUnreadedMessage());
+    }
+
+    @PutMapping("/{dialogId}/messages/{messageId}/read")
+    public ResponseEntity<Response<ResponseMessage>> setReadMessage(
+            @PathVariable int dialogId,
+            @PathVariable int messageId
+    ) {
+        return ResponseEntity.ok(dialogService.setReadMessage(messageId));
     }
 }
