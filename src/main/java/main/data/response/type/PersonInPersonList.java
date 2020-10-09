@@ -2,17 +2,15 @@ package main.data.response.type;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import main.data.response.type.CityInCityList;
+import main.data.response.type.CountryInCountryList;
 import main.model.MessagesPermission;
 import main.model.Person;
 
 @Data
-public class MeProfile {
+public class PersonInPersonList {
 
   private int id;
-
-  private CityInCityList city;
-
-  private CountryInCountryList country;
 
   @JsonProperty("first_name")
   private String firstName;
@@ -31,6 +29,10 @@ public class MeProfile {
   private String photo;
   private String about;
 
+  private CityInCityList city;
+
+  private CountryInCountryList country;
+
   @JsonProperty("messages_permission")
   private MessagesPermission messagesPermission;
 
@@ -40,7 +42,7 @@ public class MeProfile {
   @JsonProperty("is_blocked")
   private boolean isBlocked;
 
-  public MeProfile(Person person) {
+  public PersonInPersonList(Person person) {
     this.firstName = person.getFirstName();
     this.lastName = person.getLastName();
     this.email = person.getEmail();
@@ -57,7 +59,5 @@ public class MeProfile {
     this.phone = person.getPhone();
     this.isBlocked = person.isBlocked();
   }
+
 }
-
-
-
