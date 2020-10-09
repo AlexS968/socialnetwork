@@ -7,9 +7,7 @@ import main.model.Person;
 @Data
 public class MeProfileUpdate {
 
-  // из request
-
-  @JsonProperty("first_name")
+ @JsonProperty("first_name")
   private String firstName;
 
   @JsonProperty("last_name")
@@ -30,8 +28,6 @@ public class MeProfileUpdate {
   private CityInCityList city;
 
   private CountryInCountryList country;
-
-  //--- из Person остается
 
   private int id;
 
