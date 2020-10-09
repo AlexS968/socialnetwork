@@ -3,8 +3,8 @@ package main.service;
 import lombok.AllArgsConstructor;
 import main.core.OffsetPageRequest;
 import main.data.request.ListCityRequest;
-import main.data.response.ListCityResponse;
-import main.data.response.type.CityInCityList;
+import main.data.response.base.ListResponse;
+import main.data.response.type.CityList;
 import main.model.City;
 import main.repository.CityRepository;
 import org.springframework.data.domain.Page;
@@ -21,8 +21,8 @@ public class CityServiceImpl implements CityService {
     private final CityRepository cityRepository;
 
     @Override
-    public ListCityResponse list(ListCityRequest request) {
-        List<CityInCityList> cities = new ArrayList<>();
+    public ListResponse<CityList> list(ListCityRequest request) {
+        List<CityList> cities = new ArrayList<>();
 
         Pageable pageable;
         Page<City> page;
@@ -44,15 +44,15 @@ public class CityServiceImpl implements CityService {
         }
 
         page.forEach(i -> {
-            CityInCityList item = new CityInCityList(i);
+            CityList item = new CityList(i);
             cities.add(item);
         });
 
-        ListCityResponse listCityResponse = new ListCityResponse(cities);
-        listCityResponse.setTotal(page.getTotalElements());
-        listCityResponse.setOffset(request.getOffset());
-        listCityResponse.setPerPage(request.getItemPerPage());
-
-        return listCityResponse;
+        return new ListResponse<>(
+                cities,
+                page.getTotalElements(),
+                request.getOffset(),
+                request.getItemPerPage()
+        );
     }
 }

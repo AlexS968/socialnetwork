@@ -3,8 +3,8 @@ package main.service;
 import lombok.AllArgsConstructor;
 import main.core.OffsetPageRequest;
 import main.data.request.ListLanguageRequest;
-import main.data.response.ListLanguageResponse;
-import main.data.response.type.LanguageInLanguageList;
+import main.data.response.base.ListResponse;
+import main.data.response.type.LanguageList;
 import main.model.Language;
 import main.repository.LanguageRepository;
 import org.springframework.data.domain.Page;
@@ -21,8 +21,8 @@ public class LanguageServiceImpl implements LanguageService {
     private final LanguageRepository languageRepository;
 
     @Override
-    public ListLanguageResponse list(ListLanguageRequest request) {
-        List<LanguageInLanguageList> languages = new ArrayList<>();
+    public ListResponse<LanguageList> list(ListLanguageRequest request) {
+        List<LanguageList> languages = new ArrayList<>();
 
         Pageable pageable;
         Page<Language> page;
@@ -40,15 +40,15 @@ public class LanguageServiceImpl implements LanguageService {
         }
 
         page.forEach(i -> {
-            LanguageInLanguageList item = new LanguageInLanguageList(i);
+            LanguageList item = new LanguageList(i);
             languages.add(item);
         });
 
-        ListLanguageResponse listLanguageResponse = new ListLanguageResponse(languages);
-        listLanguageResponse.setTotal(page.getTotalElements());
-        listLanguageResponse.setOffset(request.getOffset());
-        listLanguageResponse.setPerPage(request.getItemPerPage());
-
-        return listLanguageResponse;
+        return new ListResponse<>(
+                languages,
+                page.getTotalElements(),
+                request.getOffset(),
+                request.getItemPerPage()
+        );
     }
 }

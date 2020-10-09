@@ -1,8 +1,9 @@
 package main.service;
 
 import main.data.request.ListCountryRequest;
-import main.data.response.ListCountryResponse;
+import main.data.response.base.ListResponse;
+import main.data.response.type.CountryList;
 
 public interface CountryService {
-    ListCountryResponse list(ListCountryRequest request);
+    ListResponse<CountryList> list(ListCountryRequest request);
 }
