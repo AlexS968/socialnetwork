@@ -6,14 +6,13 @@ import main.data.PersonPrincipal;
 import main.data.request.LoginRequest;
 import main.data.request.MeProfileRequest;
 import main.data.response.InfoResponse;
-import main.data.response.LoginResponse;
-import main.data.response.LogoutResponse;
 import main.data.response.MeProfileResponse;
 import main.data.response.MeProfileUpdateResponse;
+import main.data.response.base.Response;
 import main.data.response.type.InfoInResponse;
 import main.data.response.type.MeProfile;
 import main.data.response.type.MeProfileUpdate;
-import main.data.response.type.MessageInLogout;
+import main.data.response.type.ResponseMessage;
 import main.data.response.type.PersonInLogin;
 import main.model.City;
 import main.model.Country;
@@ -29,7 +28,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -54,8 +52,7 @@ public class PersonServiceImpl implements UserDetailsService {
         return new PersonPrincipal(user);
     }
 
-    public LoginResponse login(LoginRequest request) {
-
+    public Response<PersonInLogin> login(LoginRequest request) {
         Authentication authentication
                 = authenticationManager.authenticate(
                         new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
@@ -66,15 +63,14 @@ public class PersonServiceImpl implements UserDetailsService {
 
         PersonPrincipal personPrincipal = (PersonPrincipal) authentication.getPrincipal();
 
-        LoginResponse loginResponse = new LoginResponse();
-        loginResponse.setData(new PersonInLogin(personPrincipal.getPerson()));
-        loginResponse.getData().setToken(jwt);
+        PersonInLogin personInLogin = new PersonInLogin(personPrincipal.getPerson());
+        personInLogin.setToken(jwt);
 
-        return loginResponse;
+        return new Response<>(personInLogin);
     }
 
-    public LogoutResponse logout() {
-        return new LogoutResponse(new MessageInLogout("ok"));
+    public Response<ResponseMessage> logout() {
+        return new Response<>(new ResponseMessage("ok"));
     }
 
     public MeProfileResponse getMe() {

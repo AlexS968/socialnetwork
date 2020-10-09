@@ -6,12 +6,12 @@ import main.model.Country;
 import main.model.Dialog;
 
 @Data
-public class DialogInDialogList {
+public class DialogList {
     private int id;
     @JsonProperty("unread_count")
     private int unreadCount;
 
-    public DialogInDialogList(Dialog dialog) {
+    public DialogList(Dialog dialog) {
         id = dialog.getId();
     }
 }

@@ -4,11 +4,11 @@ import lombok.Data;
 import main.model.City;
 
 @Data
-public class CityInCityList {
+public class CityList {
     private int id;
     private String title;
 
-    public CityInCityList(City city) {
+    public CityList(City city) {
         id = city.getId();
         title = city.getTitle();
     }

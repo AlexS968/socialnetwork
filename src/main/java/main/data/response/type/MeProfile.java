@@ -10,9 +10,9 @@ public class MeProfile {
 
     private int id;
 
-    private CityInCityList city;
+    private CityList city;
 
-    private CountryInCountryList country;
+    private CountryList country;
 
     @JsonProperty("first_name")
     private String firstName;
@@ -51,8 +51,8 @@ public class MeProfile {
       this.lastOnlineTime = person.getLastOnlineTime() != null ? person.getLastOnlineTime().toEpochMilli() : 0;
       this.regDate = person.getRegDate() != null ? person.getRegDate().toEpochMilli() : 0;
       this.birthDate = person.getBirthDate() != null ? person.getBirthDate().getTime() : 0;
-      this.city = new CityInCityList(person.getCity());
-      this.country = new CountryInCountryList(person.getCountry());
+      this.city = new CityList(person.getCity());
+      this.country = new CountryList(person.getCountry());
       this.phone = person.getPhone();
       this.isBlocked = person.isBlocked();
     }

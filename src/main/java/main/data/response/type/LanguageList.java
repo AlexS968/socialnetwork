@@ -4,11 +4,11 @@ import lombok.Data;
 import main.model.Language;
 
 @Data
-public class LanguageInLanguageList {
+public class LanguageList {
     private int id;
     private String title;
 
-    public LanguageInLanguageList(Language language) {
+    public LanguageList(Language language) {
         id = language.getId();
         title = language.getTitle();
     }
