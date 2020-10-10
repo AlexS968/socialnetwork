@@ -1,6 +1,9 @@
 package main.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.Instant;
@@ -11,6 +14,7 @@ import java.util.Set;
 @Entity
 @Table(name = "person")
 @Data
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Person {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -71,15 +75,19 @@ public class Person {
     @OneToMany(mappedBy = "person", fetch = FetchType.LAZY)
     private List<BlockHistory> blockHistory;
 
+    @JsonBackReference
     @OneToMany(mappedBy = "author", fetch = FetchType.LAZY)
     private List<Post> posts;
 
+    @JsonBackReference
     @OneToMany(mappedBy = "receiver", fetch = FetchType.LAZY)
     private List<Notification> notifications;
 
+    @JsonBackReference
     @OneToMany(mappedBy = "dst", fetch = FetchType.LAZY)
     private Set<Friendship> requestFr;
 
+    @JsonBackReference
     @OneToMany(mappedBy = "src", fetch = FetchType.LAZY)
     private Set<Friendship> sendFr;
 }

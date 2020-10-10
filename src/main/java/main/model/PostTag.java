@@ -1,20 +1,33 @@
 package main.model;
 
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import lombok.*;
 
 import javax.persistence.*;
+import java.io.Serializable;
+import java.util.Objects;
 
 @Entity
 @Table(name = "post2tag")
 @Data
+@NoArgsConstructor
 public class PostTag {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    @EmbeddedId
+    private PostTagId id = new PostTagId();
 
-    @Column(name = "post_id", nullable = false)
-    private int postId;
+    @JsonManagedReference
+    @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("postId")
+    private Post post;
 
-    @Column(name = "tag_id", nullable = false)
-    private int tagId;
+    @JsonManagedReference
+    @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("tagId")
+    private Tag tag;
+
+    public PostTag(Post post, Tag tag) {
+        this.post = post;
+        this.tag = tag;
+    }
 }

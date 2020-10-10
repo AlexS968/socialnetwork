@@ -7,9 +7,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import main.model.Post;
 import main.model.PostType;
+import main.model.Tag;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Data
@@ -28,6 +30,7 @@ public class PostInResponse {
     private List<CommentInResponse> comments;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private PostType type;
+    private List<SingleTag> tags;
 
     public PostInResponse(Post post) {
         id = post.getId();
@@ -38,5 +41,12 @@ public class PostInResponse {
         isBlocked = post.isBlocked();
         likes = post.getLikes() != null ? post.getLikes().size() : 0;
         comments = new ArrayList<>();
+        tags = getTags(post);
+    }
+
+    private List<SingleTag> getTags(Post post) {
+        List<SingleTag> tags = new ArrayList<>();
+        post.getTags().forEach(t -> tags.add(new SingleTag(t.getTag().getId(), t.getTag().getTag())));
+        return tags;
     }
 }
