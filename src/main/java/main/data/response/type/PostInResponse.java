@@ -30,7 +30,7 @@ public class PostInResponse {
     private List<CommentInResponse> comments;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private PostType type;
-    private List<Tag> tags;
+    private List<SingleTag> tags;
 
     public PostInResponse(Post post) {
         id = post.getId();
@@ -44,9 +44,9 @@ public class PostInResponse {
         tags = getTags(post);
     }
 
-    private List<Tag> getTags(Post post) {
-        List<Tag> tags = new ArrayList<>();
-        post.getTags().forEach(t -> tags.add(t.getTag()));
+    private List<SingleTag> getTags(Post post) {
+        List<SingleTag> tags = new ArrayList<>();
+        post.getTags().forEach(t -> tags.add(new SingleTag(t.getTag().getId(), t.getTag().getTag())));
         return tags;
     }
 }

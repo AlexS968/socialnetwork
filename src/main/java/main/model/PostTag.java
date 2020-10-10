@@ -1,6 +1,7 @@
 package main.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import javax.persistence.*;
@@ -15,12 +16,12 @@ public class PostTag {
     @EmbeddedId
     private PostTagId id = new PostTagId();
 
-    @JsonBackReference
+    @JsonManagedReference
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("postId")
     private Post post;
 
-    @JsonBackReference
+    @JsonManagedReference
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("tagId")
     private Tag tag;

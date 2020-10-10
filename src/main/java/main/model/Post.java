@@ -36,15 +36,15 @@ public class Post {
     @Column(name = "is_blocked", nullable = false, columnDefinition = "TINYINT DEFAULT false")
     private boolean isBlocked = false;
 
-    @JsonManagedReference
+    @JsonBackReference
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostTag> tags;
 
-    @JsonManagedReference
+    @JsonBackReference
     @OneToMany(mappedBy = "post")
     private List<PostLike> likes;
 
-    @JsonManagedReference
+    @JsonBackReference
     @OneToMany(mappedBy = "post")
     private List<PostFile> files;
 }

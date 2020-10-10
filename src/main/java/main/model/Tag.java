@@ -1,5 +1,7 @@
 package main.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
@@ -22,7 +24,7 @@ public class Tag {
     @Column(nullable = false)
     private String tag;
 
-    @JsonManagedReference
+    @JsonBackReference
     @OneToMany(mappedBy = "tag", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostTag> posts;
 }
