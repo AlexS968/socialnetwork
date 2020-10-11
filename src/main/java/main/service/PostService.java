@@ -13,9 +13,13 @@ import main.exception.apierror.ApiError;
 import main.model.Person;
 import main.model.Post;
 import main.model.PostComment;
+import main.model.PostTag;
+import main.model.Tag;
 import main.repository.PersonRepository;
 import main.repository.PostCommentRepository;
 import main.repository.PostRepository;
+import main.repository.PostTagRepository;
+import main.repository.TagRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -35,6 +39,8 @@ public class PostService {
     private final PostRepository repository;
     private final PersonRepository personRepository;
     private final PostCommentRepository commentRepository;
+    private final TagRepository tagRepository;
+    private final PostTagRepository postTagRepository;
 
     public FeedsResponse getFeeds(String name, int offset, int limit) {
         Pageable pageable = PageRequest.of(offset / limit, limit, Sort.by("time").descending());
@@ -78,20 +84,30 @@ public class PostService {
     }
 
     private boolean checkPerson(Person person) {
-        if (person.getCity() == null && person.getCountry() == null && person.getAbout() == null) {
-            return false;
-        }
-        return true;
+        return person.getCity() != null || person.getCountry() != null || person.getAbout() != null;
     }
 
     private Post savePost(Post post, PostRequest postData, Person person, Long pubDate) {
-        final Post postToSave = (post == null) ? new Post() : post;
+        Post postToSave = (post == null) ? new Post() : post;
         final Instant postTime = pubDate == null ? Instant.now() : Instant.ofEpochMilli(pubDate);
+        final List<PostTag> postTags = new ArrayList<>();
+        final List<Tag> tags = new ArrayList<>();
+        for (String s : postData.getTags()) {
+            Tag tag = new Tag();
+            tag.setTag(s);
+
+            PostTag postTag = new PostTag(postToSave, tag);
+            postTags.add(postTag);
+        }
         postToSave.setTitle(postData.getTitle());
         postToSave.setPostText(postData.getPostText());
+        postToSave.setTags(postTags);
         postToSave.setTime(postTime);
         postToSave.setAuthor(person);
-        return repository.save(postToSave);
+        tagRepository.saveAll(tags);
+        postToSave = repository.save(postToSave);
+        postTagRepository.saveAll(postTags);
+        return postToSave;
     }
 
     public ItemDeleteResponse delPost(Integer id) {

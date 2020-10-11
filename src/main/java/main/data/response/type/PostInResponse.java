@@ -8,9 +8,11 @@ import lombok.NoArgsConstructor;
 import main.model.Post;
 import main.model.PostComment;
 import main.model.PostType;
+import main.model.Tag;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,6 +32,7 @@ public class PostInResponse {
     private List<CommentInResponse> comments;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private PostType type;
+    private List<SingleTag> tags;
 
     public PostInResponse(Post post, List<CommentInResponse> commentsList) {
         id = post.getId();
@@ -42,5 +45,13 @@ public class PostInResponse {
         comments = commentsList.stream()
                 .filter(commentInResponse -> Integer.parseInt(commentInResponse.getPostId()) == id)
                 .collect(Collectors.toList());
+        comments = new ArrayList<>();
+        tags = getTags(post);
+    }
+
+    private List<SingleTag> getTags(Post post) {
+        List<SingleTag> tags = new ArrayList<>();
+        post.getTags().forEach(t -> tags.add(new SingleTag(t.getTag().getId(), t.getTag().getTag())));
+        return tags;
     }
 }
