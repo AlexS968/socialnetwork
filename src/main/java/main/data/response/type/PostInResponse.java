@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public class PostInResponse {
     private Integer id;
-    private Instant time;
+    private long time;
     private MeProfile author;
     private String title;
     @JsonProperty(value = "post_text")
@@ -33,14 +33,14 @@ public class PostInResponse {
 
     public PostInResponse(Post post, List<CommentInResponse> commentsList) {
         id = post.getId();
-        time = post.getTime();
+        time = post.getTime().toEpochMilli();
         author = new MeProfile(post.getAuthor());
         title = post.getTitle();
         postText = post.getPostText();
         isBlocked = post.isBlocked();
         likes = post.getLikes() != null ? post.getLikes().size() : 0;
         comments = commentsList.stream()
-                .filter(commentInResponse -> commentInResponse.getPostId() == id)
+                .filter(commentInResponse -> Integer.parseInt(commentInResponse.getPostId()) == id)
                 .collect(Collectors.toList());
     }
 }

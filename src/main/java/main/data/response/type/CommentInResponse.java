@@ -16,7 +16,7 @@ public class CommentInResponse {
     private String commentText;
     private long id;
     @JsonProperty(value = "post_id")
-    private long postId;
+    private String postId;
     private long time;
     @JsonProperty(value = "author_id")
     private long authorId;
@@ -24,11 +24,11 @@ public class CommentInResponse {
     private boolean blocked;
 
     public CommentInResponse(PostComment comment) {
-        parentId = comment.getParent() != null ? comment.getParent().getId() : null;
+        parentId = comment.getParent() != null ? comment.getParent().getId() : 0;
         commentText = comment.getCommentText();
         id = comment.getId();
-        postId = comment.getPost().getId();
-        time = Instant.now().getEpochSecond();
+        postId = String.valueOf(comment.getPost().getId());
+        time = Instant.now().toEpochMilli();
         authorId = comment.getAuthor().getId();
         blocked = comment.isBlocked();
     }

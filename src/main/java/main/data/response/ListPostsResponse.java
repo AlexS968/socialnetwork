@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
+import main.data.response.type.CommentInResponse;
 import main.data.response.type.PostInResponse;
 import main.model.Post;
 import org.springframework.data.domain.Page;
@@ -18,7 +19,7 @@ public class ListPostsResponse {
 
   private List<PostInResponse> data = new ArrayList<>();
 
-  public ListPostsResponse(Page<Post> posts) {
+  public ListPostsResponse(Page<Post> posts, List<CommentInResponse> comments) {
 
     this.setOffset(posts.getNumber() * posts.getNumberOfElements());
     this.setPerPage(posts.getNumberOfElements());
@@ -26,10 +27,7 @@ public class ListPostsResponse {
     this.setTimestamp(Instant.now().toEpochMilli());
     this.setTotal(posts.getTotalElements());
 
-    posts.forEach(p ->
-    {{
-      data.add(new PostInResponse(p));
-      } });
+    posts.getContent().forEach(post -> data.add(new PostInResponse(post,comments)));
   }
 }
 

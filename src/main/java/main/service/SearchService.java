@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import main.core.OffsetPageRequest;
 import main.data.response.ListPersonResponse;
 import main.data.response.ListPostsResponse;
+import main.data.response.type.CommentInResponse;
 import main.model.City;
 import main.model.Country;
 import main.model.Person;
@@ -126,7 +127,7 @@ public class SearchService {
           .findByLastNameLikeOrFirstNameLike(author, author);
 
       if (authors.isEmpty()) {
-        return new ListPostsResponse(resultPostPage);
+        return new ListPostsResponse(resultPostPage , new ArrayList<>());
       }
 
       Set<Integer> authorsIdsTemp = new HashSet<>();
@@ -146,7 +147,7 @@ public class SearchService {
 
     resultPostPage = new PageImpl<>(searchPostResult, pageable, searchPostResult.size());
 
-    return new ListPostsResponse(resultPostPage);
+    return new ListPostsResponse(resultPostPage, new ArrayList<>());
   }
 
   private Date calculateBirthDateFromAge(int age) {

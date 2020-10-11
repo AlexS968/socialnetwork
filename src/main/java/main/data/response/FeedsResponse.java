@@ -1,6 +1,7 @@
 package main.data.response;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import main.data.response.base.ListResponse;
 import main.data.response.type.CommentInResponse;
@@ -12,17 +13,16 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class FeedsResponse extends ListResponse {
-
-    private List<PostInResponse> data;
+@Data
+public class FeedsResponse<T> extends ListResponse<T> {
 
     public FeedsResponse(Page<Post> posts, List<CommentInResponse> commentList){
         this.setOffset(posts.getNumber() * posts.getNumberOfElements());
         this.setPerPage(posts.getNumberOfElements());
         this.setTotal(posts.getTotalElements());
-        data = new ArrayList<>();
+        List<T> data = new ArrayList<>();
 
         for (Post item : posts.getContent()) {
             PostInResponse postInResponse = new PostInResponse(item, commentList);
@@ -31,7 +31,9 @@ public class FeedsResponse extends ListResponse {
             } else {
                 postInResponse.setType(PostType.QUEUED);
             }
-            data.add(postInResponse);
+            data.add((T) postInResponse);
         }
+
+        this.setData(data);
     }
 }

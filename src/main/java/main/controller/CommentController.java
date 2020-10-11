@@ -3,14 +3,12 @@ package main.controller;
 import lombok.AllArgsConstructor;
 import main.data.request.CommentRequest;
 import main.data.response.CommentResponse;
-import main.data.response.PostCommentsResponse;
+import main.data.response.base.ListResponse;
+import main.data.response.type.ItemDelete;
 import main.service.CommentService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
-import javax.websocket.server.PathParam;
 
 @AllArgsConstructor
 @Controller
@@ -27,13 +25,38 @@ public class CommentController {
     }
 
     @GetMapping("/{id}/comments")
-    public ResponseEntity<PostCommentsResponse> showPostComments(
+    public ResponseEntity<ListResponse> showPostComments(
             @PathVariable Integer id,
             @RequestParam(required = true, defaultValue = "0") Integer offset,
             @RequestParam(required = true, defaultValue = "20") Integer itemPerPage
     ) {
 
         return ResponseEntity.ok(commentService.getPostComments(id, offset, itemPerPage));
+    }
+
+    @PutMapping("/{id}/comments/{comment_id}")
+    public ResponseEntity<CommentResponse> editPostComment(
+            @PathVariable Integer id,
+            @PathVariable(value = "comment_id") Integer commentId,
+            @RequestBody CommentRequest request
+    ){
+        return ResponseEntity.ok(commentService.editComment(id, commentId, request));
+    }
+
+    @PutMapping("/{id}/comments/{comment_id}/recover")
+    public ResponseEntity<CommentResponse> recoverPostComment(
+            @PathVariable Integer id,
+            @PathVariable(value = "comment_id") Integer commentId
+    ) {
+        return ResponseEntity.ok(commentService.recoverComment(id, commentId));
+    }
+
+    @DeleteMapping("{id}/comments/{comment_id}")
+    public ResponseEntity<ItemDelete> deletePostComment(
+            @PathVariable Integer id,
+            @PathVariable(value = "comment_id") Integer commentId
+    ) {
+        return ResponseEntity.ok(commentService.deleteComment(id, commentId));
     }
 
 }

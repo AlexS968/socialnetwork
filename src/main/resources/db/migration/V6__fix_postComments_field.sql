@@ -1,1 +1,0 @@
-ALTER TABLE post_comment MODIFY parent_id int null;

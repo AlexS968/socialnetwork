@@ -3,10 +3,10 @@ package main.service;
 import lombok.AllArgsConstructor;
 import main.data.request.PostRequest;
 import main.data.response.FeedsResponse;
-import main.data.response.PostDeleteResponse;
+import main.data.response.ItemDeleteResponse;
 import main.data.response.PostResponse;
 import main.data.response.type.CommentInResponse;
-import main.data.response.type.PostDelete;
+import main.data.response.type.ItemDelete;
 import main.data.response.type.PostInResponse;
 import main.exception.BadRequestException;
 import main.exception.apierror.ApiError;
@@ -20,8 +20,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -55,7 +53,7 @@ public class PostService {
         return new FeedsResponse(posts, commentsList);
     }
 
-    public ResponseEntity<?> addNewPost(Integer personId, PostRequest request, Long pubDate) {
+    public PostResponse addNewPost(Integer personId, PostRequest request, Long pubDate) {
         //TODO добавить проверку авторизации
         //return new ResponseEntity<>(new ApiError("invalid_request", "Неавторизованный пользователь"), HttpStatus.UNAUTHORIZED);
         Optional<Person> personOptional = personRepository.findById(personId);
@@ -71,12 +69,12 @@ public class PostService {
         Post post = savePost(null, request, person, pubDate);
         PostResponse response = new PostResponse();
         try {
-            response = postResponseMapper(post);
+            response.setData(new PostInResponse(post, new ArrayList<>()));
         } catch (Exception ex) {
             throw new BadRequestException(new ApiError("invalid_request", "Bad Request"));
         }
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return response;
     }
 
     private boolean checkPerson(Person person) {
@@ -84,16 +82,6 @@ public class PostService {
             return false;
         }
         return true;
-    }
-
-    private PostResponse postResponseMapper(Post post) {
-        PostResponse result = new PostResponse();
-
-        result.setError("ok");
-        result.setTimestamp(Instant.now().toEpochMilli());
-        result.setData(new PostInResponse(post, new ArrayList<>()));
-
-        return result;
     }
 
     private Post savePost(Post post, PostRequest postData, Person person, Long pubDate) {
@@ -106,8 +94,8 @@ public class PostService {
         return repository.save(postToSave);
     }
 
-    public ResponseEntity<?> delPost(Integer id) {
-        PostDeleteResponse result = new PostDeleteResponse();
+    public ItemDeleteResponse delPost(Integer id) {
+        ItemDeleteResponse response = new ItemDeleteResponse();
 
         Optional<Post> postOptional = repository.findById(id);
         if (postOptional.isEmpty()) {
@@ -119,11 +107,11 @@ public class PostService {
         } catch (BadRequestException ex) {
             throw new BadRequestException(new ApiError("invalid_request", "Ошибка удаления поста"));
         }
-        result.setData(new PostDelete(id));
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        response.setData(new ItemDelete(id));
+        return response;
     }
 
-    public ResponseEntity<?> showWall(Integer personId) {
+    public <T> FeedsResponse<T> showWall(Integer personId) {
         //TODO добавить проверку авторизации
         Optional<Person> personOptional = personRepository.findById(personId);
         if (personOptional.isEmpty()) {
@@ -143,8 +131,6 @@ public class PostService {
         List<CommentInResponse> commentsList = comments.stream().map(CommentInResponse::new)
                 .collect(Collectors.toList());
 
-        FeedsResponse result = new FeedsResponse(posts, commentsList);
-
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return new FeedsResponse<>(posts, commentsList);
     }
 }
