@@ -16,13 +16,15 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @Data
-public class FeedsResponse<T> extends ListResponse<T> {
 
-    public FeedsResponse(Page<Post> posts, List<CommentInResponse> commentList){
+public class FeedsResponse extends ListResponse<PostInResponse> {
+
+    public FeedsResponse(Page<Post> posts, List<CommentInResponse> commentList, int authorId){
         this.setOffset(posts.getNumber() * posts.getNumberOfElements());
         this.setPerPage(posts.getNumberOfElements());
+        this.setTimestamp(Instant.now().toEpochMilli());
         this.setTotal(posts.getTotalElements());
-        List<T> data = new ArrayList<>();
+        this.setData(new ArrayList<>());
 
         for (Post item : posts.getContent()) {
             PostInResponse postInResponse = new PostInResponse(item, commentList);
@@ -31,9 +33,9 @@ public class FeedsResponse<T> extends ListResponse<T> {
             } else {
                 postInResponse.setType(PostType.QUEUED);
             }
-            data.add((T) postInResponse);
+            if (!(postInResponse.getType() == PostType.QUEUED && postInResponse.getAuthor().getId() != authorId)) {
+                this.add(postInResponse);
+            }
         }
-
-        this.setData(data);
     }
 }

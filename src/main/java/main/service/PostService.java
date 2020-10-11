@@ -1,6 +1,8 @@
 package main.service;
 
 import lombok.AllArgsConstructor;
+import main.core.OffsetPageRequest;
+import main.data.PersonPrincipal;
 import main.data.request.PostRequest;
 import main.data.response.FeedsResponse;
 import main.data.response.ItemDeleteResponse;
@@ -15,16 +17,17 @@ import main.model.Post;
 import main.model.PostComment;
 import main.model.PostTag;
 import main.model.Tag;
-import main.repository.PersonRepository;
 import main.repository.PostCommentRepository;
 import main.repository.PostRepository;
 import main.repository.PostTagRepository;
 import main.repository.TagRepository;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -37,18 +40,18 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class PostService {
     private final PostRepository repository;
-    private final PersonRepository personRepository;
     private final PostCommentRepository commentRepository;
+    private final PostRepository postRepository;
     private final TagRepository tagRepository;
     private final PostTagRepository postTagRepository;
 
     public FeedsResponse getFeeds(String name, int offset, int limit) {
-        Pageable pageable = PageRequest.of(offset / limit, limit, Sort.by("time").descending());
+        Pageable pageable = new OffsetPageRequest(offset, limit, Sort.by("time").descending());
         Page<Post> posts;
         if (name != null && !name.isEmpty()) {
-            posts = repository.findByTitle(name, pageable);
+            posts = postRepository.findByTitle(name, pageable);
         } else {
-            posts = repository.findAll(pageable);
+            posts = postRepository.findAll(pageable);
         }
 
         Set<Integer> list = posts.getContent().stream().map(Post::getId).collect(Collectors.toSet());
@@ -56,17 +59,15 @@ public class PostService {
         List<CommentInResponse> commentsList = comments.stream().map(CommentInResponse::new)
                 .collect(Collectors.toList());
 
-        return new FeedsResponse(posts, commentsList);
+        int authId = getAuthUser().getId();
+
+        return new FeedsResponse(posts, commentsList, authId);
     }
 
+    @Transactional
     public PostResponse addNewPost(Integer personId, PostRequest request, Long pubDate) {
-        //TODO добавить проверку авторизации
-        //return new ResponseEntity<>(new ApiError("invalid_request", "Неавторизованный пользователь"), HttpStatus.UNAUTHORIZED);
-        Optional<Person> personOptional = personRepository.findById(personId);
-        if (personOptional.isEmpty()) {
-            throw new BadRequestException(new ApiError("invalid_request", "Пользователь не существует"));
-        }
-        Person person = personOptional.get();
+        Person person = getAuthUser(personId);
+
         if (!checkPerson(person)) {
             throw new BadRequestException(
                     new ApiError("invalid_request", "Профиль пользователя не заполнен")
@@ -90,12 +91,17 @@ public class PostService {
     private Post savePost(Post post, PostRequest postData, Person person, Long pubDate) {
         Post postToSave = (post == null) ? new Post() : post;
         final Instant postTime = pubDate == null ? Instant.now() : Instant.ofEpochMilli(pubDate);
-        final List<PostTag> postTags = new ArrayList<>();
+        final List<PostTag> postTags = (post == null) ? new ArrayList<>() : postToSave.getTags();
         final List<Tag> tags = new ArrayList<>();
         for (String s : postData.getTags()) {
-            Tag tag = new Tag();
-            tag.setTag(s);
-
+            Optional<Tag> optionalTag = tagRepository.findTagByTag(s);
+            Tag tag;
+            if (optionalTag.isEmpty()) {
+                tag = new Tag();
+                tag.setTag(s);
+            } else {
+                tag = optionalTag.get();
+            }
             PostTag postTag = new PostTag(postToSave, tag);
             postTags.add(postTag);
         }
@@ -105,7 +111,7 @@ public class PostService {
         postToSave.setTime(postTime);
         postToSave.setAuthor(person);
         tagRepository.saveAll(tags);
-        postToSave = repository.save(postToSave);
+        postToSave = postRepository.save(postToSave);
         postTagRepository.saveAll(postTags);
         return postToSave;
     }
@@ -118,8 +124,9 @@ public class PostService {
             throw new BadRequestException(new ApiError("invalid_request", "Пост не существует"));
         }
         Post post = postOptional.get();
+
         try {
-            repository.delete(post);
+            postRepository.delete(post);
         } catch (BadRequestException ex) {
             throw new BadRequestException(new ApiError("invalid_request", "Ошибка удаления поста"));
         }
@@ -127,26 +134,58 @@ public class PostService {
         return response;
     }
 
-    public <T> FeedsResponse<T> showWall(Integer personId) {
-        //TODO добавить проверку авторизации
-        Optional<Person> personOptional = personRepository.findById(personId);
-        if (personOptional.isEmpty()) {
-            throw new BadRequestException(new ApiError("invalid_request", "Пользователь не существует"));
-        }
-        Person person = personOptional.get();
+    public FeedsResponse showWall(Integer personId, int offset, int itemsPerPage) {
 
-        int offset = 0;
-        int limit = 10;
+        Person person = getAuthUser(personId);
 
-        Pageable pageable = PageRequest.of(offset / limit, limit, Sort.by("time").descending());
+        Pageable pageable = new OffsetPageRequest(offset, itemsPerPage, Sort.by("time").descending());
 
-        Page<Post> posts = repository.findByAuthor(person, pageable);
+        Page<Post> posts = postRepository.findByAuthor(person, pageable);
 
         Set<Integer> list = posts.getContent().stream().map(Post::getId).collect(Collectors.toSet());
         List<PostComment> comments = commentRepository.getCommentsByList(list);
         List<CommentInResponse> commentsList = comments.stream().map(CommentInResponse::new)
                 .collect(Collectors.toList());
 
-        return new FeedsResponse<>(posts, commentsList);
+        return new FeedsResponse(posts, commentsList, getAuthUser().getId());
+    }
+
+    @Transactional
+    public PostResponse editPost(int id, Long pubDate, PostRequest request) {
+        Optional<Post> optionalPost = postRepository.findById(id);
+        if (optionalPost.isPresent()) {
+            Post post = optionalPost.get();
+            Person person = getAuthUser();
+            post = savePost(post, request, person, pubDate);
+
+            PostResponse response = new PostResponse();
+            response.setData(new PostInResponse(post,new ArrayList<>())); //заглушка на комментарии
+            return response;
+        } else {
+            throw new BadRequestException(new ApiError("invalid_request", "Пост не существует"));
+        }
+    }
+
+    private Post getPost(int id) {
+        Optional<Post> postOptional = postRepository.findById(id);
+        if (postOptional.isEmpty()) {
+            throw new BadRequestException(new ApiError("invalid_request", "Пост не существует"));
+        }
+        return postOptional.get();
+    }
+
+    private Person getAuthUser() {
+        if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
+            throw new UsernameNotFoundException("invalid_request");
+        }
+        return ((PersonPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getPerson();
+    }
+
+    private Person getAuthUser(int id) {
+        Person person = getAuthUser();
+        if (person.getId() != id) {
+            throw new UsernameNotFoundException("invalid_request");
+        }
+        return person;
     }
 }

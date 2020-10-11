@@ -3,6 +3,8 @@ package main.controller;
 import lombok.AllArgsConstructor;
 import main.data.request.TagRequest;
 import main.data.response.ListTagResponse;
+import main.data.response.TagCreateResponse;
+import main.data.response.TagDeleteResponse;
 import main.service.TagService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,12 +24,12 @@ public class TagController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<?> CreateTag(@RequestBody TagRequest request) {
+    public ResponseEntity<TagCreateResponse> CreateTag(@RequestBody TagRequest request) {
         return ResponseEntity.ok(tagService.createTag(request));
     }
 
     @DeleteMapping("/")
-    public ResponseEntity<?> DeleteTag(@RequestParam int id) {
+    public ResponseEntity<TagDeleteResponse> DeleteTag(@RequestParam int id) {
         return ResponseEntity.ok(tagService.deleteTag(id));
     }
 }

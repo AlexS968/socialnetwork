@@ -5,7 +5,6 @@ import main.data.request.PostRequest;
 import main.data.response.FeedsResponse;
 import main.data.response.PostResponse;
 import main.service.PostService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -25,11 +24,13 @@ public class ProfileController {
         return ResponseEntity.ok(postService.addNewPost(id, request, pubDate));
     }
 
-    @GetMapping("{id}/wall")
-    public ResponseEntity<FeedsResponse> showPersonWall(
-        @PathVariable int id
+    @GetMapping("/{id}/wall")
+        public ResponseEntity<FeedsResponse> showPersonWall(
+        @PathVariable int id,
+        @RequestParam(defaultValue = "0") int offset,
+        @RequestParam(defaultValue = "20") int itemsPerPage
     ){
-        return ResponseEntity.ok(postService.showWall(id));
+        return ResponseEntity.ok(postService.showWall(id, offset, itemsPerPage));
     }
 
 }
