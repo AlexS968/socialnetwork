@@ -26,7 +26,7 @@ public class PostController {
     }
 
     @DeleteMapping("/post/{id}")
-    public ResponseEntity<ItemDeleteResponse> deletePost(@PathVariable Integer id){
+    public ResponseEntity<ItemDeleteResponse> deletePost(@PathVariable Integer id) {
         return ResponseEntity.ok(postService.delPost(id));
     }
 
@@ -34,7 +34,7 @@ public class PostController {
     public ResponseEntity<PostResponse> editPost(@PathVariable Integer id,
                                                  @RequestParam(name = "publish_date", required = false) Long pubDate,
                                                  @RequestBody PostRequest request
-                                      ) {
+    ) {
         return ResponseEntity.ok(postService.editPost(id, pubDate, request));
     }
 }

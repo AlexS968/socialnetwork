@@ -39,7 +39,6 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class PostService {
-    private final PostRepository repository;
     private final PostCommentRepository commentRepository;
     private final PostRepository postRepository;
     private final TagRepository tagRepository;
@@ -119,12 +118,8 @@ public class PostService {
     public ItemDeleteResponse delPost(Integer id) {
         ItemDeleteResponse response = new ItemDeleteResponse();
 
-        Optional<Post> postOptional = repository.findById(id);
-        if (postOptional.isEmpty()) {
-            throw new BadRequestException(new ApiError("invalid_request", "Пост не существует"));
-        }
-        Post post = postOptional.get();
-
+        Post post = getPresentedPost(id);
+        //TODO check relatives post and tags
         try {
             postRepository.delete(post);
         } catch (BadRequestException ex) {
@@ -152,21 +147,18 @@ public class PostService {
 
     @Transactional
     public PostResponse editPost(int id, Long pubDate, PostRequest request) {
-        Optional<Post> optionalPost = postRepository.findById(id);
-        if (optionalPost.isPresent()) {
-            Post post = optionalPost.get();
+        Post post = getPresentedPost(id);
+
             Person person = getAuthUser();
             post = savePost(post, request, person, pubDate);
 
             PostResponse response = new PostResponse();
-            response.setData(new PostInResponse(post,new ArrayList<>())); //заглушка на комментарии
+            response.setData(new PostInResponse(post, new ArrayList<>())); //заглушка на комментарии
             return response;
-        } else {
-            throw new BadRequestException(new ApiError("invalid_request", "Пост не существует"));
-        }
+
     }
 
-    private Post getPost(int id) {
+    private Post getPresentedPost(int id) {
         Optional<Post> postOptional = postRepository.findById(id);
         if (postOptional.isEmpty()) {
             throw new BadRequestException(new ApiError("invalid_request", "Пост не существует"));
