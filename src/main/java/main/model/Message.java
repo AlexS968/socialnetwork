@@ -16,6 +16,10 @@ public class Message {
     @Column(nullable = false)
     private Instant time;
 
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "dialog_id", referencedColumnName = "id", nullable = false)
+    private Dialog dialog;
+
     @ManyToOne
     @JoinColumn(name = "author_id")
     private Person author;

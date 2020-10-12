@@ -1,8 +1,9 @@
 package main.service;
 
 import main.data.request.ListLanguageRequest;
-import main.data.response.ListLanguageResponse;
+import main.data.response.base.ListResponse;
+import main.data.response.type.LanguageList;
 
 public interface LanguageService {
-    ListLanguageResponse list(ListLanguageRequest request);
+    ListResponse<LanguageList> list(ListLanguageRequest request);
 }

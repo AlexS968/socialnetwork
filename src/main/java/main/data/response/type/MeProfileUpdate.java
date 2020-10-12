@@ -7,9 +7,7 @@ import main.model.Person;
 @Data
 public class MeProfileUpdate {
 
-  // из request
-
-  @JsonProperty("first_name")
+ @JsonProperty("first_name")
   private String firstName;
 
   @JsonProperty("last_name")
@@ -27,11 +25,9 @@ public class MeProfileUpdate {
   @JsonProperty("messages_permission")
   private MessagesPermission messagesPermission;
 
-  private CityInCityList city;
+  private CityList city;
 
-  private CountryInCountryList country;
-
-  //--- из Person остается
+  private CountryList country;
 
   private int id;
 
@@ -54,8 +50,8 @@ public class MeProfileUpdate {
     this.phone = person.getPhone();
     this.photo = person.getPhotoURL();
     this.about = person.getAbout();
-    this.city = new CityInCityList(person.getCity());
-    this.country = new CountryInCountryList(person.getCountry());
+    this.city = new CityList(person.getCity());
+    this.country = new CountryList(person.getCountry());
     this.messagesPermission = person.getMessagesPermission();
 
     this.email = person.getEmail();

@@ -14,7 +14,7 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
-public class FeedsResponse extends ListResponse {
+public class FeedsResponse extends ListResponse<PostInResponse> {
 
     @JsonProperty(value = "data")
     private List<PostInResponse> postsList;

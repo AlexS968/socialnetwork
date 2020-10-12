@@ -6,14 +6,13 @@ import main.data.PersonPrincipal;
 import main.data.request.LoginRequest;
 import main.data.request.MeProfileRequest;
 import main.data.response.InfoResponse;
-import main.data.response.LoginResponse;
-import main.data.response.LogoutResponse;
 import main.data.response.MeProfileResponse;
 import main.data.response.MeProfileUpdateResponse;
+import main.data.response.base.Response;
 import main.data.response.type.InfoInResponse;
 import main.data.response.type.MeProfile;
 import main.data.response.type.MeProfileUpdate;
-import main.data.response.type.MessageInLogout;
+import main.data.response.type.ResponseMessage;
 import main.data.response.type.PersonInLogin;
 import main.model.City;
 import main.model.Country;
@@ -21,7 +20,6 @@ import main.model.Person;
 import main.repository.CityRepository;
 import main.repository.CountryRepository;
 import main.repository.PersonRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -29,21 +27,19 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.Instant;
 
 @Service
 @AllArgsConstructor
 public class PersonServiceImpl implements UserDetailsService {
+
     private final PersonRepository personRepository;
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
-
-    @Autowired
-    private CityRepository cityRepository;
-
-    @Autowired
-    private CountryRepository countryRepository;
+    private final CityRepository cityRepository;
+    private final CountryRepository countryRepository;
 
     @Override
     public UserDetails loadUserByUsername(String email) {
@@ -54,35 +50,38 @@ public class PersonServiceImpl implements UserDetailsService {
         return new PersonPrincipal(user);
     }
 
-    public LoginResponse login(LoginRequest request) {
-
+    public Response<PersonInLogin> login(LoginRequest request) {
         Authentication authentication
                 = authenticationManager.authenticate(
-                        new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-                );
+                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+        );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
 
         PersonPrincipal personPrincipal = (PersonPrincipal) authentication.getPrincipal();
 
-        LoginResponse loginResponse = new LoginResponse();
-        loginResponse.setData(new PersonInLogin(personPrincipal.getPerson()));
-        loginResponse.getData().setToken(jwt);
+        PersonInLogin personInLogin = new PersonInLogin(personPrincipal.getPerson());
+        personInLogin.setToken(jwt);
 
-        return loginResponse;
+        Person currentPerson = personPrincipal.getPerson();
+        currentPerson.setLastOnlineTime(Instant.now());
+
+        personRepository.save(currentPerson);
+
+        return new Response<>(personInLogin);
     }
 
-    public LogoutResponse logout() {
-        return new LogoutResponse(new MessageInLogout("ok"));
+    public Response<ResponseMessage> logout() {
+        return new Response<>(new ResponseMessage("ok"));
     }
 
     public MeProfileResponse getMe() {
 
         Person person = getCurrentPerson();
 
-        MeProfileResponse response = new MeProfileResponse(); //+ поля тайм стем эрор
-        MeProfile profile = new MeProfile(person); //+ поля из персон
+        MeProfileResponse response = new MeProfileResponse();
+        MeProfile profile = new MeProfile(person);
 
         response.setData(profile);
         return response;
@@ -96,9 +95,6 @@ public class PersonServiceImpl implements UserDetailsService {
         personUpdated.setBirthDate(updatedCurrentPerson.getBirthDate());
         personUpdated.setPhone(updatedCurrentPerson.getPhone());
         personUpdated.setAbout(updatedCurrentPerson.getAbout());
-
-        //personUpdated.setPhotoURL(updatedCurrentPerson.getPhotoURL());
-        //personUpdated.setMessagesPermission(updatedCurrentPerson.getMessagesPermission());
 
         Country countryUpdated = countryRepository.findById(updatedCurrentPerson.getCountry());
         City cityUpdated = cityRepository.findById(updatedCurrentPerson.getCity());
@@ -128,6 +124,7 @@ public class PersonServiceImpl implements UserDetailsService {
 
     private Person getCurrentPerson() {
         return ((PersonPrincipal) SecurityContextHolder.getContext().
-            getAuthentication().getPrincipal()).getPerson();
+                getAuthentication().getPrincipal()).getPerson();
     }
 }
+

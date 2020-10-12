@@ -4,9 +4,10 @@ import lombok.AllArgsConstructor;
 import main.data.request.ListCityRequest;
 import main.data.request.ListCountryRequest;
 import main.data.request.ListLanguageRequest;
-import main.data.response.ListCityResponse;
-import main.data.response.ListCountryResponse;
-import main.data.response.ListLanguageResponse;
+import main.data.response.base.ListResponse;
+import main.data.response.type.CityList;
+import main.data.response.type.CountryList;
+import main.data.response.type.LanguageList;
 import main.service.CityServiceImpl;
 import main.service.CountryServiceImpl;
 import main.service.LanguageServiceImpl;
@@ -22,17 +23,17 @@ public class ApiPlatformController {
     private final CityServiceImpl cityService;
 
     @GetMapping("/languages")
-    public ResponseEntity<ListLanguageResponse> list(ListLanguageRequest request) {
+    public ResponseEntity<ListResponse<LanguageList>> list(ListLanguageRequest request) {
         return ResponseEntity.ok(languageService.list(request));
     }
 
     @GetMapping("/countries")
-    public ResponseEntity<ListCountryResponse> list(ListCountryRequest request) {
+    public ResponseEntity<ListResponse<CountryList>> list(ListCountryRequest request) {
         return ResponseEntity.ok(countryService.list(request));
     }
 
     @GetMapping("/cities")
-    public ResponseEntity<ListCityResponse> list(ListCityRequest request) {
+    public ResponseEntity<ListResponse<CityList>> list(ListCityRequest request) {
         return ResponseEntity.ok(cityService.list(request));
     }
 }
