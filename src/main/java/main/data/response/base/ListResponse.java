@@ -20,8 +20,12 @@ public class ListResponse<T> {
         this.data = data;
     }
 
-    public void add(List<T> data) {
+    public void addAll(List<T> data) {
         this.data.addAll(data);
+    }
+
+    public void add(T data) {
+        this.data.add(data);
     }
 
     public ListResponse(List<T> data, long total, int offset, int perPage) {

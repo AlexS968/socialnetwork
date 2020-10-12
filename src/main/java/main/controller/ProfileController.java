@@ -25,9 +25,11 @@ public class ProfileController {
 
     @GetMapping("/{id}/wall")
     public ResponseEntity<?> showPersonWall(
-        @PathVariable int id
+        @PathVariable int id,
+        @RequestParam(defaultValue = "0") int offset,
+        @RequestParam(defaultValue = "20") int itemsPerPage
     ){
-        return postService.showWall(id);
+        return postService.showWall(id, offset, itemsPerPage);
     }
 
 }
