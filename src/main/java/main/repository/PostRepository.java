@@ -27,11 +27,12 @@ public interface PostRepository extends CrudRepository<Post, Integer> {
           + "(:text is null or post_text LIKE :text) and "
           + "(:dateFrom is null or time >= :dateFrom) and (:dateTo is null or time <= :dateTo) and "
           + "(COALESCE(:authorId) is null or (author_id IN :authorId))")
-  List<Optional<Post>> findByTextPeriodAuthor(
+  Page<Post> findByTextPeriodAuthor(
       @Param("text") String text,
       @Param("dateFrom") Date dateFrom,
       @Param("dateTo") Date dateTo,
-      @Param("authorId") Set<Integer> authorId
+      @Param("authorId") Set<Integer> authorId,
+      Pageable pagable
   );
 
 }
