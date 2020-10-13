@@ -2,10 +2,12 @@ package main.data.response.type;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import main.model.Message;
 import main.model.ReadStatus;
 
 @Data
+@NoArgsConstructor
 public class DialogMessage {
     private int id;
     private long time;
