@@ -63,7 +63,7 @@ public class DialogServiceImpl implements DialogService {
             if (lastMessage != null) {
                 DialogMessage dialogMessage = new DialogMessage(
                         lastMessage,
-                        lastMessage.getAuthor().getId() == currentUser.getPerson().getId()
+                        lastMessage.getAuthor().getId() != currentUser.getPerson().getId()
                 );
 
                 item.setLastMessage(dialogMessage);

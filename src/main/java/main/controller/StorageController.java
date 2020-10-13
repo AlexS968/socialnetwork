@@ -1,7 +1,8 @@
 package main.controller;
 
 import lombok.AllArgsConstructor;
-import main.data.response.StorageResponse;
+import main.data.response.base.Response;
+import main.data.response.type.Storage;
 import main.service.StorageService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,7 +17,7 @@ public class StorageController {
   private final StorageService storageService;
 
   @PostMapping("/api/v1/storage")
-  public ResponseEntity<StorageResponse> upload(
+  public ResponseEntity<Response<Storage>> upload(
       @RequestParam(value = "file") MultipartFile file,
       @RequestParam(value = "type") String type) {
 

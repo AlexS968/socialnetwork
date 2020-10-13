@@ -3,8 +3,10 @@ package main.controller;
 import lombok.AllArgsConstructor;
 import main.data.request.MeProfileRequest;
 import main.data.response.InfoResponse;
-import main.data.response.MeProfileResponse;
-import main.data.response.MeProfileUpdateResponse;
+import main.data.response.base.Response;
+import main.data.response.type.InfoInResponse;
+import main.data.response.type.MeProfile;
+import main.data.response.type.MeProfileUpdate;
 import main.service.PersonServiceImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,13 +24,13 @@ public class PersonController {
   private final PersonServiceImpl personServiceImpl;
 
   @GetMapping("/me")
-  public ResponseEntity<MeProfileResponse> getCurrentUser() {
+  public ResponseEntity<Response<MeProfile>> getCurrentUser() {
 
     return ResponseEntity.ok(personServiceImpl.getMe());
   }
 
   @PutMapping("/me")
-  public ResponseEntity<MeProfileUpdateResponse> updateCurrentUser(
+  public ResponseEntity<Response<MeProfileUpdate>> updateCurrentUser(
       @RequestBody MeProfileRequest updatedCurrentUser) {
 
     return ResponseEntity.ok(personServiceImpl.putMe(updatedCurrentUser));
@@ -36,7 +38,7 @@ public class PersonController {
   }
 
   @DeleteMapping("/me")
-  public ResponseEntity<InfoResponse> delete() {
+  public ResponseEntity<Response<InfoInResponse> > delete() {
     return ResponseEntity.ok(personServiceImpl.deleteMe());
   }
 

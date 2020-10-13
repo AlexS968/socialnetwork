@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import main.data.PersonPrincipal;
-import main.data.response.StorageResponse;
+import main.data.response.base.Response;
 import main.data.response.type.Storage;
 import main.model.Person;
 import main.repository.PersonRepository;
@@ -24,7 +24,7 @@ public class StorageService {
   @Value("${upload.path}")
   public String uploadPath;
 
-  public StorageResponse store(MultipartFile file, String type) {
+  public Response<Storage> store(MultipartFile file, String type) {
 
     String uuidFile = UUID.randomUUID().toString();
     String resultName = uuidFile + "_" + file.getOriginalFilename();
@@ -53,7 +53,7 @@ public class StorageService {
     storage.setFileType(type);
     storage.setCreatedAt(new Date().getTime());
 
-    StorageResponse response = new StorageResponse();
+    Response<Storage> response = new Response<>();
     response.setData(storage);
 
     return response;

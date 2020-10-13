@@ -2,6 +2,9 @@ package main.controller;
 
 import lombok.AllArgsConstructor;
 import main.data.request.PostRequest;
+import main.data.response.base.ListResponse;
+import main.data.response.base.Response;
+import main.data.response.type.PostInResponse;
 import main.service.PostService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -14,22 +17,21 @@ public class ProfileController {
     private final PostService postService;
 
     @PostMapping("/{id}/wall")
-    public ResponseEntity<?> addPostToWall(
+    public ResponseEntity<Response<PostInResponse>> addPostToWall(
             @PathVariable int id,
             @RequestBody PostRequest request,
             @RequestParam(name = "publish_date", required = false) Long pubDate
             ){
-
-        return postService.addNewPost(id, request, pubDate);
+        return ResponseEntity.ok(postService.addNewPost(id, request, pubDate));
     }
 
     @GetMapping("/{id}/wall")
-    public ResponseEntity<?> showPersonWall(
+    public ResponseEntity<ListResponse<PostInResponse>> showPersonWall(
         @PathVariable int id,
         @RequestParam(defaultValue = "0") int offset,
         @RequestParam(defaultValue = "20") int itemsPerPage
     ){
-        return postService.showWall(id, offset, itemsPerPage);
+        return ResponseEntity.ok(postService.showWall(id, offset, itemsPerPage));
     }
 
 }
