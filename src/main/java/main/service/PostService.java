@@ -9,33 +9,27 @@ import main.data.response.PostDeleteResponse;
 import main.data.response.PostResponse;
 import main.data.response.type.PostDelete;
 import main.data.response.type.PostInResponse;
-import main.data.response.type.SingleTag;
 import main.exception.BadRequestException;
 import main.exception.apierror.ApiError;
 import main.model.Person;
 import main.model.Post;
 import main.model.PostTag;
 import main.model.Tag;
-import main.repository.PersonRepository;
 import main.repository.PostRepository;
 import main.repository.PostTagRepository;
 import main.repository.TagRepository;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.parameters.P;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -100,16 +94,19 @@ public class PostService {
             Tag tag;
             if (optionalTag.isEmpty()) {
                 tag = new Tag();
-                tag.setTag(s);
+                tag.setTag(s.trim());
             } else {
                 tag = optionalTag.get();
             }
+            tags.add(tag);
             PostTag postTag = new PostTag(postToSave, tag);
-            postTags.add(postTag);
+            if (!postTags.contains(postTag)) {
+                postTags.add(postTag);
+            }
         }
+        postTags.removeIf(pt -> !tags.contains(pt.getTag()));
         postToSave.setTitle(postData.getTitle());
         postToSave.setPostText(postData.getPostText());
-        postToSave.setTags(postTags);
         postToSave.setTime(postTime);
         postToSave.setAuthor(person);
         tagRepository.saveAll(tags);

@@ -46,4 +46,5 @@ public class Post {
     @JsonBackReference
     @OneToMany(mappedBy = "post")
     private List<PostFile> files;
+
 }

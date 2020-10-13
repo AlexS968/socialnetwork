@@ -14,6 +14,7 @@ import java.util.Objects;
 @NoArgsConstructor
 public class PostTag {
     @EmbeddedId
+    @EqualsAndHashCode.Exclude
     private PostTagId id = new PostTagId();
 
     @JsonManagedReference
@@ -29,5 +30,7 @@ public class PostTag {
     public PostTag(Post post, Tag tag) {
         this.post = post;
         this.tag = tag;
+        id.setPostId(post.getId());
+        id.setTagId(tag.getId());
     }
 }
