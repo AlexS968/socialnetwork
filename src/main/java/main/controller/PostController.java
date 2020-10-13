@@ -39,6 +39,4 @@ public class PostController {
     ) {
         return ResponseEntity.ok(postService.editPost(id, pubDate, request));
     }
-
-
 }
