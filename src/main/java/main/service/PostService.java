@@ -4,11 +4,7 @@ import lombok.AllArgsConstructor;
 import main.core.OffsetPageRequest;
 import main.data.PersonPrincipal;
 import main.data.request.PostRequest;
-import main.data.response.FeedsResponse;
-import main.data.response.ItemDeleteResponse;
-import main.data.response.PostResponse;
 import main.data.response.type.CommentInResponse;
-import main.data.response.type.ItemDelete;
 import main.data.response.type.PostInResponse;
 import main.exception.BadRequestException;
 import main.exception.apierror.ApiError;
@@ -18,6 +14,10 @@ import main.model.PostComment;
 import main.model.PostTag;
 import main.model.Tag;
 import main.repository.PostCommentRepository;
+import main.data.response.base.ListResponse;
+import main.data.response.base.Response;
+import main.data.response.type.PostDelete;
+import main.model.*;
 import main.repository.PostRepository;
 import main.repository.PostTagRepository;
 import main.repository.TagRepository;
@@ -44,49 +44,68 @@ public class PostService {
     private final TagRepository tagRepository;
     private final PostTagRepository postTagRepository;
 
-    public FeedsResponse getFeeds(String name, int offset, int limit) {
-        Pageable pageable = new OffsetPageRequest(offset, limit, Sort.by("time").descending());
-        Page<Post> posts;
+    public ListResponse<PostInResponse> getFeeds(String name, int offset, int itemPerPage) {
+        Pageable pageable = new OffsetPageRequest(offset, itemPerPage, Sort.by("time").descending());
+        Page<Post> postPage;
         if (name != null && !name.isEmpty()) {
-            posts = postRepository.findByTitle(name, pageable);
+            postPage = postRepository.findByTitle(name, pageable);
         } else {
-            posts = postRepository.findAll(pageable);
+            postPage = postRepository.findAll(pageable);
         }
-
-        Set<Integer> list = posts.getContent().stream().map(Post::getId).collect(Collectors.toSet());
+        Set<Integer> list = postPage.getContent().stream().map(Post::getId).collect(Collectors.toSet());
         List<PostComment> comments = commentRepository.getCommentsByList(list);
         List<CommentInResponse> commentsList = comments.stream().map(CommentInResponse::new)
                 .collect(Collectors.toList());
 
-        int authId = getAuthUser().getId();
-
-        return new FeedsResponse(posts, commentsList, authId);
+        return new ListResponse<>(extractPage(postPage, commentsList), postPage.getTotalElements(), offset, itemPerPage);
     }
 
     @Transactional
-    public PostResponse addNewPost(Integer personId, PostRequest request, Long pubDate) {
-        Person person = getAuthUser(personId);
-
-        if (!checkPerson(person)) {
-            throw new BadRequestException(
-                    new ApiError("invalid_request", "Профиль пользователя не заполнен")
-            );
-        }
-        Post post = savePost(null, request, person, pubDate);
-        PostResponse response = new PostResponse();
+    public Response<PostInResponse> addNewPost(Integer personId, PostRequest request, Long pubDate) {
         try {
-            response.setData(new PostInResponse(post, new ArrayList<>()));
+            Person person = getAuthUser(personId);
+            Post post = savePost(null, request, person, pubDate);
+            return new Response<>(new PostInResponse(post, new ArrayList<>()));
         } catch (Exception ex) {
-            throw new BadRequestException(new ApiError("invalid_request", "Bad Request"));
+            throw new BadRequestException(new ApiError("invalid_request", "Ошибка создания поста"));
         }
-
-        return response;
     }
 
-    private boolean checkPerson(Person person) {
-        return person.getCity() != null || person.getCountry() != null || person.getAbout() != null;
+    @Transactional
+    public Response<PostInResponse> editPost(int id, Long pubDate, PostRequest request) {
+        Optional<Post> optionalPost = postRepository.findById(id);
+        if (optionalPost.isPresent()) {
+            Post post = optionalPost.get();
+            Person person = getAuthUser();
+            post = savePost(post, request, person, pubDate);
+
+            return new Response<>(new PostInResponse(post, new ArrayList<>())); //TODO добавить метод для комментов
+        } else {
+            throw new BadRequestException(new ApiError("invalid_request", "Пост не существует"));
+        }
     }
 
+    public Response<PostDelete> delPost(Integer id) {
+        try {
+            Post post = getPost(id);
+            postRepository.delete(post);
+            return new Response<>(new PostDelete(id));
+        } catch (BadRequestException ex) {
+            throw new BadRequestException(new ApiError("invalid_request", "Ошибка удаления поста"));
+        }
+    }
+
+    public ListResponse<PostInResponse> showWall(Integer personId, int offset, int itemsPerPage) {
+        Person person = getAuthUser(personId);
+        Pageable pageable = new OffsetPageRequest(offset, itemsPerPage, Sort.by("time").descending());
+        Page<Post> postPage = postRepository.findByAuthor(person, pageable);
+        Set<Integer> list = postPage.getContent().stream().map(Post::getId).collect(Collectors.toSet());
+        List<PostComment> comments = commentRepository.getCommentsByList(list);
+        List<CommentInResponse> commentsList = comments.stream().map(CommentInResponse::new)
+                .collect(Collectors.toList());
+        return new ListResponse<>(extractPage(postPage, commentsList), postPage.getTotalElements(), offset, itemsPerPage);
+    }
+//-----------------------
     private Post savePost(Post post, PostRequest postData, Person person, Long pubDate) {
         Post postToSave = (post == null) ? new Post() : post;
         final Instant postTime = pubDate == null ? Instant.now() : Instant.ofEpochMilli(pubDate);
@@ -97,13 +116,17 @@ public class PostService {
             Tag tag;
             if (optionalTag.isEmpty()) {
                 tag = new Tag();
-                tag.setTag(s);
+                tag.setTag(s.trim());
             } else {
                 tag = optionalTag.get();
             }
+            tags.add(tag);
             PostTag postTag = new PostTag(postToSave, tag);
-            postTags.add(postTag);
+            if (!postTags.contains(postTag)) {
+                postTags.add(postTag);
+            }
         }
+        postTags.removeIf(pt -> !tags.contains(pt.getTag()));
         postToSave.setTitle(postData.getTitle());
         postToSave.setPostText(postData.getPostText());
         postToSave.setTags(postTags);
@@ -115,50 +138,7 @@ public class PostService {
         return postToSave;
     }
 
-    public ItemDeleteResponse delPost(Integer id) {
-        ItemDeleteResponse response = new ItemDeleteResponse();
-
-        Post post = getPresentedPost(id);
-        //TODO check relatives post and tags
-        try {
-            postRepository.delete(post);
-        } catch (BadRequestException ex) {
-            throw new BadRequestException(new ApiError("invalid_request", "Ошибка удаления поста"));
-        }
-        response.setData(new ItemDelete(id));
-        return response;
-    }
-
-    public FeedsResponse showWall(Integer personId, int offset, int itemsPerPage) {
-
-        Person person = getAuthUser(personId);
-
-        Pageable pageable = new OffsetPageRequest(offset, itemsPerPage, Sort.by("time").descending());
-
-        Page<Post> posts = postRepository.findByAuthor(person, pageable);
-
-        Set<Integer> list = posts.getContent().stream().map(Post::getId).collect(Collectors.toSet());
-        List<PostComment> comments = commentRepository.getCommentsByList(list);
-        List<CommentInResponse> commentsList = comments.stream().map(CommentInResponse::new)
-                .collect(Collectors.toList());
-
-        return new FeedsResponse(posts, commentsList, getAuthUser().getId());
-    }
-
-    @Transactional
-    public PostResponse editPost(int id, Long pubDate, PostRequest request) {
-        Post post = getPresentedPost(id);
-
-            Person person = getAuthUser();
-            post = savePost(post, request, person, pubDate);
-
-            PostResponse response = new PostResponse();
-            response.setData(new PostInResponse(post, new ArrayList<>())); //заглушка на комментарии
-            return response;
-
-    }
-
-    private Post getPresentedPost(int id) {
+    private Post getPost(int id) {
         Optional<Post> postOptional = postRepository.findById(id);
         if (postOptional.isEmpty()) {
             throw new BadRequestException(new ApiError("invalid_request", "Пост не существует"));
@@ -179,5 +159,21 @@ public class PostService {
             throw new UsernameNotFoundException("invalid_request");
         }
         return person;
+    }
+
+    private List<PostInResponse> extractPage(Page<Post> postPage, List<CommentInResponse> comments) {
+        List<PostInResponse> posts = new ArrayList<>();
+        for (Post item : postPage.getContent()) {
+            PostInResponse postInResponse = new PostInResponse(item, comments);
+            if (item.getTime().isBefore(Instant.now())) {
+                postInResponse.setType(PostType.POSTED);
+            } else {
+                postInResponse.setType(PostType.QUEUED);
+            }
+            if (!(postInResponse.getType() == PostType.QUEUED && postInResponse.getAuthor().getId() != getAuthUser().getId())) {
+                posts.add(postInResponse);
+            }
+        }
+        return posts;
     }
 }
