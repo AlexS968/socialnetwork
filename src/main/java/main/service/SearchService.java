@@ -12,16 +12,14 @@ import lombok.AllArgsConstructor;
 import main.core.OffsetPageRequest;
 import main.data.response.ListPostsResponse;
 import main.data.response.base.ListResponse;
+import main.data.response.type.CommentInResponse;
 import main.data.response.type.PersonInPersonList;
 import main.data.response.type.PostInResponse;
 import main.model.City;
 import main.model.Country;
 import main.model.Person;
 import main.model.Post;
-import main.repository.CityRepository;
-import main.repository.CountryRepository;
-import main.repository.PersonRepository;
-import main.repository.PostRepository;
+import main.repository.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -35,6 +33,8 @@ public class SearchService {
   private final CountryRepository countryRepository;
   private final CityRepository cityRepository;
   private final PostRepository postRepository;
+  private final PostCommentRepository postCommentRepository;
+  private final CommentService commentService;
 
   public ListResponse<PersonInPersonList> searchPerson(String firstName, String lastName,
       Integer ageFrom,
@@ -129,7 +129,7 @@ public class SearchService {
           .findByLastNameLikeOrFirstNameLike(author, author);
 
       if (authors.isEmpty()) {
-        return new ListResponse(searchPostResult, 0, offset, itemPerPage);
+        return new ListResponse<>(searchPostResult, 0, offset, itemPerPage);
       }
 
       Set<Integer> authorsIdsTemp = new HashSet<>();
@@ -143,9 +143,10 @@ public class SearchService {
     resultPostPage = postRepository
         .findByTextPeriodAuthor(textUpdated, from, to, authorsIds, pageable);
 
-    resultPostPage.forEach(p -> searchPostResult.add(new PostInResponse(p, new ArrayList<>()))); //TODO check necessity
+    List<CommentInResponse> comments = commentService.getCommentsList(resultPostPage.getContent());
+    resultPostPage.forEach(p -> searchPostResult.add(new PostInResponse(p, comments))); //TODO check necessity
 
-    return new ListResponse(searchPostResult, resultPostPage.getTotalElements(), offset,
+    return new ListResponse<>(searchPostResult, resultPostPage.getTotalElements(), offset,
         itemPerPage);
   }
 

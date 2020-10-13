@@ -9,6 +9,7 @@ import main.data.response.type.CommentInResponse;
 import main.data.response.type.ItemDelete;
 import main.exception.BadRequestException;
 import main.exception.apierror.ApiError;
+import main.model.Post;
 import main.model.PostComment;
 import main.repository.PostCommentRepository;
 import main.repository.PostRepository;
@@ -19,6 +20,8 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -54,20 +57,17 @@ public class CommentService {
         return response;
     }
 
-    public <T> ListResponse<T> getPostComments(Integer postId, Integer offset, Integer itemPerPage) {
-        ListResponse<T> response = new ListResponse<>();
+    public ListResponse<CommentInResponse> getPostComments(Integer postId, Integer offset, Integer itemPerPage) {
+        List<PostComment> comments = commentRepository.findAllByPostId(postId);
+        List<CommentInResponse> list = comments.stream().map(CommentInResponse::new).collect(Collectors.toList());
+        return new ListResponse<>(list, list.size(), offset, itemPerPage);
+    }
 
-        List<PostComment> list = commentRepository.findAllByPostId(postId);
-
-        response.setTotal(list.size());
-        response.setOffset(offset);
-        response.setPerPage(itemPerPage);
-
-        List<T> data = new ArrayList<>();
-        list.forEach(comment -> data.add((T) new CommentInResponse(comment)));
-        response.setData(data);
-
-        return response;
+    //Excess??
+    public List<CommentInResponse> getCommentsList (List<Post> posts) {
+        Set<Integer> list = posts.stream().map(Post::getId).collect(Collectors.toSet());
+        List<PostComment> comments = commentRepository.getCommentsByList(list);
+        return comments.stream().map(CommentInResponse::new).collect(Collectors.toList());
     }
 
     public CommentResponse editComment(Integer id, Integer commentId, CommentRequest request) {

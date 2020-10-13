@@ -52,11 +52,7 @@ public class PostService {
         } else {
             postPage = postRepository.findAll(pageable);
         }
-        Set<Integer> list = postPage.getContent().stream().map(Post::getId).collect(Collectors.toSet());
-        List<PostComment> comments = commentRepository.getCommentsByList(list);
-        List<CommentInResponse> commentsList = comments.stream().map(CommentInResponse::new)
-                .collect(Collectors.toList());
-
+        List<CommentInResponse> commentsList = getCommentsList(postPage.getContent());
         return new ListResponse<>(extractPage(postPage, commentsList), postPage.getTotalElements(), offset, itemPerPage);
     }
 
@@ -73,16 +69,13 @@ public class PostService {
 
     @Transactional
     public Response<PostInResponse> editPost(int id, Long pubDate, PostRequest request) {
-        Optional<Post> optionalPost = postRepository.findById(id);
-        if (optionalPost.isPresent()) {
-            Post post = optionalPost.get();
-            Person person = getAuthUser();
-            post = savePost(post, request, person, pubDate);
+        Post post = getPost(id);
 
-            return new Response<>(new PostInResponse(post, new ArrayList<>())); //TODO добавить метод для комментов
-        } else {
-            throw new BadRequestException(new ApiError("invalid_request", "Пост не существует"));
-        }
+        Person person = getAuthUser();
+        post = savePost(post, request, person, pubDate);
+
+        return new Response<>(new PostInResponse(post, new ArrayList<>()));
+
     }
 
     public Response<PostDelete> delPost(Integer id) {
@@ -99,13 +92,17 @@ public class PostService {
         Person person = getAuthUser(personId);
         Pageable pageable = new OffsetPageRequest(offset, itemsPerPage, Sort.by("time").descending());
         Page<Post> postPage = postRepository.findByAuthor(person, pageable);
-        Set<Integer> list = postPage.getContent().stream().map(Post::getId).collect(Collectors.toSet());
-        List<PostComment> comments = commentRepository.getCommentsByList(list);
-        List<CommentInResponse> commentsList = comments.stream().map(CommentInResponse::new)
-                .collect(Collectors.toList());
+        List<CommentInResponse> commentsList = getCommentsList(postPage.getContent());
         return new ListResponse<>(extractPage(postPage, commentsList), postPage.getTotalElements(), offset, itemsPerPage);
     }
-//-----------------------
+
+    private List<CommentInResponse> getCommentsList(List<Post> posts) {
+        Set<Integer> list = posts.stream().map(Post::getId).collect(Collectors.toSet());
+        List<PostComment> comments = commentRepository.getCommentsByList(list);
+        return comments.stream().map(CommentInResponse::new).collect(Collectors.toList());
+    }
+
+    //-----------------------
     private Post savePost(Post post, PostRequest postData, Person person, Long pubDate) {
         Post postToSave = (post == null) ? new Post() : post;
         final Instant postTime = pubDate == null ? Instant.now() : Instant.ofEpochMilli(pubDate);

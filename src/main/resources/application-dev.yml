@@ -2,7 +2,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/network?serverTimezone=UTC
     username: root
-    password: testtest
+    password: 1234567
   jpa:
     show-sql: true
 
@@ -11,4 +11,4 @@ linkToChange:
   email: "http://localhost:8080/shift-email"
 
 upload:
-  path: "C:/Users/Flutman/Desktop/Storage"
+  path: "C:/Users/vitta/Desktop/Storage"
