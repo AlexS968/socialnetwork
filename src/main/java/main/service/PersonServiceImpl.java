@@ -122,5 +122,25 @@ public class PersonServiceImpl implements UserDetailsService {
         return ((PersonPrincipal) SecurityContextHolder.getContext().
                 getAuthentication().getPrincipal()).getPerson();
     }
+
+    public boolean isAuthenticated() {
+        if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
+            throw new UsernameNotFoundException("invalid_request");
+        }
+        return true;
+    }
+
+    public Person getAuthUser() {
+        isAuthenticated();
+        return getCurrentPerson();
+    }
+
+    public Person checkAuthUser(int id) {
+        Person person = getAuthUser();
+        if (person.getId() != id) {
+            throw new UsernameNotFoundException("invalid_request");
+        }
+        return person;
+    }
 }
 

@@ -31,6 +31,8 @@ public class PostService {
     private final PostRepository postRepository;
     private final TagRepository tagRepository;
     private final PostTagRepository postTagRepository;
+    private final LikesService likesService;
+    private final PersonServiceImpl personService;
 
     public ListResponse<PostInResponse> getFeeds(String name, int offset, int itemPerPage) {
         Pageable pageable = new OffsetPageRequest(offset, itemPerPage, Sort.by("time").descending());
@@ -46,7 +48,7 @@ public class PostService {
     @Transactional
     public Response<PostInResponse> addNewPost(Integer personId, PostRequest request, Long pubDate) {
         try {
-            Person person = getAuthUser(personId);
+            Person person = personService.checkAuthUser(personId);
             Post post = savePost(null, request, person, pubDate);
             return new Response<>(new PostInResponse(post));
         } catch (Exception ex) {
@@ -59,7 +61,7 @@ public class PostService {
         Optional<Post> optionalPost = postRepository.findById(id);
         if (optionalPost.isPresent()) {
             Post post = optionalPost.get();
-            Person person = getAuthUser();
+            Person person = personService.getAuthUser();
             post = savePost(post, request, person, pubDate);
 
             return new Response<>(new PostInResponse(post));
@@ -79,7 +81,7 @@ public class PostService {
     }
 
     public ListResponse<PostInResponse>  showWall(Integer personId, int offset, int itemsPerPage) {
-        Person person = getAuthUser(personId);
+        Person person = personService.checkAuthUser(personId);
         Pageable pageable = new OffsetPageRequest(offset, itemsPerPage, Sort.by("time").descending());
         Page<Post> postPage = postRepository.findByAuthor(person, pageable);
 
@@ -126,21 +128,6 @@ public class PostService {
         return postOptional.get();
     }
 
-    private Person getAuthUser() {
-        if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
-            throw new UsernameNotFoundException("invalid_request");
-        }
-        return ((PersonPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getPerson();
-    }
-
-    private Person getAuthUser(int id) {
-        Person person = getAuthUser();
-        if (person.getId() != id) {
-            throw new UsernameNotFoundException("invalid_request");
-        }
-        return person;
-    }
-
     private List<PostInResponse> extractPage(Page<Post> postPage) {
         List<PostInResponse> posts = new ArrayList<>();
         for (Post item : postPage.getContent()) {
@@ -150,7 +137,7 @@ public class PostService {
             } else {
                 postInResponse.setType(PostType.QUEUED);
             }
-            if (!(postInResponse.getType() == PostType.QUEUED && postInResponse.getAuthor().getId() != getAuthUser().getId())) {
+            if (!(postInResponse.getType() == PostType.QUEUED && postInResponse.getAuthor().getId() != personService.getAuthUser().getId())) {
                 posts.add(postInResponse);
             }
         }
