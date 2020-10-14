@@ -147,4 +147,11 @@ public class PostService {
 
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
+
+    public Post findById(int id) {
+        return repository.findById(id).orElseThrow(
+                () -> new BadRequestException(new ApiError(
+                        "invalid request",
+                        "post is not found")));
+    }
 }
