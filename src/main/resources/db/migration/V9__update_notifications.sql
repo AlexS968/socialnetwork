@@ -1,0 +1,2 @@
+alter table notification_type MODIFY COLUMN code enum('POST','POST_COMMENT','COMMENT_COMMENT','FRIEND_REQUEST','MESSAGE', 'FRIEND_BIRTHDAY');
+alter table notification_type ADD COLUMN is_enabled TINYINT not null;
