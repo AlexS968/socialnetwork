@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
-import org.springframework.web.bind.annotation.DeleteMapping;
 
 import javax.persistence.*;
 import java.time.Instant;
@@ -22,7 +21,7 @@ public class Post {
     @Column(nullable = false)
     private Instant time;
 
-    @JsonBackReference
+    @JsonManagedReference
     @ManyToOne
     @JoinColumn(name = "author_id")
     private Person author;
@@ -47,4 +46,5 @@ public class Post {
     @JsonBackReference
     @OneToMany(mappedBy = "post")
     private List<PostFile> files;
+
 }

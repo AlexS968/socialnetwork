@@ -6,8 +6,6 @@ import main.data.PersonPrincipal;
 import main.data.request.LoginRequest;
 import main.data.request.MeProfileRequest;
 import main.data.response.InfoResponse;
-import main.data.response.MeProfileResponse;
-import main.data.response.MeProfileUpdateResponse;
 import main.data.response.base.Response;
 import main.data.response.type.InfoInResponse;
 import main.data.response.type.MeProfile;
@@ -30,6 +28,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -76,19 +75,17 @@ public class PersonServiceImpl implements UserDetailsService {
         return new Response<>(new ResponseMessage("ok"));
     }
 
-    public MeProfileResponse getMe() {
+    public Response<MeProfile> getMe() {
 
         Person person = getCurrentPerson();
-
-        MeProfileResponse response = new MeProfileResponse();
+        Response<MeProfile> response = new Response<>();
         MeProfile profile = new MeProfile(person);
-
         response.setData(profile);
         return response;
 
     }
 
-    public MeProfileUpdateResponse putMe(MeProfileRequest updatedCurrentPerson) {
+    public Response<MeProfileUpdate> putMe(MeProfileRequest updatedCurrentPerson) {
         Person personUpdated = personRepository.findById(getCurrentPerson().getId());
         personUpdated.setLastName(updatedCurrentPerson.getLastName());
         personUpdated.setFirstName(updatedCurrentPerson.getFirstName());
@@ -105,18 +102,18 @@ public class PersonServiceImpl implements UserDetailsService {
         personRepository.save(personUpdated);
 
         MeProfileUpdate updatedPerson = new MeProfileUpdate(personUpdated);
-        MeProfileUpdateResponse response = new MeProfileUpdateResponse();
+        Response<MeProfileUpdate> response = new Response<>();
         response.setData(updatedPerson);
         return response;
     }
 
-    public InfoResponse deleteMe() {
+    public Response<InfoInResponse> deleteMe() {
 
         int id = getCurrentPerson().getId();
         personRepository.deleteById(id);
 
         InfoInResponse info = new InfoInResponse("ok");
-        InfoResponse response = new InfoResponse();
+        Response<InfoInResponse> response = new Response<>();
         response.setData(info);
         return response;
 
@@ -125,6 +122,22 @@ public class PersonServiceImpl implements UserDetailsService {
     private Person getCurrentPerson() {
         return ((PersonPrincipal) SecurityContextHolder.getContext().
                 getAuthentication().getPrincipal()).getPerson();
+    }
+
+    public Response<MeProfile> getProfile(Integer id) {
+        Person person = new Person();
+        Optional<Person> personOpt = personRepository.findById(id);
+        if (personOpt.isPresent()) {
+            person = personOpt.get();
+        } else {
+            throw new UsernameNotFoundException("invalid_request");
+        }
+
+        Response<MeProfile> response = new Response<>();
+
+        MeProfile profile = new MeProfile(person);
+        response.setData(profile);
+        return response;
     }
 }
 
