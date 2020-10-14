@@ -2,13 +2,10 @@ package main.controller;
 
 import lombok.AllArgsConstructor;
 import main.data.request.MeProfileRequest;
-import main.data.response.InfoResponse;
-import main.data.response.base.ListResponse;
 import main.data.response.base.Response;
 import main.data.response.type.InfoInResponse;
 import main.data.response.type.MeProfile;
 import main.data.response.type.MeProfileUpdate;
-import main.data.response.type.PostInResponse;
 import main.service.PersonServiceImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
