@@ -19,6 +19,5 @@ public class NotificationType {
     @Column(nullable = false)
     private String name; // расшифрровка
 
-    //@Column(name = "is_enabled", nullable = false, columnDefinition = "TINYINT")
-   // private boolean isEnabled = true;
+
 }
