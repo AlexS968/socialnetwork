@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -12,14 +13,14 @@ public interface DialogRepository extends JpaRepository<Dialog, Integer> {
     Page<Dialog> findByPersons_id(int personId, Pageable pageable);
 
     @Query(
-            value="SELECT COUNT(*) " +
+            value="SELECT DISTINCT d.* " +
             "FROM dialog d " +
             "INNER JOIN dialog2person dp1 ON dp1.dialog_id = d.id " +
-            "INNER JOIN dialog2person dp2 ON dp1.dialog_id = d.id " +
+            "INNER JOIN dialog2person dp2 ON dp2.dialog_id = d.id " +
             "WHERE dp1.person_id = ?1 AND dp2.person_id = ?2 AND d.is_group = 0",
             nativeQuery=true
     )
-    long findTetATet(int firstPersonId, int secondPersonId);
+    Dialog findTetATet(int firstPersonId, int secondPersonId);
 
     Dialog findById(int dialogId);
 }

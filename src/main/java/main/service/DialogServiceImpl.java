@@ -1,5 +1,6 @@
 package main.service;
 
+import com.sun.xml.bind.v2.runtime.output.SAXOutput;
 import lombok.AllArgsConstructor;
 import main.core.OffsetPageRequest;
 import main.data.PersonPrincipal;
@@ -15,7 +16,6 @@ import main.model.Person;
 import main.model.ReadStatus;
 import main.repository.DialogRepository;
 import main.repository.MessageRepository;
-import main.repository.PersonRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -35,8 +36,8 @@ public class DialogServiceImpl implements DialogService {
 
     @Override
     public ListResponse<DialogList> list(ListRequest request) {
-        PersonPrincipal currentUser = (PersonPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        int currentUserId = currentUser.getPerson().getId();
+        Person currentPerson = personService.getCurrentPerson();
+        int currentUserId = currentPerson.getId();
 
         List<DialogList> dialogs = new ArrayList<>();
         Pageable pageable;
@@ -55,17 +56,13 @@ public class DialogServiceImpl implements DialogService {
 
             item.setUnreadCount(messageRepository.countByReadStatusAndRecipient_idAndDialog_id(
                     ReadStatus.SENT,
-                    currentUser.getPerson().getId(),
+                    currentPerson.getId(),
                     item.getId()
             ));
 
             Message lastMessage = messageRepository.findTopByDialog_idOrderByTimeDesc(item.getId());
             if (lastMessage != null) {
-                DialogMessage dialogMessage = new DialogMessage(
-                        lastMessage,
-                        lastMessage.getAuthor().getId() != currentUser.getPerson().getId()
-                );
-
+                DialogMessage dialogMessage = new DialogMessage(lastMessage);
                 item.setLastMessage(dialogMessage);
             }
 
@@ -82,39 +79,39 @@ public class DialogServiceImpl implements DialogService {
 
     @Override
     public Response<DialogNew> add(DialogAddRequest request) {
-        PersonPrincipal currentUser = (PersonPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Person currentPerson = personService.getCurrentPerson();
 
+        Dialog dialog = null;
         boolean isGroupDialog = request.getUserIds().size() > 1;
 
         //Может быть диалог тет-а-тет уже есть, проверим
-        if (isGroupDialog) {
-            dialogRepository.findTetATet(
-                    currentUser.getPerson().getId(),
+        if (!isGroupDialog) {
+            dialog = dialogRepository.findTetATet(
+                    currentPerson.getId(),
                     request.getUserIds().get(0)
             );
         }
 
-        Dialog dialog = new Dialog();
+        if (dialog == null) {
+            dialog = new Dialog();
 
-        List<Person> persons = new ArrayList<>();
+            List<Person> persons = request.getUserIds().stream().map(personService::getById).collect(Collectors.toList());
+            persons.add(personService.getById(currentPerson.getId()));
 
-        persons.add(personRepository.findById(currentUser.getPerson().getId()));
+            dialog.setPersons(persons);
 
-        request.getUserIds().forEach(i -> persons.add(personRepository.findById(i.intValue())));
-
-        dialog.setPersons(persons);
-
-        if (request.getName() != null && !request.getName().isEmpty()) {
-            dialog.setName(request.getName());
-        } else {
-            if (isGroupDialog) {
-                dialog.setName("Групповая беседа");
+            if (request.getName() != null && !request.getName().isEmpty()) {
+                dialog.setName(request.getName());
+            } else {
+                if (isGroupDialog) {
+                    dialog.setName("Групповая беседа");
+                }
             }
+
+            dialog.setGroup(isGroupDialog);
+
+            dialogRepository.save(dialog);
         }
-
-        dialog.setGroup(isGroupDialog);
-
-        dialogRepository.save(dialog);
 
         return new Response<>(new DialogNew(dialog.getId()));
     }
