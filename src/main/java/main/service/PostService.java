@@ -175,7 +175,7 @@ public class PostService {
     }
 
     public Post findById(int id) {
-        return repository.findById(id).orElseThrow(
+        return postRepository.findById(id).orElseThrow(
                 () -> new BadRequestException(new ApiError(
                         "invalid request",
                         "post is not found")));

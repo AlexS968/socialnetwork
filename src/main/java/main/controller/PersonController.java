@@ -32,7 +32,7 @@ public class PersonController {
   }
 
   @DeleteMapping("/me")
-  public ResponseEntity<Response<InfoInResponse> > delete() {
+  public ResponseEntity<Response<InfoInResponse>> delete() {
     return ResponseEntity.ok(personServiceImpl.deleteMe());
   }
 
