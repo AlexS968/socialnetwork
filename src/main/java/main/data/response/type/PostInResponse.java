@@ -38,7 +38,7 @@ public class PostInResponse {
         isBlocked = post.isBlocked();
         likes = post.getLikes() != null ? post.getLikes().size() : 0;
         comments = commentsList.stream()
-                .filter(commentInResponse -> Integer.parseInt(commentInResponse.getPostId()) == id)
+                .filter(commentInResponse -> commentInResponse.getPostId() == id)
                 .collect(Collectors.toList());
         tags = getTags(post);
     }
