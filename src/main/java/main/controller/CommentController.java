@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import main.data.request.CommentRequest;
 import main.data.response.CommentResponse;
 import main.data.response.base.ListResponse;
+import main.data.response.type.CommentInResponse;
 import main.data.response.type.ItemDelete;
 import main.service.CommentService;
 import org.springframework.http.ResponseEntity;
@@ -25,12 +26,11 @@ public class CommentController {
     }
 
     @GetMapping("/{id}/comments")
-    public ResponseEntity<ListResponse> showPostComments(
+    public ResponseEntity<ListResponse<CommentInResponse>> showPostComments(
             @PathVariable Integer id,
             @RequestParam(required = true, defaultValue = "0") Integer offset,
             @RequestParam(required = true, defaultValue = "20") Integer itemPerPage
     ) {
-
         return ResponseEntity.ok(commentService.getPostComments(id, offset, itemPerPage));
     }
 
