@@ -4,12 +4,19 @@ import lombok.AllArgsConstructor;
 import main.core.OffsetPageRequest;
 import main.data.PersonPrincipal;
 import main.data.request.PostRequest;
-import main.data.response.base.ListResponse;
-import main.data.response.base.Response;
-import main.data.response.type.PostDelete;
+import main.data.response.type.CommentInResponse;
 import main.data.response.type.PostInResponse;
 import main.exception.BadRequestException;
 import main.exception.apierror.ApiError;
+import main.model.Person;
+import main.model.Post;
+import main.model.PostComment;
+import main.model.PostTag;
+import main.model.Tag;
+import main.repository.PostCommentRepository;
+import main.data.response.base.ListResponse;
+import main.data.response.base.Response;
+import main.data.response.type.PostDelete;
 import main.model.*;
 import main.repository.PostRepository;
 import main.repository.PostTagRepository;
@@ -23,11 +30,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 public class PostService {
+    private final PostCommentRepository commentRepository;
     private final PostRepository postRepository;
     private final TagRepository tagRepository;
     private final PostTagRepository postTagRepository;
@@ -40,7 +52,8 @@ public class PostService {
         } else {
             postPage = postRepository.findAll(pageable);
         }
-        return new ListResponse<>(extractPage(postPage), postPage.getTotalElements(), offset, itemPerPage);
+        List<CommentInResponse> commentsList = getCommentsList(postPage.getContent());
+        return new ListResponse<>(extractPage(postPage, commentsList), postPage.getTotalElements(), offset, itemPerPage);
     }
 
     @Transactional
@@ -48,7 +61,7 @@ public class PostService {
         try {
             Person person = getAuthUser(personId);
             Post post = savePost(null, request, person, pubDate);
-            return new Response<>(new PostInResponse(post));
+            return new Response<>(new PostInResponse(post, new ArrayList<>()));
         } catch (Exception ex) {
             throw new BadRequestException(new ApiError("invalid_request", "Ошибка создания поста"));
         }
@@ -56,16 +69,13 @@ public class PostService {
 
     @Transactional
     public Response<PostInResponse> editPost(int id, Long pubDate, PostRequest request) {
-        Optional<Post> optionalPost = postRepository.findById(id);
-        if (optionalPost.isPresent()) {
-            Post post = optionalPost.get();
-            Person person = getAuthUser();
-            post = savePost(post, request, person, pubDate);
+        Post post = getPost(id);
 
-            return new Response<>(new PostInResponse(post));
-        } else {
-            throw new BadRequestException(new ApiError("invalid_request", "Пост не существует"));
-        }
+        Person person = getAuthUser();
+        post = savePost(post, request, person, pubDate);
+
+        return new Response<>(new PostInResponse(post, new ArrayList<>()));
+
     }
 
     public Response<PostDelete> delPost(Integer id) {
@@ -78,14 +88,21 @@ public class PostService {
         }
     }
 
-    public ListResponse<PostInResponse>  showWall(Integer personId, int offset, int itemsPerPage) {
+    public ListResponse<PostInResponse> showWall(Integer personId, int offset, int itemsPerPage) {
         Person person = getAuthUser(personId);
         Pageable pageable = new OffsetPageRequest(offset, itemsPerPage, Sort.by("time").descending());
         Page<Post> postPage = postRepository.findByAuthor(person, pageable);
-
-        return new ListResponse<>(extractPage(postPage), postPage.getTotalElements(), offset, itemsPerPage);
+        List<CommentInResponse> commentsList = getCommentsList(postPage.getContent());
+        return new ListResponse<>(extractPage(postPage, commentsList), postPage.getTotalElements(), offset, itemsPerPage);
     }
-//-----------------------
+
+    private List<CommentInResponse> getCommentsList(List<Post> posts) {
+        Set<Integer> list = posts.stream().map(Post::getId).collect(Collectors.toSet());
+        List<PostComment> comments = commentRepository.getCommentsByList(list);
+        return comments.stream().map(CommentInResponse::new).collect(Collectors.toList());
+    }
+
+    //-----------------------
     private Post savePost(Post post, PostRequest postData, Person person, Long pubDate) {
         Post postToSave = (post == null) ? new Post() : post;
         final Instant postTime = pubDate == null ? Instant.now() : Instant.ofEpochMilli(pubDate);
@@ -141,10 +158,10 @@ public class PostService {
         return person;
     }
 
-    private List<PostInResponse> extractPage(Page<Post> postPage) {
+    private List<PostInResponse> extractPage(Page<Post> postPage, List<CommentInResponse> comments) {
         List<PostInResponse> posts = new ArrayList<>();
         for (Post item : postPage.getContent()) {
-            PostInResponse postInResponse = new PostInResponse(item);
+            PostInResponse postInResponse = new PostInResponse(item, comments);
             if (item.getTime().isBefore(Instant.now())) {
                 postInResponse.setType(PostType.POSTED);
             } else {
