@@ -43,7 +43,7 @@ public class Person {
     private String phone;
 
     @Column(name = "photo", columnDefinition = "text")
-    private String photoURL;
+    private String photoURL = "/static/img/default_avatar.png";
 
     @Column(columnDefinition = "text")
     private String about;

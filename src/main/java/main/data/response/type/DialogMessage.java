@@ -2,10 +2,12 @@ package main.data.response.type;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import main.model.Message;
 import main.model.ReadStatus;
 
 @Data
+@NoArgsConstructor
 public class DialogMessage {
     private int id;
     private long time;
@@ -26,13 +28,7 @@ public class DialogMessage {
     @JsonProperty("read_status")
     private ReadStatus readStatus;
 
-    private boolean isSentByMe;
-
     public DialogMessage(Message message) {
-        this(message, true);
-    }
-
-    public DialogMessage(Message message, boolean isSentByMe) {
         this.id = message.getId();
         this.time = message.getTime().toEpochMilli();
         this.authorId = message.getAuthor().getId();
@@ -41,6 +37,5 @@ public class DialogMessage {
         this.recipient = (message.getRecipient() != null) ? new DialogMessagePerson(message.getRecipient()) : null;
         this.messageText = message.getMessageText();
         this.readStatus = message.getReadStatus();
-        this.isSentByMe = isSentByMe;
     }
 }
