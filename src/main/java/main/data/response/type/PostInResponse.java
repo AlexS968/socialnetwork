@@ -7,19 +7,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import main.model.Post;
 import main.model.PostType;
-import main.model.Tag;
-
-import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class PostInResponse {
     private Integer id;
-    private Instant time;
+    private long time;
     private MeProfile author;
     private String title;
     @JsonProperty(value = "post_text")
@@ -32,15 +29,17 @@ public class PostInResponse {
     private PostType type;
     private List<String> tags;
 
-    public PostInResponse(Post post) {
+    public PostInResponse(Post post, List<CommentInResponse> commentsList) {
         id = post.getId();
-        time = post.getTime();
+        time = post.getTime().toEpochMilli();
         author = new MeProfile(post.getAuthor());
         title = post.getTitle();
         postText = post.getPostText();
         isBlocked = post.isBlocked();
         likes = post.getLikes() != null ? post.getLikes().size() : 0;
-        comments = new ArrayList<>();
+        comments = commentsList.stream()
+                .filter(commentInResponse -> Integer.parseInt(commentInResponse.getPostId()) == id)
+                .collect(Collectors.toList());
         tags = getTags(post);
     }
 

@@ -28,6 +28,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -141,6 +142,22 @@ public class PersonServiceImpl implements UserDetailsService {
             throw new UsernameNotFoundException("invalid_request");
         }
         return person;
+    }
+
+    public Response<MeProfile> getProfile(Integer id) {
+        Person person = new Person();
+        Optional<Person> personOpt = personRepository.findById(id);
+        if (personOpt.isPresent()) {
+            person = personOpt.get();
+        } else {
+            throw new UsernameNotFoundException("invalid_request");
+        }
+
+        Response<MeProfile> response = new Response<>();
+
+        MeProfile profile = new MeProfile(person);
+        response.setData(profile);
+        return response;
     }
 }
 
