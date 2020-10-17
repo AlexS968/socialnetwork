@@ -1,21 +1,25 @@
 package main.model;
 
 import lombok.Data;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.time.Instant;
 
 @Entity
-@Table(name = "post_like")
+@Table(name = "likes")
 @Data
-public class PostLike {
+public class Like {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @ManyToOne
-    @JoinColumn(name = "post_id")
-    private Post post;
+    @Column(nullable = false)
+    private int itemId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "enum('POST', 'COMMENT')", nullable = false)
+    private LikeType type;
 
     @OneToOne
     @JoinColumn(name = "person_id")

@@ -159,5 +159,9 @@ public class PersonServiceImpl implements UserDetailsService {
         response.setData(profile);
         return response;
     }
+
+    public Person getPerson(int id) {
+        return personRepository.findById(id);
+    }
 }
 

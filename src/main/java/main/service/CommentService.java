@@ -105,5 +105,14 @@ public class CommentService {
         
         return response;
     }
+
+    public PostComment getComment(int itemId) {
+        Optional<PostComment> optionalPostComment = commentRepository.findById(itemId);
+        if (optionalPostComment.isPresent()) {
+            return optionalPostComment.get();
+        } else {
+            throw new BadRequestException(new ApiError("invalid_request","Несуществующий коммент"));
+        }
+    }
 }
 

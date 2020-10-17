@@ -1,8 +1,9 @@
 package main.service;
 
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import main.core.OffsetPageRequest;
-import main.data.PersonPrincipal;
 import main.data.request.PostRequest;
 import main.data.response.type.CommentInResponse;
 import main.data.response.type.PostInResponse;
@@ -21,11 +22,10 @@ import main.model.*;
 import main.repository.PostRepository;
 import main.repository.PostTagRepository;
 import main.repository.TagRepository;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,14 +37,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class PostService {
     private final PostCommentRepository commentRepository;
     private final PostRepository postRepository;
     private final TagRepository tagRepository;
     private final PostTagRepository postTagRepository;
-    private final LikesService likesService;
     private final PersonServiceImpl personService;
+//    private final LikesService likesService;
 
     public ListResponse<PostInResponse> getFeeds(String name, int offset, int itemPerPage) {
         Pageable pageable = new OffsetPageRequest(offset, itemPerPage, Sort.by("time").descending());
@@ -71,18 +71,10 @@ public class PostService {
 
     @Transactional
     public Response<PostInResponse> editPost(int id, Long pubDate, PostRequest request) {
-        Optional<Post> optionalPost = postRepository.findById(id);
-        if (optionalPost.isPresent()) {
-            Post post = optionalPost.get();
-            Person person = personService.getAuthUser();
-            post = savePost(post, request, person, pubDate);
         Post post = getPost(id);
-
-        Person person = getAuthUser();
+        Person person = personService.getAuthUser();
         post = savePost(post, request, person, pubDate);
-
         return new Response<>(new PostInResponse(post, new ArrayList<>()));
-
     }
 
     public Response<PostDelete> delPost(Integer id) {
@@ -95,7 +87,7 @@ public class PostService {
         }
     }
 
-    public ListResponse<PostInResponse>  showWall(Integer personId, int offset, int itemsPerPage) {
+    public ListResponse<PostInResponse> showWall(Integer personId, int offset, int itemsPerPage) {
         Person person = personService.checkAuthUser(personId);
         Pageable pageable = new OffsetPageRequest(offset, itemsPerPage, Sort.by("time").descending());
         Page<Post> postPage = postRepository.findByAuthor(person, pageable);
@@ -142,7 +134,7 @@ public class PostService {
         return postToSave;
     }
 
-    private Post getPost(int id) {
+    public Post getPost(int id) {
         Optional<Post> postOptional = postRepository.findById(id);
         if (postOptional.isEmpty()) {
             throw new BadRequestException(new ApiError("invalid_request", "Пост не существует"));
@@ -150,7 +142,7 @@ public class PostService {
         return postOptional.get();
     }
 
-    private List<PostInResponse> extractPage(Page<Post> postPage) {
+    private List<PostInResponse> extractPage(Page<Post> postPage, List<CommentInResponse> comments) {
         List<PostInResponse> posts = new ArrayList<>();
         for (Post item : postPage.getContent()) {
             PostInResponse postInResponse = new PostInResponse(item, comments);
