@@ -18,6 +18,8 @@ public interface PersonRepository extends JpaRepository<Person, Integer> {
 
   Optional<Person> findByConfirmationCode(String confirmationCode);
 
+  List<Person> findAll();
+
   List<Optional<Person>> findByCityId(Integer cityId);
 
   List<Optional<Person>> findByLastNameLikeOrFirstNameLike(String lastName, String firstName);
