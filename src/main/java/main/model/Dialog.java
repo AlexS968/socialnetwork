@@ -14,12 +14,10 @@ public class Dialog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "primary_recipient_id")
-    private Person primaryRecipient;
+    private String name;
 
-    @Column(name = "primary_recipient_id", insertable = false, updatable = false)
-    private Integer primaryRecipientId;
+    @Column(name = "is_group", nullable = false, columnDefinition = "TINYINT")
+    private boolean isGroup = false;
 
     @ToString.Exclude
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)

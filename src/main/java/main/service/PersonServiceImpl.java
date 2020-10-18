@@ -5,7 +5,6 @@ import main.core.auth.JwtUtils;
 import main.data.PersonPrincipal;
 import main.data.request.LoginRequest;
 import main.data.request.MeProfileRequest;
-import main.data.response.InfoResponse;
 import main.data.response.base.Response;
 import main.data.response.type.InfoInResponse;
 import main.data.response.type.MeProfile;
@@ -32,7 +31,7 @@ import java.util.Optional;
 
 @Service
 @AllArgsConstructor
-public class PersonServiceImpl implements UserDetailsService {
+public class PersonServiceImpl implements UserDetailsService, PersonService {
 
     private final PersonRepository personRepository;
     private final AuthenticationManager authenticationManager;
@@ -49,6 +48,7 @@ public class PersonServiceImpl implements UserDetailsService {
         return new PersonPrincipal(user);
     }
 
+    @Override
     public Response<PersonInLogin> login(LoginRequest request) {
         Authentication authentication
                 = authenticationManager.authenticate(
@@ -71,10 +71,12 @@ public class PersonServiceImpl implements UserDetailsService {
         return new Response<>(personInLogin);
     }
 
+    @Override
     public Response<ResponseMessage> logout() {
         return new Response<>(new ResponseMessage("ok"));
     }
 
+    @Override
     public Response<MeProfile> getMe() {
 
         Person person = getCurrentPerson();
@@ -85,6 +87,7 @@ public class PersonServiceImpl implements UserDetailsService {
 
     }
 
+    @Override
     public Response<MeProfileUpdate> putMe(MeProfileRequest updatedCurrentPerson) {
         Person personUpdated = personRepository.findById(getCurrentPerson().getId());
         personUpdated.setLastName(updatedCurrentPerson.getLastName());
@@ -107,6 +110,7 @@ public class PersonServiceImpl implements UserDetailsService {
         return response;
     }
 
+    @Override
     public Response<InfoInResponse> deleteMe() {
 
         int id = getCurrentPerson().getId();
@@ -119,9 +123,16 @@ public class PersonServiceImpl implements UserDetailsService {
 
     }
 
-    private Person getCurrentPerson() {
+    @Override
+    public Person getCurrentPerson() {
         return ((PersonPrincipal) SecurityContextHolder.getContext().
                 getAuthentication().getPrincipal()).getPerson();
+    }
+
+
+    @Override
+    public Person getById(int personId) {
+        return personRepository.findById(personId);
     }
 
     public boolean isAuthenticated() {
@@ -158,10 +169,6 @@ public class PersonServiceImpl implements UserDetailsService {
         MeProfile profile = new MeProfile(person);
         response.setData(profile);
         return response;
-    }
-
-    public Person getPerson(int id) {
-        return personRepository.findById(id);
     }
 }
 
