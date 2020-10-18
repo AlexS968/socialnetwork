@@ -28,7 +28,7 @@ public class LikesServiceImpl implements LikesService {
     private final PostService postService;
 
     public Response<LikesWithUsers> isLiked(Integer userId, int itemId, String type) {
-        Person person= userId == null ? personService.getAuthUser() : personService.getPerson(userId);
+        Person person= userId == null ? personService.getAuthUser() : personService.getById(userId);
         Optional<Like> likeOptional;
         if (type.equals("Post") || type.equals("Comment")) {
             likeOptional = likesRepository.findByItemIdAndPersonIdAndType(itemId, person.getId(), LikeType.valueOf(type.toUpperCase()));
