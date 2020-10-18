@@ -39,7 +39,7 @@ public class PostComment {
 
     @JsonManagedReference
     @OneToMany
-    @JoinTable(name = "likes", joinColumns = @JoinColumn(name = "id"), inverseJoinColumns = @JoinColumn(name = "itemId"))
+    @JoinTable(name = "likes", joinColumns = @JoinColumn(name = "itemId"), inverseJoinColumns = @JoinColumn(name = "id"))
     @Where(clause = "type = 'COMMENT'")
     private List<Like> likes;
 }

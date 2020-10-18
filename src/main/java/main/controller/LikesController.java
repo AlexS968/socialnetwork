@@ -5,7 +5,6 @@ import main.data.request.LikeRequest;
 import main.data.response.base.Response;
 import main.data.response.type.LikesWithUsers;
 import main.service.LikesService;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

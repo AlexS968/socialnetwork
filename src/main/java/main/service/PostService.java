@@ -1,7 +1,5 @@
 package main.service;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import main.core.OffsetPageRequest;
 import main.data.request.PostRequest;
@@ -44,7 +42,6 @@ public class PostService {
     private final TagRepository tagRepository;
     private final PostTagRepository postTagRepository;
     private final PersonServiceImpl personService;
-//    private final LikesService likesService;
 
     public ListResponse<PostInResponse> getFeeds(String name, int offset, int itemPerPage) {
         Pageable pageable = new OffsetPageRequest(offset, itemPerPage, Sort.by("time").descending());

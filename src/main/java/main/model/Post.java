@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import org.hibernate.annotations.Where;
+import org.hibernate.annotations.WhereJoinTable;
 
 import javax.persistence.*;
 import java.time.Instant;
@@ -41,14 +42,13 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostTag> tags;
 
-    @JsonManagedReference
+    @JsonBackReference
     @OneToMany
-    @JoinTable(name = "likes", joinColumns = @JoinColumn(name = "id"), inverseJoinColumns = @JoinColumn(name = "itemId"))
-    @Where(clause = "type = 'POST'")
+    @JoinTable(name = "likes", joinColumns = @JoinColumn(name = "itemId"), inverseJoinColumns = @JoinColumn(name = "id"))
+    @WhereJoinTable(clause = "type = 'POST'")
     private List<Like> likes;
 
     @JsonBackReference
     @OneToMany(mappedBy = "post")
     private List<PostFile> files;
-
 }

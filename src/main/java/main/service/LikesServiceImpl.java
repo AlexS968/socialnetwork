@@ -1,7 +1,6 @@
 package main.service;
 
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import main.data.request.LikeRequest;
 import main.data.response.base.Response;
@@ -10,7 +9,7 @@ import main.exception.BadRequestException;
 import main.exception.apierror.ApiError;
 import main.model.*;
 import main.repository.LikesRepository;
-import org.springframework.context.annotation.Lazy;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
