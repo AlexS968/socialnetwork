@@ -5,7 +5,7 @@ import main.data.request.PostRequest;
 import main.data.response.base.ListResponse;
 import main.data.response.base.Response;
 import main.data.response.type.PostInResponse;
-import main.service.PostService;
+import main.service.PostServiceImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 @RequestMapping("/api/v1/users")
 public class ProfileController {
-    private final PostService postService;
+    private final PostServiceImpl postServiceImpl;
 
     @PostMapping("/{id}/wall")
     public ResponseEntity<Response<PostInResponse>> addPostToWall(
@@ -22,7 +22,7 @@ public class ProfileController {
             @RequestBody PostRequest request,
             @RequestParam(name = "publish_date", required = false) Long pubDate
             ){
-        return ResponseEntity.ok(postService.addNewPost(id, request, pubDate));
+        return ResponseEntity.ok(postServiceImpl.addNewPost(id, request, pubDate));
     }
 
     @GetMapping("/{id}/wall")
@@ -31,7 +31,7 @@ public class ProfileController {
         @RequestParam(defaultValue = "0") int offset,
         @RequestParam(defaultValue = "20") int itemsPerPage
     ){
-        return ResponseEntity.ok(postService.showWall(id, offset, itemsPerPage));
+        return ResponseEntity.ok(postServiceImpl.showWall(id, offset, itemsPerPage));
     }
 
 }
