@@ -51,7 +51,7 @@ public class CommentService {
                 )));
         commentRepository.save(postComment);
 
-        CommentInResponse commentInResponse = new CommentInResponse(postComment);
+        CommentInResponse commentInResponse = new CommentInResponse(postComment, new ArrayList<>());
         response.setData(commentInResponse);
 
         return response;
@@ -59,15 +59,38 @@ public class CommentService {
 
     public ListResponse<CommentInResponse> getPostComments(Integer postId, Integer offset, Integer itemPerPage) {
         List<PostComment> comments = commentRepository.findAllByPostId(postId);
-        List<CommentInResponse> list = comments.stream().map(CommentInResponse::new).collect(Collectors.toList());
+        List<CommentInResponse> list = getComments(comments);
         return new ListResponse<>(list, list.size(), offset, itemPerPage);
     }
 
-    //Excess??
+    //Rare method
+    private List<CommentInResponse> getComments(List<PostComment> comments){
+        List<CommentInResponse> commentsDto = comments.stream().map(CommentInResponse::new).collect(Collectors.toList());
+        List<CommentInResponse> commentsResult = commentsDto.stream()
+                .filter(commentInResponse -> commentInResponse.getParentId() == 0).collect(Collectors.toList());
+        for (CommentInResponse commentDto : commentsResult) {
+            List<CommentInResponse> subComments = getSublistComment(commentsDto, commentDto.getId());
+            commentDto.setSubComments(subComments);
+        }
+        return commentsResult;
+    }
+
+    private List<CommentInResponse> getSublistComment(List<CommentInResponse> comments, long commentId){
+        List<CommentInResponse> subComments = new ArrayList<>();
+
+        for (CommentInResponse comment : comments) {
+            if (comment.getParentId() == commentId) {
+                subComments.add(comment);
+            }
+        }
+
+        return subComments;
+    }
+
     public List<CommentInResponse> getCommentsList (List<Post> posts) {
         Set<Integer> list = posts.stream().map(Post::getId).collect(Collectors.toSet());
         List<PostComment> comments = commentRepository.getCommentsByList(list);
-        return comments.stream().map(CommentInResponse::new).collect(Collectors.toList());
+        return getComments(comments);
     }
 
     public CommentResponse editComment(Integer id, Integer commentId, CommentRequest request) {
@@ -95,7 +118,6 @@ public class CommentService {
     public ItemDelete deleteComment(Integer postId, Integer commentId) {
         ItemDelete response = new ItemDelete();
 
-        //TODO complete deleteComment
         PostComment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new BadRequestException(
                         new ApiError("invalid_request","Несуществующий коммент"))
