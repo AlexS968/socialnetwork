@@ -44,7 +44,7 @@ public class PostInResponse {
                 .filter(commentInResponse -> commentInResponse.getPostId() == id)
                 .collect(Collectors.toList());
         tags = getTags(post);
-        myLike = post.getLikes().stream().anyMatch(l -> l.getPerson().getId() == currentUserId);
+        myLike = likes != 0 && post.getLikes().stream().anyMatch(l -> l.getPerson().getId() == currentUserId);
     }
 
     private List<String> getTags(Post post) {
