@@ -2,8 +2,8 @@ package main.controller;
 
 import lombok.AllArgsConstructor;
 import main.data.request.LoginRequest;
-import main.data.response.CaptchaResponse;
-import main.data.response.FriendsResponse;
+//import main.data.response.CaptchaResponse;
+//import main.data.response.FriendsResponse;
 import main.data.response.base.Response;
 import main.data.response.type.ResponseMessage;
 import main.data.response.type.PersonInLogin;
@@ -27,11 +27,10 @@ public class ApiAuthController {
     public ResponseEntity<Response<ResponseMessage>> logout() {
         return ResponseEntity.ok(userService.logout());
     }
-    @PostMapping(value = "/captcha")
-    public ResponseEntity<FriendsResponse> confirmCaptcha(){
-        FriendsResponse response = new FriendsResponse();
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
 
-
+//    @PostMapping(value = "/captcha")
+//    public ResponseEntity<FriendsResponse> confirmCaptcha(){
+//        FriendsResponse response = new FriendsResponse();
+//        return new ResponseEntity<>(response, HttpStatus.OK);
+//    }
 }
