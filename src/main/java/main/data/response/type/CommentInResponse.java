@@ -43,7 +43,7 @@ public class CommentInResponse {
         authorId = new MeProfile(comment.getAuthor());
         blocked = comment.isBlocked();
         subComments = new ArrayList<>();
-        likeCount = 0;
+        likeCount = comment.getLikes() != null ? comment.getLikes().size() : 0;;
         isMyLike = false;
     }
 }
