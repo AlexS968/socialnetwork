@@ -9,6 +9,7 @@ import main.data.response.type.CommentInResponse;
 import main.data.response.type.ItemDelete;
 import main.exception.BadRequestException;
 import main.exception.apierror.ApiError;
+import main.model.Person;
 import main.model.Post;
 import main.model.PostComment;
 import main.repository.PostCommentRepository;
@@ -29,6 +30,7 @@ public class CommentService {
 
     private final PostCommentRepository commentRepository;
     private final PostRepository postRepository;
+    private final PersonService personService;
 
     public CommentResponse createComment(Integer postId, CommentRequest request) {
         CommentResponse response = new CommentResponse();
@@ -40,9 +42,8 @@ public class CommentService {
             postCommentOpt.ifPresent(postComment::setParent);
         }
 
-        PersonPrincipal currentUser = (PersonPrincipal) SecurityContextHolder.getContext()
-                .getAuthentication().getPrincipal();
-        postComment.setAuthor(currentUser.getPerson());
+        Person currentUser = personService.getAuthUser();
+        postComment.setAuthor(currentUser);
         postComment.setTime(Instant.now());
         postComment.setBlocked(false);
         postComment.setPost(postRepository.findById(postId)
@@ -51,23 +52,25 @@ public class CommentService {
                 )));
         commentRepository.save(postComment);
 
-        CommentInResponse commentInResponse = new CommentInResponse(postComment);
+        CommentInResponse commentInResponse = new CommentInResponse(postComment, currentUser.getId());
         response.setData(commentInResponse);
 
         return response;
     }
 
     public ListResponse<CommentInResponse> getPostComments(Integer postId, Integer offset, Integer itemPerPage) {
+        Person currentUser = personService.getAuthUser();
         List<PostComment> comments = commentRepository.findAllByPostId(postId);
-        List<CommentInResponse> list = comments.stream().map(CommentInResponse::new).collect(Collectors.toList());
+        List<CommentInResponse> list = comments.stream().map(comment -> new CommentInResponse(comment, currentUser.getId())).collect(Collectors.toList());
         return new ListResponse<>(list, list.size(), offset, itemPerPage);
     }
 
     //Excess??
     public List<CommentInResponse> getCommentsList (List<Post> posts) {
+        Person currentUser = personService.getAuthUser();
         Set<Integer> list = posts.stream().map(Post::getId).collect(Collectors.toSet());
         List<PostComment> comments = commentRepository.getCommentsByList(list);
-        return comments.stream().map(CommentInResponse::new).collect(Collectors.toList());
+        return comments.stream().map(comment -> new CommentInResponse(comment, currentUser.getId())).collect(Collectors.toList());
     }
 
     public CommentResponse editComment(Integer id, Integer commentId, CommentRequest request) {

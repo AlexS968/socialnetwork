@@ -14,4 +14,7 @@ public interface PersonService {
     Response<InfoInResponse> deleteMe();
     Person getCurrentPerson();
     Person getById(int personId);
+    Person getAuthUser();
+    Person checkAuthUser(int id);
+    boolean isAuthenticated();
 }

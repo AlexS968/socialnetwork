@@ -34,7 +34,7 @@ public class CommentInResponse {
     @JsonProperty("is_my_like")
     private boolean isMyLike;
 
-    public CommentInResponse(PostComment comment) {
+    public CommentInResponse(PostComment comment, int userId) {
         parentId = comment.getParent() != null ? comment.getParent().getId() : 0;
         commentText = comment.getCommentText();
         id = comment.getId();
@@ -44,6 +44,7 @@ public class CommentInResponse {
         blocked = comment.isBlocked();
         subComments = new ArrayList<>();
         likeCount = comment.getLikes() != null ? comment.getLikes().size() : 0;;
-        isMyLike = false;
+
+        isMyLike = comment.getLikes().stream().anyMatch(l -> l.getPerson().getId() == userId);
     }
 }

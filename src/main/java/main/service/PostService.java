@@ -20,7 +20,6 @@ import main.model.*;
 import main.repository.PostRepository;
 import main.repository.PostTagRepository;
 import main.repository.TagRepository;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -41,9 +40,10 @@ public class PostService {
     private final PostRepository postRepository;
     private final TagRepository tagRepository;
     private final PostTagRepository postTagRepository;
-    private final PersonServiceImpl personService;
+    private final PersonService personService;
 
     public ListResponse<PostInResponse> getFeeds(String name, int offset, int itemPerPage) {
+        Person person = personService.getAuthUser();
         Pageable pageable = new OffsetPageRequest(offset, itemPerPage, Sort.by("time").descending());
         Page<Post> postPage;
         if (name != null && !name.isEmpty()) {
@@ -52,7 +52,7 @@ public class PostService {
             postPage = postRepository.findAll(pageable);
         }
         List<CommentInResponse> commentsList = getCommentsList(postPage.getContent());
-        return new ListResponse<>(extractPage(postPage, commentsList), postPage.getTotalElements(), offset, itemPerPage);
+        return new ListResponse<>(extractPage(postPage, commentsList, person.getId()), postPage.getTotalElements(), offset, itemPerPage);
     }
 
     @Transactional
@@ -60,7 +60,7 @@ public class PostService {
         try {
             Person person = personService.checkAuthUser(personId);
             Post post = savePost(null, request, person, pubDate);
-            return new Response<>(new PostInResponse(post, new ArrayList<>()));
+            return new Response<>(new PostInResponse(post, new ArrayList<>(), personId));
         } catch (Exception ex) {
             throw new BadRequestException(new ApiError("invalid_request", "Ошибка создания поста"));
         }
@@ -71,7 +71,7 @@ public class PostService {
         Post post = getPost(id);
         Person person = personService.getAuthUser();
         post = savePost(post, request, person, pubDate);
-        return new Response<>(new PostInResponse(post, new ArrayList<>()));
+        return new Response<>(new PostInResponse(post, new ArrayList<>(), person.getId()));
     }
 
     public Response<PostDelete> delPost(Integer id) {
@@ -89,13 +89,14 @@ public class PostService {
         Pageable pageable = new OffsetPageRequest(offset, itemsPerPage, Sort.by("time").descending());
         Page<Post> postPage = postRepository.findByAuthor(person, pageable);
         List<CommentInResponse> commentsList = getCommentsList(postPage.getContent());
-        return new ListResponse<>(extractPage(postPage, commentsList), postPage.getTotalElements(), offset, itemsPerPage);
+        return new ListResponse<>(extractPage(postPage, commentsList, personId), postPage.getTotalElements(), offset, itemsPerPage);
     }
 
     private List<CommentInResponse> getCommentsList(List<Post> posts) {
+        Person person = personService.getAuthUser();
         Set<Integer> list = posts.stream().map(Post::getId).collect(Collectors.toSet());
         List<PostComment> comments = commentRepository.getCommentsByList(list);
-        return comments.stream().map(CommentInResponse::new).collect(Collectors.toList());
+        return comments.stream().map(comment -> new CommentInResponse(comment, person.getId())).collect(Collectors.toList());
     }
 
     //-----------------------
@@ -139,16 +140,16 @@ public class PostService {
         return postOptional.get();
     }
 
-    private List<PostInResponse> extractPage(Page<Post> postPage, List<CommentInResponse> comments) {
+    private List<PostInResponse> extractPage(Page<Post> postPage, List<CommentInResponse> comments, int userId) {
         List<PostInResponse> posts = new ArrayList<>();
         for (Post item : postPage.getContent()) {
-            PostInResponse postInResponse = new PostInResponse(item, comments);
+            PostInResponse postInResponse = new PostInResponse(item, comments, userId);
             if (item.getTime().isBefore(Instant.now())) {
                 postInResponse.setType(PostType.POSTED);
             } else {
                 postInResponse.setType(PostType.QUEUED);
             }
-            if (!(postInResponse.getType() == PostType.QUEUED && postInResponse.getAuthor().getId() != personService.getAuthUser().getId())) {
+            if (!(postInResponse.getType() == PostType.QUEUED && postInResponse.getAuthor().getId() != userId)) {
                 posts.add(postInResponse);
             }
         }

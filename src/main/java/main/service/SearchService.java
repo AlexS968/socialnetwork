@@ -10,7 +10,6 @@ import java.util.Optional;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import main.core.OffsetPageRequest;
-import main.data.response.ListPostsResponse;
 import main.data.response.base.ListResponse;
 import main.data.response.type.CommentInResponse;
 import main.data.response.type.PersonInPersonList;
@@ -104,6 +103,8 @@ public class SearchService {
       String author,
       Integer offset, Integer itemPerPage) {
 
+
+
     Pageable pageable;
 
     if (offset == 0 && itemPerPage == 0) {
@@ -144,7 +145,7 @@ public class SearchService {
         .findByTextPeriodAuthor(textUpdated, from, to, authorsIds, pageable);
 
     List<CommentInResponse> comments = commentService.getCommentsList(resultPostPage.getContent());
-    resultPostPage.forEach(p -> searchPostResult.add(new PostInResponse(p, comments))); //TODO check necessity
+    resultPostPage.forEach(p -> searchPostResult.add(new PostInResponse(p, comments, -1))); //TODO check necessity
 
     return new ListResponse<>(searchPostResult, resultPostPage.getTotalElements(), offset,
         itemPerPage);
