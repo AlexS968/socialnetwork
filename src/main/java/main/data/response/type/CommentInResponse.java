@@ -43,8 +43,8 @@ public class CommentInResponse {
         authorId = new MeProfile(comment.getAuthor());
         blocked = comment.isBlocked();
         subComments = new ArrayList<>();
-        likeCount = comment.getLikes() != null ? comment.getLikes().size() : 0;;
+        likeCount = comment.getLikes() != null ? comment.getLikes().size() : 0;
 
-        isMyLike = comment.getLikes().stream().anyMatch(l -> l.getPerson().getId() == userId);
+        isMyLike = likeCount != 0 &&  comment.getLikes().stream().anyMatch(l -> l.getPerson().getId() == userId);
     }
 }
