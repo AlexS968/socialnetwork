@@ -44,12 +44,6 @@ public class RegistrationService {
                     "пароли не совпадают"
             ));
         }
-        if (!(request.getCode().equals("3675"))){
-            throw new BadRequestException(new ApiError(
-                    "invalid_request",
-                    "код не совпадает"
-            ));
-        }
         Person person = new Person();
         person.setEmail(request.getEmail());
         person.setPasswordHash(String.valueOf(cryptoService.encode(request.getPasswd1())));
@@ -67,11 +61,11 @@ public class RegistrationService {
         person.setBirthDate(birthDate);
         personRepository.save(person);
 
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(request.getEmail());
-        message.setSubject("Успешная регистрация");
-        message.setText("Вы успешно зарегестрированы в социальной сети");
-        emailSender.send(message);
+//        SimpleMailMessage message = new SimpleMailMessage();
+//        message.setTo(request.getEmail());
+//        message.setSubject("Успешная регистрация");
+//        message.setText("Вы успешно зарегестрированы в социальной сети");
+//        emailSender.send(message);
 
         return new RegistrationResponse(
                 "",
