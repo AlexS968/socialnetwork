@@ -2,7 +2,6 @@ package main.controller;
 
 import lombok.AllArgsConstructor;
 import main.data.request.LoginRequest;
-import main.data.response.CaptchaResponse;
 import main.data.response.FriendsResponse;
 import main.data.response.base.Response;
 import main.data.response.type.ResponseMessage;
@@ -11,7 +10,6 @@ import main.service.PersonServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
 @RestController
 @AllArgsConstructor
