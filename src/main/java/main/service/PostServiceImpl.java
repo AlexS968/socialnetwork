@@ -65,7 +65,7 @@ public class PostServiceImpl implements PostService {
         try {
             Person person = getAuthUser(personId);
             Post post = savePost(null, request, person, pubDate);
-            return new Response<>(new PostInResponse(post, new ArrayList<>()));
+            return new Response<>(new PostInResponse(post, new ArrayList<>(), personId));
         } catch (Exception ex) {
             throw new BadRequestException(new ApiError("invalid_request", "Ошибка создания поста"));
         }
@@ -79,7 +79,7 @@ public class PostServiceImpl implements PostService {
         Person person = getAuthUser();
         post = savePost(post, request, person, pubDate);
 
-        return new Response<>(new PostInResponse(post, new ArrayList<>()));
+        return new Response<>(new PostInResponse(post, new ArrayList<>(), person.getId()));
 
     }
 
@@ -136,7 +136,8 @@ public class PostServiceImpl implements PostService {
         return postToSave;
     }
 
-    private Post getPost(int id) {
+    @Override
+    public Post getPost(int id) {
         Optional<Post> postOptional = postRepository.findById(id);
         if (postOptional.isEmpty()) {
             throw new BadRequestException(new ApiError("invalid_request", "Пост не существует"));
@@ -162,7 +163,7 @@ public class PostServiceImpl implements PostService {
     private List<PostInResponse> extractPage(Page<Post> postPage, List<CommentInResponse> comments) {
         List<PostInResponse> posts = new ArrayList<>();
         for (Post item : postPage.getContent()) {
-            PostInResponse postInResponse = new PostInResponse(item, comments);
+            PostInResponse postInResponse = new PostInResponse(item, comments, 0); // need a Person?
             if (item.getTime().isBefore(Instant.now())) {
                 postInResponse.setType(PostType.POSTED);
             } else {

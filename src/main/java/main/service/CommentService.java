@@ -9,6 +9,7 @@ import main.data.response.type.CommentInResponse;
 import main.data.response.type.ItemDelete;
 import main.exception.BadRequestException;
 import main.exception.apierror.ApiError;
+import main.model.Person;
 import main.model.Post;
 import main.model.PostComment;
 import main.repository.PostCommentRepository;
@@ -60,14 +61,14 @@ public class CommentService {
     public ListResponse<CommentInResponse> getPostComments(Integer postId, Integer offset, Integer itemPerPage) {
         Person currentUser = personService.getAuthUser();
         List<PostComment> comments = commentRepository.findAllByPostId(postId);
-        List<CommentInResponse> list = getComments(comments);
+        List<CommentInResponse> list = getComments(comments, currentUser);
         //List<CommentInResponse> list = comments.stream().map(comment -> new CommentInResponse(comment, currentUser.getId())).collect(Collectors.toList());
         return new ListResponse<>(list, list.size(), offset, itemPerPage);
     }
 
     //Rare method
-    private List<CommentInResponse> getComments(List<PostComment> comments){
-        List<CommentInResponse> commentsDto = comments.stream().map(CommentInResponse::new).collect(Collectors.toList());
+    private List<CommentInResponse> getComments(List<PostComment> comments, Person currentUser){
+        List<CommentInResponse> commentsDto = comments.stream().map(p -> new CommentInResponse(p, currentUser.getId())).collect(Collectors.toList());
         List<CommentInResponse> commentsResult = commentsDto.stream()
                 .filter(commentInResponse -> commentInResponse.getParentId() == 0).collect(Collectors.toList());
         for (CommentInResponse commentDto : commentsResult) {
@@ -93,7 +94,7 @@ public class CommentService {
         Person currentUser = personService.getAuthUser();
         Set<Integer> list = posts.stream().map(Post::getId).collect(Collectors.toSet());
         List<PostComment> comments = commentRepository.getCommentsByList(list);
-        return getComments(comments);
+        return getComments(comments , currentUser);
         //return comments.stream().map(comment -> new CommentInResponse(comment, currentUser.getId())).collect(Collectors.toList());
     }
 

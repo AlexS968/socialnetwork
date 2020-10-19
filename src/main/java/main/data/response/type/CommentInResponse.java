@@ -46,10 +46,11 @@ public class CommentInResponse {
         blocked = comment.isBlocked();
         this.subComments = subComments;
         likeCount = comment.getLikes() != null ? comment.getLikes().size() : 0;;
+        assert comment.getLikes() != null;
         isMyLike = comment.getLikes().stream().anyMatch(l -> l.getPerson().getId() == userId);;
     }
 
-    public CommentInResponse(PostComment comment) {
+    public CommentInResponse(PostComment comment, int userId) {
         parentId = comment.getParent() != null ? comment.getParent().getId() : 0;
         commentText = comment.getCommentText();
         id = comment.getId();
@@ -59,6 +60,7 @@ public class CommentInResponse {
         blocked = comment.isBlocked();
         subComments = new ArrayList<>();
         likeCount = comment.getLikes() != null ? comment.getLikes().size() : 0;;
+        assert comment.getLikes() != null;
         isMyLike = comment.getLikes().stream().anyMatch(l -> l.getPerson().getId() == userId);;
     }
 }
