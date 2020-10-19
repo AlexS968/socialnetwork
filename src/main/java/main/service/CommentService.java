@@ -62,12 +62,11 @@ public class CommentService {
         Person currentUser = personService.getAuthUser();
         List<PostComment> comments = commentRepository.findAllByPostId(postId);
         List<CommentInResponse> list = getComments(comments, currentUser);
-        //List<CommentInResponse> list = comments.stream().map(comment -> new CommentInResponse(comment, currentUser.getId())).collect(Collectors.toList());
         return new ListResponse<>(list, list.size(), offset, itemPerPage);
     }
 
     //Rare method
-    private List<CommentInResponse> getComments(List<PostComment> comments, Person currentUser){
+    private List<CommentInResponse> getComments(List<PostComment> comments, Person currentUser) {
         List<CommentInResponse> commentsDto = comments.stream().map(p -> new CommentInResponse(p, currentUser.getId())).collect(Collectors.toList());
         List<CommentInResponse> commentsResult = commentsDto.stream()
                 .filter(commentInResponse -> commentInResponse.getParentId() == 0).collect(Collectors.toList());
@@ -78,7 +77,7 @@ public class CommentService {
         return commentsResult;
     }
 
-    private List<CommentInResponse> getSublistComment(List<CommentInResponse> comments, long commentId){
+    private List<CommentInResponse> getSublistComment(List<CommentInResponse> comments, long commentId) {
         List<CommentInResponse> subComments = new ArrayList<>();
 
         for (CommentInResponse comment : comments) {
@@ -90,12 +89,11 @@ public class CommentService {
         return subComments;
     }
 
-    public List<CommentInResponse> getCommentsList (List<Post> posts) {
+    public List<CommentInResponse> getCommentsList(List<Post> posts) {
         Person currentUser = personService.getAuthUser();
         Set<Integer> list = posts.stream().map(Post::getId).collect(Collectors.toSet());
         List<PostComment> comments = commentRepository.getCommentsByList(list);
-        return getComments(comments , currentUser);
-        //return comments.stream().map(comment -> new CommentInResponse(comment, currentUser.getId())).collect(Collectors.toList());
+        return getComments(comments, currentUser);
     }
 
     public CommentResponse editComment(Integer id, Integer commentId, CommentRequest request) {
@@ -126,11 +124,11 @@ public class CommentService {
         //TODO complete deleteComment
         PostComment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new BadRequestException(
-                        new ApiError("invalid_request","Несуществующий коммент"))
+                        new ApiError("invalid_request", "Несуществующий коммент"))
                 );
         commentRepository.delete(comment);
         response.setId(commentId);
-        
+
         return response;
     }
 
@@ -139,7 +137,7 @@ public class CommentService {
         if (optionalPostComment.isPresent()) {
             return optionalPostComment.get();
         } else {
-            throw new BadRequestException(new ApiError("invalid_request","Несуществующий коммент"));
+            throw new BadRequestException(new ApiError("invalid_request", "Несуществующий коммент"));
         }
     }
 }
