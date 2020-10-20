@@ -1,5 +1,6 @@
 package main.repository;
 
+import java.util.List;
 import java.util.Optional;
 import main.model.City;
 import org.springframework.data.domain.Page;
@@ -18,5 +19,6 @@ public interface CityRepository extends PagingAndSortingRepository<City, Integer
   Page<City> findByCountryIdAndTitleIgnoreCaseContaining(int countryId, String title,
       Pageable pageable);
 
-  Optional<City> findByTitle(String title);
+  List<Optional<City>> findByTitle(String title);
+  List<Optional<City>> findByTitleAndCountryId(String title, Integer countryId);
 }

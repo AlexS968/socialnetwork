@@ -1,5 +1,6 @@
 package main.controller;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import main.data.response.base.ListResponse;
 import main.data.response.type.PersonInPersonList;
@@ -39,10 +40,11 @@ public class SearchController {
       @RequestParam(required = false, name = "date_from") Long dateFrom,
       @RequestParam(required = false, name = "date_to") Long dateTo,
       @RequestParam(required = false, name = "author") String author,
+      @RequestParam(required = false, name = "tags") List<String> tags,
       @RequestParam(required = false, defaultValue = "0") Integer offset,
       @RequestParam(required = false, defaultValue = "10") Integer itemPerPage) {
 
-    return ResponseEntity.ok(searchService.searchPost(text, dateFrom, dateTo, author,
+    return ResponseEntity.ok(searchService.searchPost(text, dateFrom, dateTo, author, tags,
         offset, itemPerPage));
   }
 
