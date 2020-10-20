@@ -1,1 +1,0 @@
-alter table notification add column read_status varchar(255) not null;
