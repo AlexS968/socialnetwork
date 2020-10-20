@@ -40,7 +40,6 @@ public class ApiDialogController {
             @PathVariable int dialogId,
             ListRequest request
     ) {
-        System.out.println(dialogId);
         return ResponseEntity.ok(dialogService.listMessage(dialogId, request));
     }
 

@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import main.model.PostComment;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -16,20 +18,32 @@ public class CommentInResponse {
     private String commentText;
     private long id;
     @JsonProperty(value = "post_id")
-    private String postId;
+    private Integer postId;
     private long time;
-    @JsonProperty(value = "author_id")
-    private long authorId;
+    @JsonProperty(value = "author")
+    private MeProfile authorId;
     @JsonProperty(value = "is_blocked")
     private boolean blocked;
+
+    @JsonProperty("sub_comments")
+    private List<CommentInResponse> subComments;
+
+    @JsonProperty("like_count")
+    private int likeCount;
+
+    @JsonProperty("is_my_like")
+    private boolean isMyLike;
 
     public CommentInResponse(PostComment comment) {
         parentId = comment.getParent() != null ? comment.getParent().getId() : 0;
         commentText = comment.getCommentText();
         id = comment.getId();
-        postId = String.valueOf(comment.getPost().getId());
+        postId = comment.getPost().getId();
         time = Instant.now().toEpochMilli();
-        authorId = comment.getAuthor().getId();
+        authorId = new MeProfile(comment.getAuthor());
         blocked = comment.isBlocked();
+        subComments = new ArrayList<>();
+        likeCount = comment.getLikes() != null ? comment.getLikes().size() : 0;;
+        isMyLike = false;
     }
 }

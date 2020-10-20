@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
+import org.hibernate.annotations.Where;
+import org.hibernate.annotations.WhereJoinTable;
 
 import javax.persistence.*;
 import java.time.Instant;
@@ -13,6 +15,7 @@ import java.util.List;
 @Table(name = "post")
 @Data
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+
 public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,11 +43,12 @@ public class Post {
     private List<PostTag> tags;
 
     @JsonBackReference
-    @OneToMany(mappedBy = "post")
-    private List<PostLike> likes;
+    @OneToMany
+    @JoinTable(name = "likes", joinColumns = @JoinColumn(name = "itemId"), inverseJoinColumns = @JoinColumn(name = "id"))
+    @WhereJoinTable(clause = "type = 'POST'")
+    private List<Like> likes;
 
     @JsonBackReference
     @OneToMany(mappedBy = "post")
     private List<PostFile> files;
-
 }

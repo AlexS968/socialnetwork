@@ -9,4 +9,6 @@ import java.util.List;
 public class DialogAddRequest {
     @JsonProperty("users_ids")
     private List<Integer> userIds;
+
+    private String name;
 }

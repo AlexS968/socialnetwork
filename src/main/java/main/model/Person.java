@@ -19,88 +19,88 @@ import java.util.Set;
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Person {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private int id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
 
-  @Column(name = "first_name", nullable = false)
-  private String firstName;
+    @Column(name = "first_name", nullable = false)
+    private String firstName;
 
-  @Column(name = "last_name", nullable = false)
-  private String lastName;
+    @Column(name = "last_name", nullable = false)
+    private String lastName;
 
-  @Column(name = "reg_date", nullable = false)
-  private Instant regDate;
+    @Column(name = "reg_date", nullable = false)
+    private Instant regDate;
 
-  @Column(name = "birth_date")
-  @Temporal(TemporalType.DATE)
-  private Date birthDate;
+    @Column(name = "birth_date")
+    @Temporal(TemporalType.DATE)
+    private Date birthDate;
 
-  @Column(name = "e_mail", nullable = false)
-  private String email;
+    @Column(name = "e_mail", nullable = false)
+    private String email;
 
-  @Column(name = "password", nullable = false)
-  private String passwordHash;
+    @Column(name = "password", nullable = false)
+    private String passwordHash;
 
-  @Column(name = "phone")
-  private String phone;
+    @Column(name = "phone")
+    private String phone;
 
-  @Column(name = "photo", columnDefinition = "text")
-  private String photoURL;
+    @Column(name = "photo", columnDefinition = "text")
+    private String photoURL = "/static/img/default_avatar.png";
 
-  @Column(columnDefinition = "text")
-  private String about;
+    @Column(columnDefinition = "text")
+    private String about;
 
-  @ManyToOne
-  @JoinColumn(name = "country_id", referencedColumnName = "id")
-  private Country country;
+    @ManyToOne
+    @JoinColumn(name = "country_id", referencedColumnName = "id")
+    private Country country;
 
-  @ManyToOne
-  @JoinColumn(name = "city_id", referencedColumnName = "id")
-  private City city;
+    @ManyToOne
+    @JoinColumn(name = "city_id", referencedColumnName = "id")
+    private City city;
 
-  @Column(name = "confirmation_code")
-  private String confirmationCode;
+    @Column(name = "confirmation_code")
+    private String confirmationCode;
 
-  @Column(name = "is_approved", nullable = false, columnDefinition = "TINYINT")
-  private boolean isApproved = false;
+    @Column(name = "is_approved", nullable = false, columnDefinition = "TINYINT")
+    private boolean isApproved = false;
 
-  @Enumerated(EnumType.STRING)
-  @Column(name = "messages_permission", columnDefinition = "enum('ALL', 'FRIENDS')", nullable = false)
-  private MessagesPermission messagesPermission;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "messages_permission", columnDefinition = "enum('ALL', 'FRIENDS')", nullable = false)
+    private MessagesPermission messagesPermission;
 
-  @Column(name = "last_online_time")
-  private Instant lastOnlineTime;
+    @Column(name = "last_online_time")
+    private Instant lastOnlineTime;
 
-  @Column(name = "is_blocked", nullable = false, columnDefinition = "TINYINT")
-  private boolean isBlocked = false;
+    @Column(name = "is_blocked", nullable = false, columnDefinition = "TINYINT")
+    private boolean isBlocked = false;
 
-  @ElementCollection
-  @LazyCollection(LazyCollectionOption.FALSE)
-  @CollectionTable(name = "notification_settings",
-      joinColumns = {@JoinColumn(name = "person_id", referencedColumnName = "id")})
-  @MapKeyColumn(name = "notification_type_code")
-  @MapKeyEnumerated(EnumType.STRING)
-  @Column(name = "is_enabled") // value
+    @ElementCollection
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @CollectionTable(name = "notification_settings",
+            joinColumns = {@JoinColumn(name = "person_id", referencedColumnName = "id")})
+    @MapKeyColumn(name = "notification_type_code")
+    @MapKeyEnumerated(EnumType.STRING)
+    @Column(name = "is_enabled") // value
 
-  private Map<NotificationTypeCode, Boolean> notificationSettings;
+    private Map<NotificationTypeCode, Boolean> notificationSettings;
 
-  @OneToMany(mappedBy = "person", fetch = FetchType.LAZY)
-  private List<BlockHistory> blockHistory;
+    @OneToMany(mappedBy = "person", fetch = FetchType.LAZY)
+    private List<BlockHistory> blockHistory;
 
-  @JsonBackReference
-  @OneToMany(mappedBy = "author", fetch = FetchType.LAZY)
-  private List<Post> posts;
+    @JsonBackReference
+    @OneToMany(mappedBy = "author", fetch = FetchType.LAZY)
+    private List<Post> posts;
 
-  @JsonBackReference
-  @OneToMany(mappedBy = "receiver", fetch = FetchType.LAZY)
-  private List<Notification> notifications;
+    @JsonBackReference
+    @OneToMany(mappedBy = "receiver", fetch = FetchType.LAZY)
+    private List<Notification> notifications;
 
-  @JsonBackReference
-  @OneToMany(mappedBy = "dst", fetch = FetchType.LAZY)
-  private Set<Friendship> requestFr;
+    @JsonBackReference
+    @OneToMany(mappedBy = "dst", fetch = FetchType.LAZY)
+    private Set<Friendship> requestFr;
 
-  @JsonBackReference
-  @OneToMany(mappedBy = "src", fetch = FetchType.LAZY)
-  private Set<Friendship> sendFr;
+    @JsonBackReference
+    @OneToMany(mappedBy = "src", fetch = FetchType.LAZY)
+    private Set<Friendship> sendFr;
 }
