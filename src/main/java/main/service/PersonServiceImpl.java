@@ -166,5 +166,10 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
         response.setData(profile);
         return response;
     }
+
+    @Override
+    public Person save(Person person) {
+        return personRepository.save(person);
+    }
 }
 

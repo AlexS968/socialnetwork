@@ -33,4 +33,8 @@ public class Notification {
     @Enumerated(EnumType.STRING)
     @Column(name = "read_status", columnDefinition = "enum('SENT', 'READ')", nullable = false)
     private NotificationReadStatusCode readStatus;
+
+    public Notification (){
+        contact="";
+    }
 }

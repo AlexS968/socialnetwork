@@ -79,11 +79,9 @@ public class Person {
     @LazyCollection(LazyCollectionOption.FALSE)
     @CollectionTable(name = "notification_settings",
             joinColumns = {@JoinColumn(name = "person_id", referencedColumnName = "id")})
-    @MapKeyColumn(name = "notification_type_code")
-    @MapKeyEnumerated(EnumType.STRING)
+    @MapKeyColumn(name = "notification_type_id") // key
     @Column(name = "is_enabled") // value
-
-    private Map<NotificationTypeCode, Boolean> notificationSettings;
+    private Map<Integer, Boolean> notificationSettings;
 
     @OneToMany(mappedBy = "person", fetch = FetchType.LAZY)
     private List<BlockHistory> blockHistory;

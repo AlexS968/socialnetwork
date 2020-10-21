@@ -1,23 +1,13 @@
 package main.controller;
 
 import lombok.AllArgsConstructor;
-//import main.data.request.FriendsRequest;
-import main.data.request.RegistrationRequest;
-import main.data.response.FeedsResponse;
 import main.data.response.FriendsResponse;
-import main.data.response.RegistrationResponse;
 import main.exception.BadRequestException;
 import main.exception.apierror.ApiError;
 import main.service.FriendsServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.Optional;
 
 @RestController
 @AllArgsConstructor

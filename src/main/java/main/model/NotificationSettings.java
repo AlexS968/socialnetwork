@@ -1,15 +1,7 @@
 package main.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
+
 import lombok.Data;
 
 @Entity
@@ -28,11 +20,8 @@ public class NotificationSettings {
   @Column(name = "is_enabled", nullable = false, columnDefinition = "TINYINT")
   private boolean isEnabled = true;
 
-  // NotificationType ------ заменить!!!
-
-  @Enumerated(EnumType.STRING)
-  @Column(name = "notification_type_code", columnDefinition = "enum('COMMENT_COMMENT', 'POST_COMMENT', 'FRIEND_REQUEST', 'MESSAGE', 'FRIEND_BIRTHDAY')", nullable = false)
-  private NotificationTypeCode notificationTypeCode;
-
+  @OneToOne
+  @JoinColumn(name = "notification_type_id")
+  private NotificationType type;
 
 }
