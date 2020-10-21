@@ -1,10 +1,10 @@
 alter table notification_type MODIFY COLUMN code enum('POST','POST_COMMENT','COMMENT_COMMENT','FRIEND_REQUEST','MESSAGE', 'FRIEND_BIRTHDAY');
-insert into network.notification_type (id,code,name) values (1,"POST","новый пост");
-insert into network.notification_type (id,code,name) values (2,"POST_COMMENT","комментарий к посту");
-insert into network.notification_type (id,code,name) values (3,"COMMENT_COMMENT","ответ на комментарий");
-insert into network.notification_type (id,code,name) values (4,"FRIEND_REQUEST","запрос дружбы");
-insert into network.notification_type (id,code,name) values (5,"MESSAGE","личное сообщение");
-insert into network.notification_type (id,code,name) values (6,"FRIEND_BIRTHDAY","день рождения друга");
+insert into notification_type (id,code,name) values (1,"POST","новый пост");
+insert into notification_type (id,code,name) values (2,"POST_COMMENT","комментарий к посту");
+insert into notification_type (id,code,name) values (3,"COMMENT_COMMENT","ответ на комментарий");
+insert into notification_type (id,code,name) values (4,"FRIEND_REQUEST","запрос дружбы");
+insert into notification_type (id,code,name) values (5,"MESSAGE","личное сообщение");
+insert into notification_type (id,code,name) values (6,"FRIEND_BIRTHDAY","день рождения друга");
 
 alter table notification add column read_status varchar(255) not null;
 
