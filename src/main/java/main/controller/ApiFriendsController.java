@@ -3,7 +3,7 @@ package main.controller;
 import lombok.AllArgsConstructor;
 //import main.data.request.FriendsRequest;
 import main.data.request.RegistrationRequest;
-import main.data.response.FeedsResponse;
+//import main.data.response.FeedsResponse;
 import main.data.response.FriendsResponse;
 import main.data.response.RegistrationResponse;
 import main.exception.BadRequestException;

@@ -121,16 +121,22 @@ public class CommentService {
     public ItemDelete deleteComment(Integer postId, Integer commentId) {
         ItemDelete response = new ItemDelete();
 
-        //TODO complete deleteComment
         PostComment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new BadRequestException(
                         new ApiError("invalid_request", "Несуществующий коммент"))
                 );
+        deleteSubComment(commentId);
         commentRepository.delete(comment);
         response.setId(commentId);
 
         return response;
     }
+
+    private void deleteSubComment(Integer commentId){
+        Set<PostComment> subComments = commentRepository.subCommentsG(commentId);
+        commentRepository.deleteAll(subComments);
+    }
+
 
     public PostComment getComment(int itemId) {
         Optional<PostComment> optionalPostComment = commentRepository.findById(itemId);
