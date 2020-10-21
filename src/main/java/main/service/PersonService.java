@@ -14,4 +14,5 @@ public interface PersonService {
     Response<InfoInResponse> deleteMe();
     Person getCurrentPerson();
     Person getById(int personId);
+    Person save(Person person);
 }

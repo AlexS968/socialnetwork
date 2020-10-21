@@ -7,6 +7,7 @@ import main.data.response.base.ListResponse;
 import main.data.response.type.CommentInResponse;
 import main.data.response.type.PostInResponse;
 import main.model.*;
+import main.model.PostType;
 import org.springframework.data.domain.Page;
 
 import java.time.Instant;
