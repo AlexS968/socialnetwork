@@ -183,8 +183,7 @@ public class SearchService {
         .findByTextPeriodAuthor(textUpdated, from, to, authorsIds, tagsIds, pageable);
 
     List<CommentInResponse> comments = commentService.getCommentsList(resultPostPage.getContent());
-    resultPostPage
-        .forEach(p -> searchPostResult.add(new PostInResponse(p, comments, -1))); //TODO check necessity
+    resultPostPage.forEach(p -> searchPostResult.add(new PostInResponse(p, comments, -1))); //TODO check necessity
 
     return new ListResponse<>(searchPostResult, resultPostPage.getTotalElements(), offset,
         itemPerPage);
