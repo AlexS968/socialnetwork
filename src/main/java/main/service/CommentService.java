@@ -1,6 +1,7 @@
 package main.service;
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import main.data.PersonPrincipal;
 import main.data.request.CommentRequest;
 import main.data.response.CommentResponse;
@@ -14,6 +15,7 @@ import main.model.Post;
 import main.model.PostComment;
 import main.repository.PostCommentRepository;
 import main.repository.PostRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -25,12 +27,18 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class CommentService {
 
     private final PostCommentRepository commentRepository;
     private final PostRepository postRepository;
     private final PersonService personService;
+    private NotificationService notificationService;
+
+    @Autowired
+    public void setNotificationService(NotificationService notificationService) {
+        this.notificationService = notificationService;
+    }
 
     public CommentResponse createComment(Integer postId, CommentRequest request) {
         CommentResponse response = new CommentResponse();
@@ -52,7 +60,10 @@ public class CommentService {
                 )));
         commentRepository.save(postComment);
 
+        //создаем notification
+        notificationService.setNotification(postComment);
         CommentInResponse commentInResponse = new CommentInResponse(postComment, new ArrayList<>(), currentUser.getId());
+
         response.setData(commentInResponse);
 
         return response;
@@ -137,7 +148,6 @@ public class CommentService {
         commentRepository.deleteAll(subComments);
     }
 
-
     public PostComment getComment(int itemId) {
         Optional<PostComment> optionalPostComment = commentRepository.findById(itemId);
         if (optionalPostComment.isPresent()) {
@@ -146,5 +156,7 @@ public class CommentService {
             throw new BadRequestException(new ApiError("invalid_request", "Несуществующий коммент"));
         }
     }
+
+
 }
 

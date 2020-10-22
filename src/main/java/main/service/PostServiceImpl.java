@@ -1,6 +1,7 @@
 package main.service;
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import main.core.OffsetPageRequest;
 import main.data.PersonPrincipal;
 import main.data.request.PostRequest;
@@ -37,13 +38,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
-    private final PostCommentRepository commentRepository;
     private final PostRepository postRepository;
     private final TagRepository tagRepository;
     private final PostTagRepository postTagRepository;
     private final CommentService commentService;
+
+
 
     @Override
     public ListResponse<PostInResponse> getFeeds(String name, int offset, int itemPerPage) {
@@ -54,7 +56,6 @@ public class PostServiceImpl implements PostService {
         } else {
             postPage = postRepository.findAll(pageable);
         }
-//        List<CommentInResponse> commentsList = getCommentsList(postPage.getContent());
         List<CommentInResponse> commentsList = commentService.getCommentsList(postPage.getContent());
         return new ListResponse<>(extractPage(postPage, commentsList), postPage.getTotalElements(), offset, itemPerPage);
     }
@@ -159,6 +160,15 @@ public class PostServiceImpl implements PostService {
         }
         return person;
     }
+
+    @Override
+    public Post findById(int id) {
+        return postRepository.findById(id).orElseThrow(
+                () -> new BadRequestException(new ApiError(
+                        "invalid request",
+                        "post is not found")));
+    }
+
 
     private List<PostInResponse> extractPage(Page<Post> postPage, List<CommentInResponse> comments) {
         List<PostInResponse> posts = new ArrayList<>();

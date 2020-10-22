@@ -18,7 +18,13 @@ import main.model.City;
 import main.model.Country;
 import main.model.Person;
 import main.model.Post;
-import main.repository.*;
+import main.model.Tag;
+import main.repository.CityRepository;
+import main.repository.CountryRepository;
+import main.repository.PersonRepository;
+import main.repository.PostCommentRepository;
+import main.repository.PostRepository;
+import main.repository.TagRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -34,6 +40,7 @@ public class SearchService {
   private final PostRepository postRepository;
   private final PostCommentRepository postCommentRepository;
   private final CommentService commentService;
+  private final TagRepository tagRepository;
 
   public ListResponse<PersonInPersonList> searchPerson(String firstName, String lastName,
       Integer ageFrom,
@@ -53,7 +60,7 @@ public class SearchService {
     Page<Person> resultPage;
 
     Integer countryId = null;
-    Integer cityId = null;
+    Set<Integer> cityIds = new HashSet<>();
     Date ageFromToDate = null;
     Date ageToToDate = null;
 
@@ -70,15 +77,36 @@ public class SearchService {
       countryId = countryOptional.get().getId();
     }
     if (city != null) {
-      Optional<City> cityOptional = cityRepository.findByTitle(city);
 
-      if (cityOptional.isEmpty()) {
-        return new ListResponse<>(searchResult, 0,
-            offset,
-            itemPerPage);
+      //города в мире
+      if (country == null) {
+
+        List<Optional<City>> cityOptional = cityRepository.findByTitle(city);
+
+        if (cityOptional.isEmpty()) {
+          return new ListResponse<>(searchResult, 0,
+              offset,
+              itemPerPage);
+        }
+
+        cityOptional.stream().forEach(c -> cityIds.add(c.get().getId()));
+      }
+      //города в стране
+      else {
+
+        List<Optional<City>> cityOptional = cityRepository.findByTitleAndCountryId(city, countryId);
+
+        if (cityOptional.isEmpty()) {
+          return new ListResponse<>(searchResult, 0,
+              offset,
+              itemPerPage);
+        }
+
+        cityOptional.stream().forEach(c -> cityIds.add(c.get().getId()));
+
       }
 
-      cityId = cityOptional.get().getId();
+
     }
     if (ageFrom != null) {
       ageFromToDate = calculateBirthDateFromAge(ageFrom);
@@ -89,7 +117,7 @@ public class SearchService {
 
     resultPage = personRepository
         .findPersonByNameLastNameAgeCityCountry(firstName, lastName, ageFromToDate, ageToToDate,
-            countryId, cityId, pageable);
+            countryId, cityIds, pageable);
 
     resultPage.forEach(r -> searchResult.add(new PersonInPersonList(r)));
 
@@ -100,7 +128,7 @@ public class SearchService {
   }
 
   public ListResponse<PostInResponse> searchPost(String text, Long dateFrom, Long dateTo,
-      String author,
+      String author, List<String> tags,
       Integer offset, Integer itemPerPage) {
 
 
@@ -120,6 +148,7 @@ public class SearchService {
     Date to = null;
     Set<Integer> authorsIds = new HashSet<>();
     String textUpdated = "%" + text + "%";
+    Set<Integer> tagsIds = new HashSet<>();
 
     if (dateFrom != null && dateTo != null) {
       from = new Date(dateFrom);
@@ -140,9 +169,20 @@ public class SearchService {
       authorsIds = authorsIdsTemp;
 
     }
+    if (tags.size() > 0) {
+
+      List<Optional<Tag>> tagsFound = tagRepository.findTagsByTagNames(tags);
+
+      if (tagsFound.isEmpty()) {
+        return new ListResponse<>(searchPostResult, 0, offset, itemPerPage);
+      }
+
+      tagsFound.forEach(t -> tagsIds.add(t.get().getId()));
+
+    }
 
     resultPostPage = postRepository
-        .findByTextPeriodAuthor(textUpdated, from, to, authorsIds, pageable);
+        .findByTextPeriodAuthor(textUpdated, from, to, authorsIds, tagsIds, pageable);
 
     List<CommentInResponse> comments = commentService.getCommentsList(resultPostPage.getContent());
     resultPostPage.forEach(p -> searchPostResult.add(new PostInResponse(p, comments, -1))); //TODO check necessity

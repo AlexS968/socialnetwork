@@ -14,5 +14,6 @@ public interface PostService {
     Post getPost(int id);
     Response<PostDelete> delPost(Integer id);
     ListResponse<PostInResponse> showWall(Integer personId, int offset, int itemsPerPage);
+    Post findById(int id);
 
 }

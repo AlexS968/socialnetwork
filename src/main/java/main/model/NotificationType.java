@@ -17,5 +17,7 @@ public class NotificationType {
     private NotificationTypeCode code;
 
     @Column(nullable = false)
-    private String name;
+    private String name; // расшифрровка
+
+
 }
