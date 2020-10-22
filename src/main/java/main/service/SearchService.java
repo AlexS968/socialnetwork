@@ -131,8 +131,6 @@ public class SearchService {
       String author, List<String> tags,
       Integer offset, Integer itemPerPage) {
 
-
-
     Pageable pageable;
 
     if (offset == 0 && itemPerPage == 0) {

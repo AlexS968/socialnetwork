@@ -60,9 +60,10 @@ public class CommentService {
                 )));
         commentRepository.save(postComment);
 
+        CommentInResponse commentInResponse = new CommentInResponse(postComment, currentUser.getId());
+
         //создаем notification
         notificationService.setNotification(postComment);
-        CommentInResponse commentInResponse = new CommentInResponse(postComment, new ArrayList<>(), currentUser.getId());
 
         response.setData(commentInResponse);
 

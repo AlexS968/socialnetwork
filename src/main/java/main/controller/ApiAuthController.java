@@ -1,28 +1,19 @@
 package main.controller;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import main.data.request.LoginRequest;
 import main.data.response.CaptchaResponse;
 import main.data.response.base.Response;
-import main.data.response.type.ResponseMessage;
 import main.data.response.type.PersonInLogin;
-import main.exception.BadRequestException;
-import main.exception.GlobalExceptionHandler;
-import main.exception.apierror.ApiError;
+import main.data.response.type.ResponseMessage;
 import main.service.CaptchaServiceImpl;
 import main.service.PersonServiceImpl;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
-
-import java.util.Collections;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
