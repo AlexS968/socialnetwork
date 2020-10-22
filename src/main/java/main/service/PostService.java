@@ -102,7 +102,8 @@ public class PostService {
     //-----------------------
     private Post savePost(Post post, PostRequest postData, Person person, Long pubDate) {
         Post postToSave = (post == null) ? new Post() : post;
-        final Instant postTime = pubDate == null ? Instant.now() : Instant.ofEpochMilli(pubDate);
+        final Instant postTime = pubDate == null ? Instant.now() :
+                Instant.ofEpochMilli(pubDate).isBefore(Instant.now()) ? Instant.now() : Instant.ofEpochMilli(pubDate);
         final List<PostTag> postTags = (post == null) ? new ArrayList<>() : postToSave.getTags();
         final List<Tag> tags = new ArrayList<>();
         for (String s : postData.getTags()) {

@@ -57,7 +57,6 @@ public class CommentService {
         //создаем notification
         notificationService.setNotification(postComment);
 
-        CommentInResponse commentInResponse = new CommentInResponse(postComment);
         response.setData(commentInResponse);
 
         return response;
