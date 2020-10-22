@@ -15,6 +15,9 @@ app:
 appEmail:
   email: socialnetwork.studygroup8@gmail.com
   password: ghFrgwh45*hdtQe1f?hd
+reCaptcha:
+  secretCode: 6LfacNYZAAAAAJnnrWQoIva5pbnWLXOJgaIuBGKe
+  url: https://www.google.com/recaptcha/api/siteverify?secret=%s&response=%s
 
 
 
