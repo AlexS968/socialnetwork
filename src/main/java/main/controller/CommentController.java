@@ -6,7 +6,7 @@ import main.data.response.CommentResponse;
 import main.data.response.base.ListResponse;
 import main.data.response.type.CommentInResponse;
 import main.data.response.type.ItemDelete;
-import main.service.CommentService;
+import main.service.CommentServiceImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 @RequestMapping("/api/v1/post")
 public class CommentController {
-    private final CommentService commentService;
+    private final CommentServiceImpl commentService;
 
     @PostMapping("/{id}/comments")
     public ResponseEntity<CommentResponse> createComment(

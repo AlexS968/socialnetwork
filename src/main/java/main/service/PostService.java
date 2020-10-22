@@ -11,7 +11,6 @@ public interface PostService {
     ListResponse<PostInResponse> getFeeds(String name, int offset, int itemPerPage);
     Response<PostInResponse> addNewPost(Integer personId, PostRequest request, Long pubDate);
     Response<PostInResponse> editPost(int id, Long pubDate, PostRequest request);
-    Post getPost(int id);
     Response<PostDelete> delPost(Integer id);
     ListResponse<PostInResponse> showWall(Integer personId, int offset, int itemsPerPage);
     Post findById(int id);

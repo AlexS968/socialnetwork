@@ -39,7 +39,7 @@ public class SearchService {
   private final CityRepository cityRepository;
   private final PostRepository postRepository;
   private final PostCommentRepository postCommentRepository;
-  private final CommentService commentService;
+  private final CommentServiceImpl commentService;
   private final TagRepository tagRepository;
 
   public ListResponse<PersonInPersonList> searchPerson(String firstName, String lastName,
