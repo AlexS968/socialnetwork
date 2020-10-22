@@ -5,7 +5,7 @@ import main.core.auth.JwtUtils;
 import main.data.PersonPrincipal;
 import main.data.request.PasswordRecoveryRequest;
 import main.data.request.PasswordSetRequest;
-import main.data.response.InfoResponse;
+import main.data.response.base.Response;
 import main.data.response.type.InfoInResponse;
 import main.exception.BadRequestException;
 import main.exception.apierror.ApiError;
@@ -28,7 +28,7 @@ public class PasswordServiceImpl implements PasswordService {
 
     //send link to restore password
     @Override
-    public InfoResponse restorePassword(PasswordRecoveryRequest request, String link) {
+    public Response<InfoInResponse> restorePassword(PasswordRecoveryRequest request, String link) {
         Person person = personRepository.findByEmail(request.getEmail());
         if (person == null) {
             throw new BadRequestException(new ApiError(
@@ -44,12 +44,12 @@ public class PasswordServiceImpl implements PasswordService {
         message.setSubject("Ссылка на восстановление пароля на SocialNetwork (group 8)");
         message.setText(link + "?code=" + confirmationCode);
         emailSender.send(message);
-        return new InfoResponse(new InfoInResponse("ok"));
+        return new Response<>(new InfoInResponse("ok"));
     }
 
     //set new password by restoring or changing
     @Override
-    public InfoResponse setPassword(PasswordSetRequest request, String referer) {
+    public Response<InfoInResponse> setPassword(PasswordSetRequest request, String referer) {
         Person person;
         //if password is restored (person is unauthenticated)
         if (SecurityContextHolder.getContext().getAuthentication()
@@ -71,12 +71,13 @@ public class PasswordServiceImpl implements PasswordService {
         }
         person.setPasswordHash(encoder.encode(request.getPassword()));
         personRepository.save(person);
-        return new InfoResponse(new InfoInResponse("ok"));
+
+        return new Response<>(new InfoInResponse("ok"));
     }
 
     //send link to change password or email address
     @Override
-    public InfoResponse changePassOrEmail(String subject, String link) {
+    public Response<InfoInResponse> changePassOrEmail(String subject, String link) {
         Person person = ((PersonPrincipal) SecurityContextHolder.getContext().
                 getAuthentication().getPrincipal()).getPerson();
 
@@ -90,12 +91,12 @@ public class PasswordServiceImpl implements PasswordService {
                 .concat(" на SocialNetwork (group 8)"));
         message.setText(link + "?code=" + confirmationCode);
         emailSender.send(message);
-        return new InfoResponse(new InfoInResponse("ok"));
+        return new Response<>(new InfoInResponse("ok"));
     }
 
     //set new email address
     @Override
-    public InfoResponse setEmail(PasswordRecoveryRequest request) {
+    public Response<InfoInResponse> setEmail(PasswordRecoveryRequest request) {
         Person person = ((PersonPrincipal) SecurityContextHolder.getContext().
                 getAuthentication().getPrincipal()).getPerson();
 
@@ -107,7 +108,7 @@ public class PasswordServiceImpl implements PasswordService {
         message.setSubject("Подтверждение изменения email на SocialNetwork (group 8)");
         message.setText("Ваш email успешно изменен.");
         emailSender.send(message);
-        return new InfoResponse(new InfoInResponse("ok"));
+        return new Response<>(new InfoInResponse("ok"));
     }
 }
 

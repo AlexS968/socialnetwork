@@ -6,11 +6,7 @@ import main.data.PersonPrincipal;
 import main.data.request.LoginRequest;
 import main.data.request.MeProfileRequest;
 import main.data.response.base.Response;
-import main.data.response.type.InfoInResponse;
-import main.data.response.type.MeProfile;
-import main.data.response.type.MeProfileUpdate;
-import main.data.response.type.ResponseMessage;
-import main.data.response.type.PersonInLogin;
+import main.data.response.type.*;
 import main.model.City;
 import main.model.Country;
 import main.model.Person;
@@ -169,6 +165,11 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
         MeProfile profile = new MeProfile(person);
         response.setData(profile);
         return response;
+    }
+
+    @Override
+    public Person save(Person person) {
+        return personRepository.save(person);
     }
 }
 

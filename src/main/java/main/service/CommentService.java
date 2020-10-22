@@ -18,7 +18,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -31,6 +30,7 @@ public class CommentService {
     private final PostCommentRepository commentRepository;
     private final PostRepository postRepository;
     private final PersonService personService;
+    private final NotificationService notificationService;
 
     public CommentResponse createComment(Integer postId, CommentRequest request) {
         CommentResponse response = new CommentResponse();
@@ -53,6 +53,11 @@ public class CommentService {
         commentRepository.save(postComment);
 
         CommentInResponse commentInResponse = new CommentInResponse(postComment, currentUser.getId());
+
+        //создаем notification
+        notificationService.setNotification(postComment);
+
+        CommentInResponse commentInResponse = new CommentInResponse(postComment);
         response.setData(commentInResponse);
 
         return response;
@@ -101,11 +106,11 @@ public class CommentService {
         //TODO complete deleteComment
         PostComment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new BadRequestException(
-                        new ApiError("invalid_request","Несуществующий коммент"))
+                        new ApiError("invalid_request", "Несуществующий коммент"))
                 );
         commentRepository.delete(comment);
         response.setId(commentId);
-        
+
         return response;
     }
 
@@ -114,7 +119,7 @@ public class CommentService {
         if (optionalPostComment.isPresent()) {
             return optionalPostComment.get();
         } else {
-            throw new BadRequestException(new ApiError("invalid_request","Несуществующий коммент"));
+            throw new BadRequestException(new ApiError("invalid_request", "Несуществующий коммент"));
         }
     }
 }

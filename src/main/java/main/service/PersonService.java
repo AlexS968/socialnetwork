@@ -17,4 +17,5 @@ public interface PersonService {
     Person getAuthUser();
     Person checkAuthUser(int id);
     boolean isAuthenticated();
+    Person save(Person person);
 }

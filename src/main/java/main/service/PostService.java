@@ -12,11 +12,11 @@ import main.model.Post;
 import main.model.PostComment;
 import main.model.PostTag;
 import main.model.Tag;
+import main.model.PostType;
 import main.repository.PostCommentRepository;
 import main.data.response.base.ListResponse;
 import main.data.response.base.Response;
 import main.data.response.type.PostDelete;
-import main.model.*;
 import main.repository.PostRepository;
 import main.repository.PostTagRepository;
 import main.repository.TagRepository;
@@ -154,5 +154,12 @@ public class PostService {
             }
         }
         return posts;
+    }
+
+    public Post findById(int id) {
+        return postRepository.findById(id).orElseThrow(
+                () -> new BadRequestException(new ApiError(
+                        "invalid request",
+                        "post is not found")));
     }
 }
