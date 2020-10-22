@@ -13,6 +13,7 @@ import main.model.*;
 import main.repository.NotificationRepository;
 import main.repository.NotificationTypeRepository;
 import main.repository.PostCommentRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -31,8 +32,13 @@ public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
     private final NotificationTypeRepository notificationTypeRepository;
     private final PersonService personService;
-    private final PostService postService;
+    private PostService postService;
     private final PostCommentRepository postCommentRepository;
+
+    @Autowired
+    public void setPostService(PostService postService) {
+        this.postService = postService;
+    }
 
     @Override
     public ListResponse<NotificationResponse> list(int offset, int itemPerPage, boolean needToRead) {

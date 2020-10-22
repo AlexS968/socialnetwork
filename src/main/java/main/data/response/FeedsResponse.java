@@ -28,7 +28,7 @@ public class FeedsResponse extends ListResponse<PostInResponse> {
         this.setData(new ArrayList<>());
 
         for (Post item : posts.getContent()) {
-            PostInResponse postInResponse = new PostInResponse(item, commentList);
+            PostInResponse postInResponse = new PostInResponse(item, commentList, 0);
             if (item.getTime().isBefore(Instant.now())) {
                 postInResponse.setType(PostType.POSTED);
             } else {

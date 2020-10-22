@@ -11,11 +11,15 @@ import java.util.Set;
 
 @Repository
 public interface PostCommentRepository extends CrudRepository<PostComment, Integer> {
-    @Query( value = "SELECT * FROM post_comment WHERE post_id IN (:list)",
+    @Query(value = "SELECT * FROM post_comment WHERE post_id IN (:list)",
             nativeQuery = true)
     List<PostComment> getCommentsByList(Set<Integer> list);
 
-    @Query( value = "SELECT * FROM post_comment WHERE post_id = (:postId)",
+    @Query(value = "SELECT * FROM post_comment WHERE post_id = (:postId)",
             nativeQuery = true)
     List<PostComment> findAllByPostId(Integer postId);
+
+    @Query(value = "SELECT DISTINCT * FROM post_comment WHERE `parent_id` = (:commentId)",
+            nativeQuery = true)
+    Set<PostComment> subCommentsG(Integer commentId);
 }
