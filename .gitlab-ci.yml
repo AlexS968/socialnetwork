@@ -55,6 +55,7 @@ backup_dev:
     - schedules
     - dev
   script:
+    - echo $CI_COMMIT_BRANCH
     - cd ~/backups
     - find ~/backups -name "network*.gz" -type f -mtime +15 -exec rm -f {} \;
     - mysqldump -u root network_dev -p$MYSQL_PASSWORD | gzip -c >  "network_dev_$(date +"%F_%T").sql.gz"
