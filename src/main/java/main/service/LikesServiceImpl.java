@@ -23,7 +23,7 @@ import java.util.Optional;
 public class LikesServiceImpl implements LikesService {
     private final LikesRepository likesRepository;
     private final PersonServiceImpl personService;
-    private final CommentService commentService;
+    private final CommentServiceImpl commentService;
     private final PostService postService;
 
     public Response<LikesWithUsers> isLiked(Integer userId, int itemId, String type) {
@@ -50,7 +50,7 @@ public class LikesServiceImpl implements LikesService {
         if (isLiked(person.getId(), request.getItemId(), request.getType()).getData().getLikes() == 0) {
             Like like = new Like();
             if (request.getType().equals("Post")) {
-                Post post = postService.getPost(request.getItemId());
+                Post post = postService.findById(request.getItemId());
                 like.setItemId(post.getId());
                 like.setType(LikeType.POST);
             } else if (request.getType().equals("Comment")) {

@@ -1,9 +1,7 @@
 package main.service;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import main.core.OffsetPageRequest;
-import main.data.PersonPrincipal;
 import main.data.request.PostRequest;
 import main.data.response.type.CommentInResponse;
 import main.data.response.type.PostInResponse;
@@ -11,10 +9,8 @@ import main.exception.BadRequestException;
 import main.exception.apierror.ApiError;
 import main.model.Person;
 import main.model.Post;
-import main.model.PostComment;
 import main.model.PostTag;
 import main.model.Tag;
-import main.repository.PostCommentRepository;
 import main.data.response.base.ListResponse;
 import main.data.response.base.Response;
 import main.data.response.type.PostDelete;
@@ -25,8 +21,6 @@ import main.repository.TagRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,8 +28,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -43,9 +35,8 @@ public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final TagRepository tagRepository;
     private final PostTagRepository postTagRepository;
-    private final CommentService commentService;
+    private final CommentServiceImpl commentService;
     private final PersonService personService;
-
 
     @Override
     public ListResponse<PostInResponse> getFeeds(String name, int offset, int itemPerPage) {
@@ -64,7 +55,7 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public Response<PostInResponse> addNewPost(Integer personId, PostRequest request, Long pubDate) {
         try {
-            Person person = personService.checkAuthUser(personId);
+            Person person = personService.getById(personId);
             Post post = savePost(null, request, person, pubDate);
             return new Response<>(new PostInResponse(post, new ArrayList<>(), personId));
         } catch (Exception ex) {
@@ -75,7 +66,7 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public Response<PostInResponse> editPost(int id, Long pubDate, PostRequest request) {
-        Post post = getPost(id);
+        Post post = findById(id);
 
         Person person = personService.getAuthUser();
         post = savePost(post, request, person, pubDate);
@@ -87,7 +78,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public Response<PostDelete> delPost(Integer id) {
         try {
-            Post post = getPost(id);
+            Post post = findById(id);
             postRepository.delete(post);
             return new Response<>(new PostDelete(id));
         } catch (BadRequestException ex) {
@@ -153,7 +144,7 @@ public class PostServiceImpl implements PostService {
         return postRepository.findById(id).orElseThrow(
                 () -> new BadRequestException(new ApiError(
                         "invalid request",
-                        "post is not found")));
+                        "Пост не существует")));
     }
 
     private List<PostInResponse> extractPage(Page<Post> postPage, List<CommentInResponse> comments) {
@@ -166,7 +157,7 @@ public class PostServiceImpl implements PostService {
             } else {
                 postInResponse.setType(PostType.QUEUED);
             }
-            if (!(postInResponse.getType() == PostType.QUEUED && postInResponse.getAuthor().getId() != userId)) {
+            if (!(postInResponse.getType() == PostType.QUEUED && postInResponse.getAuthor().getId() != personService.getAuthUser().getId())) {
                 posts.add(postInResponse);
             }
         }
