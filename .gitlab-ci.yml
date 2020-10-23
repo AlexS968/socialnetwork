@@ -1,5 +1,6 @@
 stages:
   - build
+  - backup
   - deploy
 
 build:
@@ -10,6 +11,8 @@ build:
     - cp target/Network-1.0-SNAPSHOT.jar /opt/network/prod/app.jar
   only:
     - master
+  except:
+    - schedules
 
 production:
   stage: deploy
@@ -20,6 +23,8 @@ production:
     - sudo systemctl start networkapp
   only:
     - master
+  except:
+    - schedules
 
 build_dev:
   stage: build
@@ -29,6 +34,8 @@ build_dev:
     - cp target/Network-1.0-SNAPSHOT.jar /opt/network/dev/app.jar
   only:
     - dev
+  except:
+    - schedules
 
 production_dev:
   stage: deploy
@@ -39,3 +46,16 @@ production_dev:
     - sudo systemctl start networkapp_dev
   only:
     - dev
+  except:
+    - schedules
+
+backup_dev:
+  stage: backup
+  only:
+    - schedules
+    - dev
+  script:
+    - echo $CI_COMMIT_BRANCH
+    - cd ~/backups
+    - find ~/backups -name "network*.gz" -type f -mtime +15 -exec rm -f {} \;
+    - mysqldump -u root network_dev -p$MYSQL_PASSWORD | gzip -c >  "network_dev_$(date +"%F_%T").sql.gz"

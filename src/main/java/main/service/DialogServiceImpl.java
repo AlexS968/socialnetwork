@@ -1,6 +1,5 @@
 package main.service;
 
-import com.sun.xml.bind.v2.runtime.output.SAXOutput;
 import lombok.AllArgsConstructor;
 import main.core.OffsetPageRequest;
 import main.data.PersonPrincipal;
@@ -150,7 +149,7 @@ public class DialogServiceImpl implements DialogService {
         Page<Message> page;
 
         if (request.getItemPerPage() > 0) {
-            pageable = new OffsetPageRequest(request.getOffset(), request.getItemPerPage(), Sort.unsorted());
+            pageable = new OffsetPageRequest(request.getOffset(), request.getItemPerPage(), Sort.by(Sort.Order.desc("id")));
         } else {
             pageable = Pageable.unpaged();
         }
@@ -161,6 +160,8 @@ public class DialogServiceImpl implements DialogService {
             DialogMessage item = new DialogMessage(i);
             messages.add(item);
         });
+
+        messages.stream().filter(msg -> msg.getReadStatus().equals(ReadStatus.SENT)).forEach(msg -> setReadMessage(msg.getId()));
 
         return new ListResponse<>(
                 messages,
