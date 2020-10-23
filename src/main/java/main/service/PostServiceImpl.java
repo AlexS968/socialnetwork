@@ -44,7 +44,7 @@ public class PostServiceImpl implements PostService {
     private final TagRepository tagRepository;
     private final PostTagRepository postTagRepository;
     private final CommentService commentService;
-
+    private final PersonService personService;
 
 
     @Override
@@ -64,7 +64,7 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public Response<PostInResponse> addNewPost(Integer personId, PostRequest request, Long pubDate) {
         try {
-            Person person = getAuthUser(personId);
+            Person person = personService.checkAuthUser(personId);
             Post post = savePost(null, request, person, pubDate);
             return new Response<>(new PostInResponse(post, new ArrayList<>(), personId));
         } catch (Exception ex) {
@@ -77,7 +77,7 @@ public class PostServiceImpl implements PostService {
     public Response<PostInResponse> editPost(int id, Long pubDate, PostRequest request) {
         Post post = getPost(id);
 
-        Person person = getAuthUser();
+        Person person = personService.getAuthUser();
         post = savePost(post, request, person, pubDate);
 
         return new Response<>(new PostInResponse(post, new ArrayList<>(), person.getId()));
@@ -97,7 +97,8 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public ListResponse<PostInResponse> showWall(Integer personId, int offset, int itemsPerPage) {
-        Person person = getAuthUser(personId);
+        personService.isAuthenticated();
+        Person person = personService.getById(personId);
         Pageable pageable = new OffsetPageRequest(offset, itemsPerPage, Sort.by("time").descending());
         Page<Post> postPage = postRepository.findByAuthor(person, pageable);
         List<CommentInResponse> commentsList = commentService.getCommentsList(postPage.getContent());
@@ -147,21 +148,6 @@ public class PostServiceImpl implements PostService {
         return postOptional.get();
     }
 
-    private Person getAuthUser() {
-        if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
-            throw new UsernameNotFoundException("invalid_request");
-        }
-        return ((PersonPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getPerson();
-    }
-
-    private Person getAuthUser(int id) {
-        Person person = getAuthUser();
-        if (person.getId() != id) {
-            throw new UsernameNotFoundException("invalid_request");
-        }
-        return person;
-    }
-
     @Override
     public Post findById(int id) {
         return postRepository.findById(id).orElseThrow(
@@ -170,9 +156,9 @@ public class PostServiceImpl implements PostService {
                         "post is not found")));
     }
 
-
     private List<PostInResponse> extractPage(Page<Post> postPage, List<CommentInResponse> comments) {
         List<PostInResponse> posts = new ArrayList<>();
+        int userId = personService.getAuthUser().getId();
         for (Post item : postPage.getContent()) {
             PostInResponse postInResponse = new PostInResponse(item, comments, 0); // need a Person?
             if (item.getTime().isBefore(Instant.now())) {
@@ -180,7 +166,7 @@ public class PostServiceImpl implements PostService {
             } else {
                 postInResponse.setType(PostType.QUEUED);
             }
-            if (!(postInResponse.getType() == PostType.QUEUED && postInResponse.getAuthor().getId() != getAuthUser().getId())) {
+            if (!(postInResponse.getType() == PostType.QUEUED && postInResponse.getAuthor().getId() != userId)) {
                 posts.add(postInResponse);
             }
         }
