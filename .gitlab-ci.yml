@@ -56,4 +56,4 @@ backup_dev:
     - dev
   script:
     - cd ~
-    - mysqldump -u root –piddqd network_dev > "network_dev_$(date +"%F_%T").sql"
+    - mysqldump -u root network_dev -p$MYSQL_PASSWORD | gzip -c >  "network_dev_$(date +"%F_%T").sql.gz"
