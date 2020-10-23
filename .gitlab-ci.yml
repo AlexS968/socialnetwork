@@ -46,7 +46,7 @@ production_dev:
     - sudo systemctl start networkapp_dev
   only:
     - dev
- except:
+  except:
     - schedules
 
 backup_dev:
