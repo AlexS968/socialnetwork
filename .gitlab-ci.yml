@@ -53,5 +53,6 @@ backup_dev:
   stage: deploy
   only:
     - schedules
+    - dev
   script:
-    - echo 123
+    - mysqldump -u root –p$MYSQL_PASSWORD network_dev > "network_dev_$(date +"%F_%T").sql"
