@@ -55,4 +55,4 @@ backup_dev:
     - schedules
     - dev
   script:
-    - mysqldump -u root –p$MYSQL_PASSWORD network_dev > "network_dev_$(date +"%F_%T").sql"
+    - mysqldump -u root –p $MYSQL_PASSWORD network_dev > "network_dev_$(date +"%F_%T").sql"
