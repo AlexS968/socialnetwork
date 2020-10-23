@@ -50,7 +50,7 @@ production_dev:
     - schedules
 
 backup_dev:
-  stage: deploy
+  stage: backup
   only:
     - schedules
     - dev
