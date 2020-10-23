@@ -1,44 +1,45 @@
-stages:
-  - build
-  - deploy
+build_job:
+  stages:
+    - build
+    - deploy
 
-build:
-  stage: build
-  script:
-    - mvn -Pprod clean package
-    - sudo systemctl stop networkapp
-    - cp target/Network-1.0-SNAPSHOT.jar /opt/network/prod/app.jar
-  only:
-    - master
+  build:
+    stage: build
+    script:
+      - mvn -Pprod clean package
+      - sudo systemctl stop networkapp
+      - cp target/Network-1.0-SNAPSHOT.jar /opt/network/prod/app.jar
+    only:
+      - master
 
-production:
-  stage: deploy
-  script:
-    - echo ARG1=--spring.datasource.url=$PROD_DB_URL > /opt/network/prod/.progconf
-    - echo ARG2=--app.jwtSecret=$PROD_JWT_SECRET >> /opt/network/prod/.progconf
-    - echo ARG3=--server.port=$PROD_PORT >> /opt/network/prod/.progconf
-    - sudo systemctl start networkapp
-  only:
-    - master
+  production:
+    stage: deploy
+    script:
+      - echo ARG1=--spring.datasource.url=$PROD_DB_URL > /opt/network/prod/.progconf
+      - echo ARG2=--app.jwtSecret=$PROD_JWT_SECRET >> /opt/network/prod/.progconf
+      - echo ARG3=--server.port=$PROD_PORT >> /opt/network/prod/.progconf
+      - sudo systemctl start networkapp
+    only:
+      - master
 
-build_dev:
-  stage: build
-  script:
-    - mvn -Pprod clean package
-    - sudo systemctl stop networkapp_dev
-    - cp target/Network-1.0-SNAPSHOT.jar /opt/network/dev/app.jar
-  only:
-    - dev
+  build_dev:
+    stage: build
+    script:
+      - mvn -Pprod clean package
+      - sudo systemctl stop networkapp_dev
+      - cp target/Network-1.0-SNAPSHOT.jar /opt/network/dev/app.jar
+    only:
+      - dev
 
-production_dev:
-  stage: deploy
-  script:
-    - echo ARG1=--spring.datasource.url=$DEV_DB_URL > /opt/network/dev/.progconf
-    - echo ARG2=--app.jwtSecret=$DEV_JWT_SECRET >> /opt/network/dev/.progconf
-    - echo ARG3=--server.port=$DEV_PORT >> /opt/network/dev/.progconf
-    - sudo systemctl start networkapp_dev
-  only:
-    - dev
+  production_dev:
+    stage: deploy
+    script:
+      - echo ARG1=--spring.datasource.url=$DEV_DB_URL > /opt/network/dev/.progconf
+      - echo ARG2=--app.jwtSecret=$DEV_JWT_SECRET >> /opt/network/dev/.progconf
+      - echo ARG3=--server.port=$DEV_PORT >> /opt/network/dev/.progconf
+      - sudo systemctl start networkapp_dev
+    only:
+      - dev
 
 job:on-schedule:
   only:
