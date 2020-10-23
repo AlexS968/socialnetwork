@@ -39,3 +39,9 @@ production_dev:
     - sudo systemctl start networkapp_dev
   only:
     - dev
+
+job:on-schedule:
+  only:
+    - schedules
+  script:
+    - echo 123
