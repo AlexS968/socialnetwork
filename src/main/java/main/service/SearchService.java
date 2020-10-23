@@ -131,8 +131,6 @@ public class SearchService {
       String author, List<String> tags,
       Integer offset, Integer itemPerPage) {
 
-
-
     Pageable pageable;
 
     if (offset == 0 && itemPerPage == 0) {
@@ -169,16 +167,21 @@ public class SearchService {
       authorsIds = authorsIdsTemp;
 
     }
-    if (tags.size() > 0) {
+    if (tags != null) {
 
-      List<Optional<Tag>> tagsFound = tagRepository.findTagsByTagNames(tags);
+      if (!tags.isEmpty()) {
 
-      if (tagsFound.isEmpty()) {
-        return new ListResponse<>(searchPostResult, 0, offset, itemPerPage);
+        List<Optional<Tag>> tagsFound = tagRepository.findTagsByTagNames(tags);
+
+        if (tagsFound.isEmpty()) {
+          return new ListResponse<>(searchPostResult, 0, offset, itemPerPage);
+        }
+
+        Set<Integer> tagsIdsTemp = new HashSet<>();
+        tagsFound.forEach(t -> tagsIdsTemp.add(t.get().getId()));
+        tagsIds = tagsIdsTemp;
+
       }
-
-      tagsFound.forEach(t -> tagsIds.add(t.get().getId()));
-
     }
 
     resultPostPage = postRepository

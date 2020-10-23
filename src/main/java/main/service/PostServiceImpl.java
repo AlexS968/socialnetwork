@@ -88,6 +88,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public ListResponse<PostInResponse> showWall(Integer personId, int offset, int itemsPerPage) {
+        personService.isAuthenticated();
         Person person = personService.getById(personId);
         Pageable pageable = new OffsetPageRequest(offset, itemsPerPage, Sort.by("time").descending());
         Page<Post> postPage = postRepository.findByAuthor(person, pageable);
@@ -98,7 +99,8 @@ public class PostServiceImpl implements PostService {
     //-----------------------
     private Post savePost(Post post, PostRequest postData, Person person, Long pubDate) {
         Post postToSave = (post == null) ? new Post() : post;
-        final Instant postTime = pubDate == null ? Instant.now() : Instant.ofEpochMilli(pubDate);
+        final Instant postTime = pubDate == null ? Instant.now() :
+                Instant.ofEpochMilli(pubDate).isBefore(Instant.now()) ? Instant.now() : Instant.ofEpochMilli(pubDate);
         final List<PostTag> postTags = (post == null) ? new ArrayList<>() : postToSave.getTags();
         final List<Tag> tags = new ArrayList<>();
         for (String s : postData.getTags()) {
@@ -128,14 +130,14 @@ public class PostServiceImpl implements PostService {
         return postToSave;
     }
 
-//    @Override
-//    public Post getPost(int id) {
-//        Optional<Post> postOptional = postRepository.findById(id);
-//        if (postOptional.isEmpty()) {
-//            throw new BadRequestException(new ApiError("invalid_request", "Пост не существует"));
-//        }
-//        return postOptional.get();
-//    }
+    @Override
+    public Post getPost(int id) {
+        Optional<Post> postOptional = postRepository.findById(id);
+        if (postOptional.isEmpty()) {
+            throw new BadRequestException(new ApiError("invalid_request", "Пост не существует"));
+        }
+        return postOptional.get();
+    }
 
     @Override
     public Post findById(int id) {
@@ -147,6 +149,7 @@ public class PostServiceImpl implements PostService {
 
     private List<PostInResponse> extractPage(Page<Post> postPage, List<CommentInResponse> comments) {
         List<PostInResponse> posts = new ArrayList<>();
+        int userId = personService.getAuthUser().getId();
         for (Post item : postPage.getContent()) {
             PostInResponse postInResponse = new PostInResponse(item, comments, 0); // need a Person?
             if (item.getTime().isBefore(Instant.now())) {
