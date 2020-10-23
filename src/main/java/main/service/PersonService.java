@@ -5,6 +5,7 @@ import main.data.request.MeProfileRequest;
 import main.data.response.base.Response;
 import main.data.response.type.*;
 import main.model.Person;
+import main.model.Post;
 
 public interface PersonService {
     Response<PersonInLogin> login(LoginRequest request);
@@ -14,4 +15,8 @@ public interface PersonService {
     Response<InfoInResponse> deleteMe();
     Person getCurrentPerson();
     Person getById(int personId);
+    Person getAuthUser();
+    Person checkAuthUser(int id);
+    boolean isAuthenticated();
+    Person save(Person person);
 }

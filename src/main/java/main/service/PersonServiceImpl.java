@@ -6,11 +6,7 @@ import main.data.PersonPrincipal;
 import main.data.request.LoginRequest;
 import main.data.request.MeProfileRequest;
 import main.data.response.base.Response;
-import main.data.response.type.InfoInResponse;
-import main.data.response.type.MeProfile;
-import main.data.response.type.MeProfileUpdate;
-import main.data.response.type.ResponseMessage;
-import main.data.response.type.PersonInLogin;
+import main.data.response.type.*;
 import main.model.City;
 import main.model.Country;
 import main.model.Person;
@@ -134,7 +130,27 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
     public Person getById(int personId) {
         return personRepository.findById(personId);
     }
-    
+
+    public boolean isAuthenticated() {
+        if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
+            throw new UsernameNotFoundException("invalid_request");
+        }
+        return true;
+    }
+
+    public Person getAuthUser() {
+        isAuthenticated();
+        return getCurrentPerson();
+    }
+
+    public Person checkAuthUser(int id) {
+        Person person = getAuthUser();
+        if (person.getId() != id) {
+            throw new UsernameNotFoundException("invalid_request");
+        }
+        return person;
+    }
+
     public Response<MeProfile> getProfile(Integer id) {
         Person person = new Person();
         Optional<Person> personOpt = personRepository.findById(id);
@@ -149,6 +165,11 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
         MeProfile profile = new MeProfile(person);
         response.setData(profile);
         return response;
+    }
+
+    @Override
+    public Person save(Person person) {
+        return personRepository.save(person);
     }
 }
 

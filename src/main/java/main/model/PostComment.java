@@ -1,9 +1,13 @@
 package main.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.util.List;
 
 @Entity
 @Table(name = "post_comment")
@@ -33,4 +37,10 @@ public class PostComment {
 
     @Column(nullable = false, columnDefinition = "TINYINT")
     private boolean isBlocked = false;
+
+    @JsonManagedReference
+    @OneToMany
+    @JoinTable(name = "likes", joinColumns = @JoinColumn(name = "itemId"), inverseJoinColumns = @JoinColumn(name = "id"))
+    @Where(clause = "type = 'COMMENT'")
+    private List<Like> likes;
 }
