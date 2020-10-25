@@ -10,7 +10,11 @@ import main.data.response.type.NotificationResponse;
 import main.exception.BadRequestException;
 import main.exception.apierror.ApiError;
 import main.model.*;
-import main.repository.*;
+import main.repository.FriendsRepository;
+import main.repository.NotificationRepository;
+import main.repository.NotificationTypeRepository;
+import main.repository.PostCommentRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -28,10 +32,16 @@ public class NotificationServiceImpl implements NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final NotificationTypeRepository notificationTypeRepository;
-    private final PersonService personService;
-    private final PostRepository postRepository;
     private final PostCommentRepository postCommentRepository;
     private final FriendsRepository friendsRepository;
+
+    private final PersonService personService;
+    private PostService postService;
+
+    @Autowired
+    public void setPostService(PostService postService) {
+        this.postService = postService;
+    }
 
     @Override
     public ListResponse<NotificationResponse> list(int offset, int itemPerPage, boolean needToRead) {
@@ -109,9 +119,7 @@ public class NotificationServiceImpl implements NotificationService {
                 author = null;
                 break;
             case POST:
-                Post post = postRepository.findById(notification.getEntityId())
-                        .orElseThrow(EntityNotFoundException::new);
-                ;
+                Post post = postService.findById(notification.getEntityId());
                 info = post.getTitle();
                 author = post.getAuthor();
                 break;

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import main.model.Like;
 import main.model.Post;
 import main.model.PostType;
 import java.util.ArrayList;
@@ -28,8 +29,10 @@ public class PostInResponse {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private PostType type;
     private List<String> tags;
+    @JsonProperty(value = "my_like")
+    private boolean myLike;
 
-    public PostInResponse(Post post, List<CommentInResponse> commentsList) {
+    public PostInResponse(Post post, List<CommentInResponse> commentsList, int currentUserId) {
         id = post.getId();
         time = post.getTime().toEpochMilli();
         author = new MeProfile(post.getAuthor());
@@ -41,6 +44,7 @@ public class PostInResponse {
                 .filter(commentInResponse -> commentInResponse.getPostId() == id)
                 .collect(Collectors.toList());
         tags = getTags(post);
+        myLike = likes != 0 && post.getLikes().stream().anyMatch(l -> l.getPerson().getId() == currentUserId);
     }
 
     private List<String> getTags(Post post) {

@@ -21,15 +21,14 @@ public interface PostRepository extends CrudRepository<Post, Integer> {
   Page<Post> findByAuthor(Person person, Pageable pageable);
 
   @Query(nativeQuery = true, value =
-      "SELECT * FROM post "
+      "SELECT DISTINCT post.* FROM post "
           + "JOIN person ON person.id = post.author_id "
           + "JOIN post2tag ON post2tag.post_id = post.id "
           + "WHERE "
-          + "(:text is null or post_text LIKE :text) and "
-          + "(:dateFrom is null or time >= :dateFrom) and "
-          + "(:dateTo is null or time <= :dateTo) and "
-          + "(COALESCE(:authorId) is null or (author_id IN (:authorId))) and"
-          + "(COALESCE(:tagId) is null or (post2tag.tag_id IN (:tagId))) GROUP BY post.id")
+          + "((:text is null) OR (post_text LIKE :text) OR (title LIKE :text)) AND "
+          + "((:dateFrom is null AND :dateTo is null) or (time >= :dateFrom AND time <= :dateTo)) AND  "
+          + "(COALESCE(:authorId) is null or (author_id IN (:authorId))) AND "
+          + "(COALESCE(:tagId) is null or (post2tag.tag_id IN (:tagId)))")
   Page<Post> findByTextPeriodAuthor(
       @Param("text") String text,
       @Param("dateFrom") Date dateFrom,
