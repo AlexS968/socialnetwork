@@ -36,6 +36,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<ApiError> handleGenericException(
             Exception ex, WebRequest req) {
         logger.error(ex.getMessage());
+        ex.printStackTrace();
         return handleExceptionInternal(ex, null, HttpStatus.INTERNAL_SERVER_ERROR, req);
     }
 

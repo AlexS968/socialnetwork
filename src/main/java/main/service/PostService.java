@@ -42,6 +42,7 @@ public class PostService {
     private final TagRepository tagRepository;
     private final PostTagRepository postTagRepository;
     private final PersonServiceImpl personService;
+    private final NotificationService notificationService;
 
     public ListResponse<PostInResponse> getFeeds(String name, int offset, int itemPerPage) {
         Pageable pageable = new OffsetPageRequest(offset, itemPerPage, Sort.by("time").descending());
@@ -60,6 +61,7 @@ public class PostService {
         try {
             Person person = personService.checkAuthUser(personId);
             Post post = savePost(null, request, person, pubDate);
+            notificationService.setNotification(post);
             return new Response<>(new PostInResponse(post, new ArrayList<>()));
         } catch (Exception ex) {
             throw new BadRequestException(new ApiError("invalid_request", "Ошибка создания поста"));

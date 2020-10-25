@@ -10,9 +10,7 @@ import main.data.response.type.NotificationResponse;
 import main.exception.BadRequestException;
 import main.exception.apierror.ApiError;
 import main.model.*;
-import main.repository.NotificationRepository;
-import main.repository.NotificationTypeRepository;
-import main.repository.PostCommentRepository;
+import main.repository.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -31,8 +29,9 @@ public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
     private final NotificationTypeRepository notificationTypeRepository;
     private final PersonService personService;
-    private final PostService postService;
+    private final PostRepository postRepository;
     private final PostCommentRepository postCommentRepository;
+    private final FriendsRepository friendsRepository;
 
     @Override
     public ListResponse<NotificationResponse> list(int offset, int itemPerPage, boolean needToRead) {
@@ -110,13 +109,17 @@ public class NotificationServiceImpl implements NotificationService {
                 author = null;
                 break;
             case POST:
-                Post post = postService.findById(notification.getEntityId());
-                info = post.getPostText();
+                Post post = postRepository.findById(notification.getEntityId())
+                        .orElseThrow(EntityNotFoundException::new);
+                ;
+                info = post.getTitle();
                 author = post.getAuthor();
                 break;
             case FRIEND_REQUEST:
-                info = "FRIEND_REQUEST";
-                author = null;
+                Friendship friendship = friendsRepository.findById(notification.getEntityId())
+                        .orElseThrow(EntityNotFoundException::new);
+                info = notification.getContact();
+                author = friendship.getSrc();
                 break;
             default:
                 info = "";
@@ -147,27 +150,51 @@ public class NotificationServiceImpl implements NotificationService {
         return response;
     }
 
+    @Override
     public void setNotification(PostComment postComment) {
         Notification notification = new Notification();
-        notification.setSentTime(postComment.getTime());
-        notification.setReadStatus(NotificationReadStatusCode.SENT);
         if (postComment.getParent() != null) {
             //комментарий на комментарий
             notification.setReceiver(postComment.getParent().getAuthor());
             notification.setEntityId(postComment.getId());
-            NotificationType notificationType = notificationTypeRepository
-                    .findByCode(NotificationTypeCode.COMMENT_COMMENT.toString())
-                    .orElseThrow(EntityNotFoundException::new);
-            notification.setType(notificationType);
+            notification.setType(getNotificationType(NotificationTypeCode.COMMENT_COMMENT));
         } else {
             //комментарий на пост
             notification.setReceiver(postComment.getPost().getAuthor());
             notification.setEntityId(postComment.getId());
-            NotificationType notificationType = notificationTypeRepository
-                    .findByCode(NotificationTypeCode.POST_COMMENT.toString())
-                    .orElseThrow(EntityNotFoundException::new);
-            notification.setType(notificationType);
+            notification.setType(getNotificationType(NotificationTypeCode.POST_COMMENT));
         }
         notificationRepository.save(notification);
+    }
+
+    @Override
+    public void setNotification(Friendship friendship, String status) {
+        Notification notification = new Notification();
+        notification.setReceiver(friendship.getDst());
+        notification.setEntityId(friendship.getId());
+        notification.setType(getNotificationType(NotificationTypeCode.FRIEND_REQUEST));
+        notification.setContact(status);
+        notificationRepository.save(notification);
+    }
+
+    @Override
+    public void setNotification(Post post) {
+        int authorId = post.getAuthor().getId();
+        List<Notification> notifications = new ArrayList<>();
+
+        friendsRepository.findByDst_IdAndStatusId(authorId, 2)
+                .forEach(friendship -> {
+                    Notification notification = new Notification();
+                    notification.setReceiver(friendship.getSrc());
+                    notification.setEntityId(post.getId());
+                    notification.setType(getNotificationType(NotificationTypeCode.POST));
+                    notifications.add(notification);
+                });
+        notificationRepository.saveAll(notifications);
+    }
+
+    private NotificationType getNotificationType(NotificationTypeCode notificationTypeCode) {
+        return notificationTypeRepository.findByCode(notificationTypeCode.toString())
+                .orElseThrow(EntityNotFoundException::new);
     }
 }

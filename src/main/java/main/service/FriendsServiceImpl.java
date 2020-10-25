@@ -25,6 +25,7 @@ public class FriendsServiceImpl implements FriendsService {
     private final PersonRepository personRepository;
     private final FriendsRepository friendsRepository;
     private final FriendshipStatusRepository friendshipStatusRepository;
+    private final NotificationService notificationService;
 
     @Override
     public FriendsResponse getFriends(String name, int offset, int limit) {
@@ -37,13 +38,15 @@ public class FriendsServiceImpl implements FriendsService {
     @Override
     public FriendsResponse addFriend(int id) {
         int currentUserId = getCurrentUserId();
-        if (friendsRepository.findBySrc_idAndDst_IdAndStatusId(currentUserId,id, 1) == null){
+        String status;
+        if (friendsRepository.findBySrc_idAndDst_IdAndStatusId(currentUserId, id, 1) == null) {
             Friendship friendship = friendsRepository.findByDst_IdAndSrc_IdAndStatusId(currentUserId, id, 1);
             if (friendship == null) {
                 friendship = new Friendship();
                 friendship.setDst(personRepository.findById(id));
                 friendship.setSrc(personRepository.findById(currentUserId));
                 friendship.setStatus(friendshipStatusRepository.findById(1));
+                status = "Запрос направлен";
             } else {
                 friendship.setStatus(friendshipStatusRepository.findById(2));
                 friendsRepository.save(friendship);
@@ -51,8 +54,10 @@ public class FriendsServiceImpl implements FriendsService {
                 friendship.setDst(personRepository.findById(id));
                 friendship.setSrc(personRepository.findById(currentUserId));
                 friendship.setStatus(friendshipStatusRepository.findById(2));
+                status = "Запрос принят";
             }
             friendsRepository.save(friendship);
+            notificationService.setNotification(friendship, status);
             FriendsResponse friendsResponse = new FriendsResponse();
             friendsResponse.setError("");
             friendsResponse.setDataMessage(new DataMessage("ok"));
@@ -92,7 +97,7 @@ public class FriendsServiceImpl implements FriendsService {
     }
 
     @Override
-    public FriendsResponse getRecommendations(int offset, int limit){
+    public FriendsResponse getRecommendations(int offset, int limit) {
         List<Person> recommendedFriends = personRepository.findAll();
         return new FriendsResponse(recommendedFriends, offset, limit);
     }
@@ -105,11 +110,11 @@ public class FriendsServiceImpl implements FriendsService {
         return new FriendsResponse(requests, personRepository.findAll());
     }
 
-    private Pageable getPage(int offset, int limit){
+    private Pageable getPage(int offset, int limit) {
         return PageRequest.of(offset / limit, limit);
     }
 
-    private int getCurrentUserId(){
+    private int getCurrentUserId() {
         return ((PersonPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
                 .getPerson().getId();
     }
