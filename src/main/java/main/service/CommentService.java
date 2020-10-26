@@ -25,4 +25,5 @@ public interface CommentService {
 
     PostComment getComment(int itemId);
 
+    PostComment findById(int id);
 }

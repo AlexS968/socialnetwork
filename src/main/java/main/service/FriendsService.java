@@ -1,6 +1,8 @@
 package main.service;
 
 import main.data.response.FriendsResponse;
+import main.model.Friendship;
+import main.model.FriendshipStatus;
 import main.model.Person;
 
 import java.util.List;
@@ -18,4 +20,10 @@ public interface FriendsService {
     FriendsResponse getRecommendations(int offset, int limit);
 
     FriendsResponse getRequests(int offset, int limit);
+
+    Friendship findById(int id);
+
+    List<Friendship> findByDst_IdAndStatusId(int dstId, int statusId);
+
+    FriendshipStatus findFriendshipStatusById(int id);
 }
