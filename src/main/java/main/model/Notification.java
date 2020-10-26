@@ -29,4 +29,14 @@ public class Notification {
 
     @Column(nullable = false)
     private String contact;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "read_status", columnDefinition = "enum('SENT', 'READ')", nullable = false)
+    private NotificationReadStatusCode readStatus;
+
+    public Notification() {
+        sentTime = Instant.now();
+        contact = "";
+        readStatus = NotificationReadStatusCode.SENT;
+    }
 }

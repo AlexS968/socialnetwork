@@ -3,12 +3,14 @@ package main.model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
-import lombok.ToString;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Entity
@@ -16,6 +18,7 @@ import java.util.Set;
 @Data
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Person {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -43,7 +46,7 @@ public class Person {
     private String phone;
 
     @Column(name = "photo", columnDefinition = "text")
-    private String photoURL;
+    private String photoURL = "/static/img/default_avatar.png";
 
     @Column(columnDefinition = "text")
     private String about;
@@ -71,6 +74,14 @@ public class Person {
 
     @Column(name = "is_blocked", nullable = false, columnDefinition = "TINYINT")
     private boolean isBlocked = false;
+
+    @ElementCollection
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @CollectionTable(name = "notification_settings",
+            joinColumns = {@JoinColumn(name = "person_id", referencedColumnName = "id")})
+    @MapKeyColumn(name = "notification_type_id") // key
+    @Column(name = "is_enabled") // value
+    private Map<Integer, Boolean> notificationSettings;
 
     @OneToMany(mappedBy = "person", fetch = FetchType.LAZY)
     private List<BlockHistory> blockHistory;

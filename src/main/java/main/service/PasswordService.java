@@ -2,15 +2,16 @@ package main.service;
 
 import main.data.request.PasswordRecoveryRequest;
 import main.data.request.PasswordSetRequest;
-import main.data.response.InfoResponse;
+import main.data.response.base.Response;
+import main.data.response.type.InfoInResponse;
 
 public interface PasswordService {
 
-    InfoResponse restorePassword(PasswordRecoveryRequest request, String link);
+    Response<InfoInResponse> restorePassword(PasswordRecoveryRequest request, String link);
 
-    InfoResponse setPassword(PasswordSetRequest request, String referer);
+    Response<InfoInResponse> setPassword(PasswordSetRequest request, String referer);
 
-    InfoResponse changePassOrEmail(String subject, String link);
+    Response<InfoInResponse> changePassOrEmail(String subject, String link);
 
-    InfoResponse setEmail(PasswordRecoveryRequest request);
+    Response<InfoInResponse> setEmail(PasswordRecoveryRequest request);
 }

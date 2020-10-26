@@ -1,8 +1,10 @@
 package main.controller;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
-import main.data.response.ListPersonResponse;
-import main.data.response.ListPostsResponse;
+import main.data.response.base.ListResponse;
+import main.data.response.type.PersonInPersonList;
+import main.data.response.type.PostInResponse;
 import main.service.SearchService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -16,7 +18,7 @@ public class SearchController {
   private final SearchService searchService;
 
   @GetMapping("/api/v1/users/search")
-  public ResponseEntity<ListPersonResponse> searchPerson(
+  public ResponseEntity<ListResponse<PersonInPersonList>> searchPerson(
       @RequestParam(required = false, name = "first_name") String firstName,
       @RequestParam(required = false, name = "last_name") String lastName,
       @RequestParam(required = false, name = "age_from") Integer ageFrom,
@@ -28,24 +30,22 @@ public class SearchController {
 
   ) {
 
-    ListPersonResponse response = searchService
-        .searchPerson(firstName, lastName, ageFrom, ageTo, country, city, offset, itemPerPage);
-
-    return ResponseEntity.ok(response);
+    return ResponseEntity.ok(searchService
+        .searchPerson(firstName, lastName, ageFrom, ageTo, country, city, offset, itemPerPage));
   }
 
   @GetMapping("/api/v1/post")
-  public ResponseEntity<ListPostsResponse> searchNews(
+  public ResponseEntity<ListResponse<PostInResponse>> searchNews(
       @RequestParam(required = false, name = "text") String text,
       @RequestParam(required = false, name = "date_from") Long dateFrom,
       @RequestParam(required = false, name = "date_to") Long dateTo,
       @RequestParam(required = false, name = "author") String author,
+      @RequestParam(required = false, name = "tags") List<String> tags,
       @RequestParam(required = false, defaultValue = "0") Integer offset,
       @RequestParam(required = false, defaultValue = "10") Integer itemPerPage) {
 
-    ListPostsResponse response = searchService.searchPost(text, dateFrom, dateTo, author,
-        offset, itemPerPage);
-    return ResponseEntity.ok(response);
+    return ResponseEntity.ok(searchService.searchPost(text, dateFrom, dateTo, author, tags,
+        offset, itemPerPage));
   }
 
 

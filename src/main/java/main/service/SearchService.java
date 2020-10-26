@@ -10,18 +10,22 @@ import java.util.Optional;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import main.core.OffsetPageRequest;
-import main.data.response.ListPersonResponse;
-import main.data.response.ListPostsResponse;
+import main.data.response.base.ListResponse;
+import main.data.response.type.CommentInResponse;
+import main.data.response.type.PersonInPersonList;
+import main.data.response.type.PostInResponse;
 import main.model.City;
 import main.model.Country;
 import main.model.Person;
 import main.model.Post;
+import main.model.Tag;
 import main.repository.CityRepository;
 import main.repository.CountryRepository;
 import main.repository.PersonRepository;
+import main.repository.PostCommentRepository;
 import main.repository.PostRepository;
+import main.repository.TagRepository;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -34,8 +38,12 @@ public class SearchService {
   private final CountryRepository countryRepository;
   private final CityRepository cityRepository;
   private final PostRepository postRepository;
+  private final PostCommentRepository postCommentRepository;
+  private final CommentServiceImpl commentService;
+  private final TagRepository tagRepository;
 
-  public ListPersonResponse searchPerson(String firstName, String lastName, Integer ageFrom,
+  public ListResponse<PersonInPersonList> searchPerson(String firstName, String lastName,
+      Integer ageFrom,
       Integer ageTo, String country,
       String city, Integer offset, Integer itemPerPage) {
 
@@ -47,13 +55,12 @@ public class SearchService {
       pageable = new OffsetPageRequest(offset, itemPerPage, Sort.unsorted());
     }
 
-    List<Person> searchResult = new ArrayList<>();
+    List<PersonInPersonList> searchResult = new ArrayList<>();
 
-    Page<Person> resultPage = new PageImpl<>(new ArrayList<>(), pageable,
-        0); // чтобы вернуть пустую страницу если какоето условие не соблюдено
+    Page<Person> resultPage;
 
     Integer countryId = null;
-    Integer cityId = null;
+    Set<Integer> cityIds = new HashSet<>();
     Date ageFromToDate = null;
     Date ageToToDate = null;
 
@@ -63,18 +70,43 @@ public class SearchService {
 
       if (countryOptional.isEmpty()) {
 
-        return new ListPersonResponse(resultPage);
+        return new ListResponse<>(searchResult, 0,
+            offset,
+            itemPerPage);
       }
       countryId = countryOptional.get().getId();
     }
     if (city != null) {
-      Optional<City> cityOptional = cityRepository.findByTitle(city);
 
-      if (cityOptional.isEmpty()) {
-        return new ListPersonResponse(resultPage);
+      //города в мире
+      if (country == null) {
+
+        List<Optional<City>> cityOptional = cityRepository.findByTitle(city);
+
+        if (cityOptional.isEmpty()) {
+          return new ListResponse<>(searchResult, 0,
+              offset,
+              itemPerPage);
+        }
+
+        cityOptional.stream().forEach(c -> cityIds.add(c.get().getId()));
+      }
+      //города в стране
+      else {
+
+        List<Optional<City>> cityOptional = cityRepository.findByTitleAndCountryId(city, countryId);
+
+        if (cityOptional.isEmpty()) {
+          return new ListResponse<>(searchResult, 0,
+              offset,
+              itemPerPage);
+        }
+
+        cityOptional.stream().forEach(c -> cityIds.add(c.get().getId()));
+
       }
 
-      cityId = cityOptional.get().getId();
+
     }
     if (ageFrom != null) {
       ageFromToDate = calculateBirthDateFromAge(ageFrom);
@@ -83,21 +115,20 @@ public class SearchService {
       ageToToDate = calculateBirthDateFromAge(ageTo);
     }
 
-    List<Optional<Person>> res = personRepository
+    resultPage = personRepository
         .findPersonByNameLastNameAgeCityCountry(firstName, lastName, ageFromToDate, ageToToDate,
-            countryId, cityId);
+            countryId, cityIds, pageable);
 
-    if (!res.isEmpty()) {
-      res.stream().forEach(r -> searchResult.add(r.get()));
-    }
+    resultPage.forEach(r -> searchResult.add(new PersonInPersonList(r)));
 
-    resultPage = new PageImpl<>(searchResult, pageable, searchResult.size());
-
-    return new ListPersonResponse(resultPage);
+    return new ListResponse<>(searchResult, resultPage.getTotalElements(),
+        offset,
+        itemPerPage);
 
   }
 
-  public ListPostsResponse searchPost(String text, Long dateFrom, Long dateTo, String author,
+  public ListResponse<PostInResponse> searchPost(String text, Long dateFrom, Long dateTo,
+      String author, List<String> tags,
       Integer offset, Integer itemPerPage) {
 
     Pageable pageable;
@@ -108,14 +139,14 @@ public class SearchService {
       pageable = new OffsetPageRequest(offset, itemPerPage, Sort.unsorted());
     }
 
-    List<Post> searchPostResult = new ArrayList<>();
+    List<PostInResponse> searchPostResult = new ArrayList<>();
 
-    Page<Post> resultPostPage = new PageImpl<>(new ArrayList<>(), pageable, 0);
-
+    Page<Post> resultPostPage;
     Date from = null;
     Date to = null;
     Set<Integer> authorsIds = new HashSet<>();
     String textUpdated = "%" + text + "%";
+    Set<Integer> tagsIds = new HashSet<>();
 
     if (dateFrom != null && dateTo != null) {
       from = new Date(dateFrom);
@@ -126,7 +157,7 @@ public class SearchService {
           .findByLastNameLikeOrFirstNameLike(author, author);
 
       if (authors.isEmpty()) {
-        return new ListPostsResponse(resultPostPage);
+        return new ListResponse<>(searchPostResult, 0, offset, itemPerPage);
       }
 
       Set<Integer> authorsIdsTemp = new HashSet<>();
@@ -136,17 +167,31 @@ public class SearchService {
       authorsIds = authorsIdsTemp;
 
     }
+    if (tags != null) {
 
-    List<Optional<Post>> res = postRepository
-        .findByTextPeriodAuthor(textUpdated, from, to, authorsIds);
+      if (!tags.isEmpty()) {
 
-    if (!res.isEmpty()) {
-      res.stream().forEach(r -> searchPostResult.add(r.get()));
+        List<Optional<Tag>> tagsFound = tagRepository.findTagsByTagNames(tags);
+
+        if (tagsFound.isEmpty()) {
+          return new ListResponse<>(searchPostResult, 0, offset, itemPerPage);
+        }
+
+        Set<Integer> tagsIdsTemp = new HashSet<>();
+        tagsFound.forEach(t -> tagsIdsTemp.add(t.get().getId()));
+        tagsIds = tagsIdsTemp;
+
+      }
     }
 
-    resultPostPage = new PageImpl<>(searchPostResult, pageable, searchPostResult.size());
+    resultPostPage = postRepository
+        .findByTextPeriodAuthor(textUpdated, from, to, authorsIds, tagsIds, pageable);
 
-    return new ListPostsResponse(resultPostPage);
+    List<CommentInResponse> comments = commentService.getCommentsList(resultPostPage.getContent());
+    resultPostPage.forEach(p -> searchPostResult.add(new PostInResponse(p, comments, -1))); //TODO check necessity
+
+    return new ListResponse<>(searchPostResult, resultPostPage.getTotalElements(), offset,
+        itemPerPage);
   }
 
   private Date calculateBirthDateFromAge(int age) {

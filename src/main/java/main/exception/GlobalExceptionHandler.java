@@ -29,13 +29,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<ApiError> handleUserNotAuthorizedException(
             UsernameNotFoundException ex, WebRequest req) {
         logger.error(ex.getClass().getName()+ ", " + ex.getMessage());
-        return handleExceptionInternal(ex, null, HttpStatus.UNAUTHORIZED, req);
+        return handleExceptionInternal(ex, new ApiError(ex.getMessage(), "Пользователь не авторизован"), HttpStatus.UNAUTHORIZED, req);
     }
 
     @ExceptionHandler(value = {Exception.class})
     protected ResponseEntity<ApiError> handleGenericException(
             Exception ex, WebRequest req) {
         logger.error(ex.getMessage());
+        ex.printStackTrace();
         return handleExceptionInternal(ex, null, HttpStatus.INTERNAL_SERVER_ERROR, req);
     }
 

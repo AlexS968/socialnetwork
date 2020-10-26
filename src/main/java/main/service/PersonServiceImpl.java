@@ -5,15 +5,8 @@ import main.core.auth.JwtUtils;
 import main.data.PersonPrincipal;
 import main.data.request.LoginRequest;
 import main.data.request.MeProfileRequest;
-import main.data.response.InfoResponse;
-import main.data.response.MeProfileResponse;
-import main.data.response.MeProfileUpdateResponse;
 import main.data.response.base.Response;
-import main.data.response.type.InfoInResponse;
-import main.data.response.type.MeProfile;
-import main.data.response.type.MeProfileUpdate;
-import main.data.response.type.ResponseMessage;
-import main.data.response.type.PersonInLogin;
+import main.data.response.type.*;
 import main.model.City;
 import main.model.Country;
 import main.model.Person;
@@ -30,10 +23,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
-public class PersonServiceImpl implements UserDetailsService {
+public class PersonServiceImpl implements UserDetailsService, PersonService {
 
     private final PersonRepository personRepository;
     private final AuthenticationManager authenticationManager;
@@ -50,6 +44,7 @@ public class PersonServiceImpl implements UserDetailsService {
         return new PersonPrincipal(user);
     }
 
+    @Override
     public Response<PersonInLogin> login(LoginRequest request) {
         Authentication authentication
                 = authenticationManager.authenticate(
@@ -72,23 +67,24 @@ public class PersonServiceImpl implements UserDetailsService {
         return new Response<>(personInLogin);
     }
 
+    @Override
     public Response<ResponseMessage> logout() {
         return new Response<>(new ResponseMessage("ok"));
     }
 
-    public MeProfileResponse getMe() {
+    @Override
+    public Response<MeProfile> getMe() {
 
         Person person = getCurrentPerson();
-
-        MeProfileResponse response = new MeProfileResponse();
+        Response<MeProfile> response = new Response<>();
         MeProfile profile = new MeProfile(person);
-
         response.setData(profile);
         return response;
 
     }
 
-    public MeProfileUpdateResponse putMe(MeProfileRequest updatedCurrentPerson) {
+    @Override
+    public Response<MeProfileUpdate> putMe(MeProfileRequest updatedCurrentPerson) {
         Person personUpdated = personRepository.findById(getCurrentPerson().getId());
         personUpdated.setLastName(updatedCurrentPerson.getLastName());
         personUpdated.setFirstName(updatedCurrentPerson.getFirstName());
@@ -105,26 +101,75 @@ public class PersonServiceImpl implements UserDetailsService {
         personRepository.save(personUpdated);
 
         MeProfileUpdate updatedPerson = new MeProfileUpdate(personUpdated);
-        MeProfileUpdateResponse response = new MeProfileUpdateResponse();
+        Response<MeProfileUpdate> response = new Response<>();
         response.setData(updatedPerson);
         return response;
     }
 
-    public InfoResponse deleteMe() {
+    @Override
+    public Response<InfoInResponse> deleteMe() {
 
         int id = getCurrentPerson().getId();
         personRepository.deleteById(id);
 
         InfoInResponse info = new InfoInResponse("ok");
-        InfoResponse response = new InfoResponse();
+        Response<InfoInResponse> response = new Response<>();
         response.setData(info);
         return response;
 
     }
 
-    private Person getCurrentPerson() {
+    @Override
+    public Person getCurrentPerson() {
         return ((PersonPrincipal) SecurityContextHolder.getContext().
                 getAuthentication().getPrincipal()).getPerson();
+    }
+
+
+    @Override
+    public Person getById(int personId) {
+        return personRepository.findById(personId);
+    }
+
+    public boolean isAuthenticated() {
+        if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
+            throw new UsernameNotFoundException("invalid_request");
+        }
+        return true;
+    }
+
+    public Person getAuthUser() {
+        isAuthenticated();
+        return getCurrentPerson();
+    }
+
+    public Person checkAuthUser(int id) {
+        Person person = getAuthUser();
+        if (person.getId() != id) {
+            throw new UsernameNotFoundException("invalid_request");
+        }
+        return person;
+    }
+
+    public Response<MeProfile> getProfile(Integer id) {
+        Person person = new Person();
+        Optional<Person> personOpt = personRepository.findById(id);
+        if (personOpt.isPresent()) {
+            person = personOpt.get();
+        } else {
+            throw new UsernameNotFoundException("invalid_request");
+        }
+
+        Response<MeProfile> response = new Response<>();
+
+        MeProfile profile = new MeProfile(person);
+        response.setData(profile);
+        return response;
+    }
+
+    @Override
+    public Person save(Person person) {
+        return personRepository.save(person);
     }
 }
 

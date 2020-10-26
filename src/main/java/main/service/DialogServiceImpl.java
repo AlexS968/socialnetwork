@@ -15,7 +15,6 @@ import main.model.Person;
 import main.model.ReadStatus;
 import main.repository.DialogRepository;
 import main.repository.MessageRepository;
-import main.repository.PersonRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -25,17 +24,19 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 public class DialogServiceImpl implements DialogService {
     private final DialogRepository dialogRepository;
-    private final PersonRepository personRepository;
     private final MessageRepository messageRepository;
+    private final PersonService personService;
 
     @Override
     public ListResponse<DialogList> list(ListRequest request) {
-        PersonPrincipal currentUser = (PersonPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Person currentPerson = personService.getCurrentPerson();
+        int currentUserId = currentPerson.getId();
 
         List<DialogList> dialogs = new ArrayList<>();
         Pageable pageable;
@@ -47,24 +48,20 @@ public class DialogServiceImpl implements DialogService {
             pageable = Pageable.unpaged();
         }
 
-        page = dialogRepository.findByPersons_id(currentUser.getPerson().getId(), pageable);
+        page = dialogRepository.findByPersons_id(currentUserId, pageable);
 
         page.forEach(i -> {
             DialogList item = new DialogList(i);
 
-            item.setUnreadCount(messageRepository.countByReadStatusAndAuthor_idNotAndDialog_id(
+            item.setUnreadCount(messageRepository.countByReadStatusAndRecipient_idAndDialog_id(
                     ReadStatus.SENT,
-                    currentUser.getPerson().getId(),
+                    currentPerson.getId(),
                     item.getId()
             ));
 
             Message lastMessage = messageRepository.findTopByDialog_idOrderByTimeDesc(item.getId());
             if (lastMessage != null) {
-                DialogMessage dialogMessage = new DialogMessage(
-                        lastMessage,
-                        lastMessage.getAuthor().getId() == currentUser.getPerson().getId()
-                );
-
+                DialogMessage dialogMessage = new DialogMessage(lastMessage);
                 item.setLastMessage(dialogMessage);
             }
 
@@ -81,30 +78,41 @@ public class DialogServiceImpl implements DialogService {
 
     @Override
     public Response<DialogNew> add(DialogAddRequest request) {
-        PersonPrincipal currentUser = (PersonPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Person currentPerson = personService.getCurrentPerson();
 
-        Dialog dialog = new Dialog();
+        Dialog dialog = null;
+        boolean isGroupDialog = request.getUserIds().size() > 1;
 
-        List<Person> persons = new ArrayList<>();
-
-        persons.add(personRepository.findById(currentUser.getPerson().getId()));
-
-        request.getUserIds().forEach(i -> persons.add(personRepository.findById(i.intValue())));
-
-        dialog.setPersons(persons);
-
-        if (persons.size() > 1) {
-           dialog.setPrimaryRecipient(persons.get(1));
+        //Может быть диалог тет-а-тет уже есть, проверим
+        if (!isGroupDialog) {
+            dialog = dialogRepository.findTetATet(
+                    currentPerson.getId(),
+                    request.getUserIds().get(0)
+            );
         }
 
-        dialogRepository.save(dialog);
+        if (dialog == null) {
+            dialog = new Dialog();
 
-        Response<DialogNew> response = new Response<>();
-        DialogNew dialogNew = new DialogNew();
-        dialogNew.setId(dialog.getId());
-        response.setData(dialogNew);
+            List<Person> persons = request.getUserIds().stream().map(personService::getById).collect(Collectors.toList());
+            persons.add(personService.getById(currentPerson.getId()));
 
-        return response;
+            dialog.setPersons(persons);
+
+            if (request.getName() != null && !request.getName().isEmpty()) {
+                dialog.setName(request.getName());
+            } else {
+                if (isGroupDialog) {
+                    dialog.setName("Групповая беседа");
+                }
+            }
+
+            dialog.setGroup(isGroupDialog);
+
+            dialogRepository.save(dialog);
+        }
+
+        return new Response<>(new DialogNew(dialog.getId()));
     }
 
     @Override
@@ -113,38 +121,47 @@ public class DialogServiceImpl implements DialogService {
 
         Dialog dialog = dialogRepository.findById(dialogId);
 
-        Message message = new Message();
-        message.setMessageText(request.getMessageText());
-        message.setDialog(dialog);
-        message.setTime(Instant.now());
-        message.setAuthor(currentUser.getPerson());
-        message.setRecipient(dialog.getPrimaryRecipient());
-        message.setReadStatus(ReadStatus.SENT);
-        messageRepository.save(message);
+        dialog.getPersons().forEach(p -> {
+            Message message = new Message();
+            message.setMessageText(request.getMessageText());
+            message.setDialog(dialog);
+            message.setTime(Instant.now());
+            message.setAuthor(currentUser.getPerson());
+            message.setRecipient(p);
+            message.setReadStatus((p.getId() != currentUser.getPerson().getId()) ? ReadStatus.SENT : ReadStatus.READ);
+            messageRepository.save(message);
+        });
 
         Response<DialogMessage> response = new Response<>();
-        response.setData(new DialogMessage(message));
+        DialogMessage dialogMessage = new DialogMessage();
+        dialogMessage.setMessageText(request.getMessageText());
+        response.setData(dialogMessage);
         return response;
     }
 
     @Override
     public ListResponse<DialogMessage> listMessage(int dialogId, ListRequest request) {
+        PersonPrincipal currentUser = (PersonPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        int currentUserId = currentUser.getPerson().getId();
+
         List<DialogMessage> messages = new ArrayList<>();
         Pageable pageable;
         Page<Message> page;
 
         if (request.getItemPerPage() > 0) {
-            pageable = new OffsetPageRequest(request.getOffset(), request.getItemPerPage(), Sort.unsorted());
+            pageable = new OffsetPageRequest(request.getOffset(), request.getItemPerPage(), Sort.by(Sort.Order.desc("id")));
         } else {
             pageable = Pageable.unpaged();
         }
 
-        page = messageRepository.findByDialog_id(dialogId, pageable);
+        page = messageRepository.findByDialog_idAndRecipient_id(dialogId, currentUserId, pageable);
 
         page.forEach(i -> {
             DialogMessage item = new DialogMessage(i);
             messages.add(item);
         });
+
+        messages.stream().filter(msg -> msg.getReadStatus().equals(ReadStatus.SENT)).forEach(msg -> setReadMessage(msg.getId()));
 
         return new ListResponse<>(
                 messages,
@@ -158,9 +175,8 @@ public class DialogServiceImpl implements DialogService {
     public Response<ResponseCount> countUnreadedMessage() {
         PersonPrincipal currentUser = (PersonPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        long count = messageRepository.countByReadStatusAndAuthor_idNotAndDialog_persons_id(
+        long count = messageRepository.countByReadStatusAndRecipient_id(
                 ReadStatus.SENT,
-                currentUser.getPerson().getId(),
                 currentUser.getPerson().getId()
         );
 
