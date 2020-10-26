@@ -10,18 +10,21 @@ import main.data.response.type.NotificationResponse;
 import main.exception.BadRequestException;
 import main.exception.apierror.ApiError;
 import main.model.*;
-import main.repository.FriendsRepository;
 import main.repository.NotificationRepository;
 import main.repository.NotificationTypeRepository;
-import main.repository.PostCommentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.Year;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -32,15 +35,24 @@ public class NotificationServiceImpl implements NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final NotificationTypeRepository notificationTypeRepository;
-    private final PostCommentRepository postCommentRepository;
-    private final FriendsRepository friendsRepository;
-
     private final PersonService personService;
+    private CommentService commentService;
     private PostService postService;
+    private FriendsService friendsService;
 
     @Autowired
     public void setPostService(PostService postService) {
         this.postService = postService;
+    }
+
+    @Autowired
+    public void setCommentService(CommentService commentService) {
+        this.commentService = commentService;
+    }
+
+    @Autowired
+    public void setFriendsService(@Lazy FriendsService friendsService) {
+        this.friendsService = friendsService;
     }
 
     @Override
@@ -109,8 +121,7 @@ public class NotificationServiceImpl implements NotificationService {
         switch (notification.getType().getCode()) {
             case POST_COMMENT:
             case COMMENT_COMMENT:
-                PostComment postComment = postCommentRepository.findById(notification
-                        .getEntityId()).orElseThrow(EntityNotFoundException::new);
+                PostComment postComment = commentService.findById(notification.getEntityId());
                 info = postComment.getCommentText();
                 author = postComment.getAuthor();
                 break;
@@ -124,10 +135,16 @@ public class NotificationServiceImpl implements NotificationService {
                 author = post.getAuthor();
                 break;
             case FRIEND_REQUEST:
-                Friendship friendship = friendsRepository.findById(notification.getEntityId())
-                        .orElseThrow(EntityNotFoundException::new);
+                Friendship friendship = friendsService.findById(notification.getEntityId());
                 info = notification.getContact();
                 author = friendship.getSrc();
+                break;
+            case FRIEND_BIRTHDAY:
+                friendship = friendsService.findById(notification.getEntityId());
+                Person personSrs = friendship.getSrc();
+                Person personDst = friendship.getDst();
+                info = notification.getContact();
+                author = notification.getReceiver().equals(personSrs) ? personDst : personSrs;
                 break;
             default:
                 info = "";
@@ -176,13 +193,55 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public void setNotification(Friendship friendship, String status) {
-        Notification notification = new Notification();
-        notification.setReceiver(friendship.getDst());
-        notification.setEntityId(friendship.getId());
-        notification.setType(getNotificationType(NotificationTypeCode.FRIEND_REQUEST));
-        notification.setContact(status);
-        notificationRepository.save(notification);
+    public void setNotification(Friendship friendship) {
+        // отправка уведомления о направлении или принятии запроса в друзья
+        Notification not1 = new Notification();
+        not1.setReceiver(friendship.getDst());
+        not1.setEntityId(friendship.getId());
+        not1.setType(getNotificationType(NotificationTypeCode.FRIEND_REQUEST));
+        not1.setContact(friendship
+                .getStatus().equals(friendsService.findFriendshipStatusById(1)) ?
+                "Запрос направлен" :
+                "Запрос принят");
+        notificationRepository.save(not1);
+
+        //если запрос принят, отправка обоим друзьям уведомления о дне рождения
+        SimpleDateFormat formatForDate = new SimpleDateFormat("EEEE, dd MMMM");
+        Calendar cal = Calendar.getInstance();
+        if (friendship.getStatus().equals(friendsService.findFriendshipStatusById(2))) {
+            // создаем уведомление для первого друга
+            Notification not2 = new Notification();
+            not2.setReceiver(friendship.getDst());
+            not2.setEntityId(friendship.getId());
+            not2.setType(getNotificationType(NotificationTypeCode.FRIEND_BIRTHDAY));
+            // устанавливаем дату уведомления за сутки до д/р
+            cal.setTime(friendship.getSrc().getBirthDate());
+            cal.add(Calendar.DATE, -1);
+            cal.set(Calendar.YEAR, Year.now().getValue());
+            not2.setSentTime(Instant.ofEpochMilli(cal.getTime().getTime()));
+            not2.setContact("У " + friendship.getSrc().getFirstName() + " " +
+                    friendship.getSrc().getLastName() + " в " +
+                    formatForDate.format(friendship.getSrc().getBirthDate()) +
+                    ", день рождения");
+
+            // создаем уведомление для второго друга
+            Notification not3 = new Notification();
+            not3.setReceiver(friendship.getSrc());
+            not3.setEntityId(friendship.getId());
+            not3.setType(getNotificationType(NotificationTypeCode.FRIEND_BIRTHDAY));
+            // устанавливаем дату уведомления за сутки до д/р
+            cal.setTime(friendship.getDst().getBirthDate());
+            cal.add(Calendar.DATE, -1);
+            cal.set(Calendar.YEAR, Year.now().getValue());
+            not3.setSentTime(Instant.ofEpochMilli(cal.getTime().getTime()));
+            not3.setContact("У " + friendship.getDst().getFirstName() + " " +
+                    friendship.getDst().getLastName() + " в " +
+                    formatForDate.format(friendship.getSrc().getBirthDate()) +
+                    ", день рождения");
+
+            notificationRepository.save(not2);
+            notificationRepository.save(not3);
+        }
     }
 
     @Override
@@ -190,7 +249,7 @@ public class NotificationServiceImpl implements NotificationService {
         int authorId = post.getAuthor().getId();
         List<Notification> notifications = new ArrayList<>();
 
-        friendsRepository.findByDst_IdAndStatusId(authorId, 2)
+        friendsService.findByDst_IdAndStatusId(authorId, 2)
                 .forEach(friendship -> {
                     Notification notification = new Notification();
                     notification.setReceiver(friendship.getSrc());

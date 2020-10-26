@@ -14,6 +14,5 @@ public interface FriendsRepository extends CrudRepository<Friendship, Integer> {
     Page<Friendship> findBySrc_IdAndStatusId(int srcId, Pageable pageable, int statusId);
     Friendship findByDst_IdAndSrc_IdAndStatusId(int dstId, int srcId, int statusId);
     Friendship findBySrc_idAndDst_IdAndStatusId(int dstId, int scrId, int statusId);
-    List<Friendship> findBySrc_idAndStatusId(int scrId, int statusId);
     List<Friendship> findByDst_IdAndStatusId(int dstId, int statusId);
 }

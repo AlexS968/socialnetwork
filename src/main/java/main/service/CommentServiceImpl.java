@@ -15,6 +15,7 @@ import main.repository.PostCommentRepository;
 import main.repository.PostRepository;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -142,6 +143,12 @@ public class CommentServiceImpl implements CommentService {
         } else {
             throw new BadRequestException(new ApiError("invalid_request", "Несуществующий коммент"));
         }
+    }
+
+    @Override
+    public PostComment findById(int id){
+        return commentRepository.findById(id)
+                .orElseThrow(EntityNotFoundException::new);
     }
 }
 

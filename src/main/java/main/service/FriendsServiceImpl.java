@@ -5,16 +5,20 @@ import main.data.PersonPrincipal;
 import main.data.response.FriendsResponse;
 import main.data.response.type.DataMessage;
 import main.model.Friendship;
+import main.model.FriendshipStatus;
 import main.model.Person;
 import main.repository.FriendsRepository;
 import main.repository.FriendshipStatusRepository;
 import main.repository.PersonRepository;
+import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
 
@@ -25,7 +29,13 @@ public class FriendsServiceImpl implements FriendsService {
     private final PersonRepository personRepository;
     private final FriendsRepository friendsRepository;
     private final FriendshipStatusRepository friendshipStatusRepository;
-    private final NotificationService notificationService;
+
+    private NotificationService notificationService;
+
+    @Autowired
+    public void setNotificationService(NotificationService notificationService) {
+        this.notificationService = notificationService;
+    }
 
     @Override
     public FriendsResponse getFriends(String name, int offset, int limit) {
@@ -38,7 +48,6 @@ public class FriendsServiceImpl implements FriendsService {
     @Override
     public FriendsResponse addFriend(int id) {
         int currentUserId = getCurrentUserId();
-        String status;
         if (friendsRepository.findBySrc_idAndDst_IdAndStatusId(currentUserId, id, 1) == null) {
             Friendship friendship = friendsRepository.findByDst_IdAndSrc_IdAndStatusId(currentUserId, id, 1);
             if (friendship == null) {
@@ -46,7 +55,6 @@ public class FriendsServiceImpl implements FriendsService {
                 friendship.setDst(personRepository.findById(id));
                 friendship.setSrc(personRepository.findById(currentUserId));
                 friendship.setStatus(friendshipStatusRepository.findById(1));
-                status = "Запрос направлен";
             } else {
                 friendship.setStatus(friendshipStatusRepository.findById(2));
                 friendsRepository.save(friendship);
@@ -54,10 +62,9 @@ public class FriendsServiceImpl implements FriendsService {
                 friendship.setDst(personRepository.findById(id));
                 friendship.setSrc(personRepository.findById(currentUserId));
                 friendship.setStatus(friendshipStatusRepository.findById(2));
-                status = "Запрос принят";
             }
             friendsRepository.save(friendship);
-            notificationService.setNotification(friendship, status);
+            notificationService.setNotification(friendship);
             FriendsResponse friendsResponse = new FriendsResponse();
             friendsResponse.setError("");
             friendsResponse.setDataMessage(new DataMessage("ok"));
@@ -108,6 +115,21 @@ public class FriendsServiceImpl implements FriendsService {
         Page<Friendship> requests;
         requests = friendsRepository.findByDst_IdAndStatusId(currentUserId, getPage(offset, limit), 1);
         return new FriendsResponse(requests, personRepository.findAll());
+    }
+
+    @Override
+    public Friendship findById(int id) {
+        return friendsRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+    }
+
+    @Override
+    public List<Friendship> findByDst_IdAndStatusId(int dstId, int statusId){
+        return friendsRepository.findByDst_IdAndStatusId(dstId, statusId);
+    }
+
+    @Override
+    public FriendshipStatus findFriendshipStatusById(int id) {
+        return friendshipStatusRepository.findById(id);
     }
 
     private Pageable getPage(int offset, int limit) {

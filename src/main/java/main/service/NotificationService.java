@@ -19,7 +19,7 @@ public interface NotificationService {
 
     void setNotification(PostComment postComment);
 
-    void setNotification(Friendship friendship,String status);
+    void setNotification(Friendship friendship);
 
     void setNotification(Post post);
 }
