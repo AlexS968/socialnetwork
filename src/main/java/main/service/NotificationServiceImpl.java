@@ -41,12 +41,12 @@ public class NotificationServiceImpl implements NotificationService {
     private FriendsService friendsService;
 
     @Autowired
-    public void setPostService(PostService postService) {
+    public void setPostService(@Lazy PostService postService) {
         this.postService = postService;
     }
 
     @Autowired
-    public void setCommentService(CommentService commentService) {
+    public void setCommentService(@Lazy CommentService commentService) {
         this.commentService = commentService;
     }
 

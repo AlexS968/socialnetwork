@@ -6,7 +6,7 @@ import main.data.response.CommentResponse;
 import main.data.response.base.ListResponse;
 import main.data.response.type.CommentInResponse;
 import main.data.response.type.ItemDelete;
-import main.service.CommentServiceImpl;
+import main.service.CommentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 @RequestMapping("/api/v1/post")
 public class CommentController {
-    private final CommentServiceImpl commentService;
+    private final CommentService commentService;
 
     @PostMapping("/{id}/comments")
     public ResponseEntity<CommentResponse> createComment(
@@ -39,7 +39,7 @@ public class CommentController {
             @PathVariable Integer id,
             @PathVariable(value = "comment_id") Integer commentId,
             @RequestBody CommentRequest request
-    ){
+    ) {
         return ResponseEntity.ok(commentService.editComment(id, commentId, request));
     }
 
