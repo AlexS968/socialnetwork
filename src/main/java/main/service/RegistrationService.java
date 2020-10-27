@@ -25,6 +25,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 
 @Service
@@ -36,9 +38,9 @@ public class RegistrationService {
   private final CountryRepository countryRepository;
   private final CityRepository cityRepository;
   private final JavaMailSender emailSender;
-  private RestTemplate restTemplate;
+  private final RestTemplate restTemplate;
 
-  public RegistrationResponse registrationNewPerson(RegistrationRequest request, String ip) {
+  public RegistrationResponse registrationNewPerson(RegistrationRequest request) {
     if (personRepository.findByEmail(request.getEmail()) != null) {
       throw new BadRequestException(new ApiError(
           "invalid_request",
@@ -51,6 +53,9 @@ public class RegistrationService {
           "пароли не совпадают"
       ));
     }
+
+    String ip = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+        .getRequest().getRemoteAddr();
 
     Person person = new Person();
     person.setEmail(request.getEmail());
