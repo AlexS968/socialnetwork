@@ -69,8 +69,6 @@ public class ApiAccountController {
     String ipAddress = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
         .getRequest().getRemoteAddr();
 
-    System.out.println(ipAddress + "---------ipAddress");
-
     return ResponseEntity.ok(registrationService.registrationNewPerson(request, ipAddress));
   }
 }
