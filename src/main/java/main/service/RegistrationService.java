@@ -22,6 +22,7 @@ import main.repository.CityRepository;
 import main.repository.CountryRepository;
 import main.repository.PersonRepository;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
