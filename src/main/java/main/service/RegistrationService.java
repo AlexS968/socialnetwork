@@ -65,15 +65,12 @@ public class RegistrationService {
     if (ip.equals("0:0:0:0:0:0:0:1")) {
       person.setCity(cityRepository.findByCountryId(1, pageable).getContent().get(0));
       person.setCountry(countryRepository.findById(1));
-    }
-    else {
+    } else {
 
       GeoLocationResponseShort response = checkGeoData(ip);
 
       String countryFromIp = response.getCountryName();
       String cityFromIp = response.getCity();
-
-      System.out.println(countryFromIp + " ------ " + cityFromIp);
 
       Optional<Country> countryOptional = countryRepository.findByTitle(countryFromIp);
 
@@ -130,17 +127,8 @@ public class RegistrationService {
 
   private GeoLocationResponseShort checkGeoData(String ip) {
 
-    //RestTemplate restTemplate = new RestTemplate();
-
     String requestUrl = "http://api.ipstack.com/" + ip
         + "?access_key=1f3f0d1d66eaeb5f262fb6f2603da2ce&fields=country_name,city&language=ru";
-
-    System.out.println(requestUrl);
-
-    System.out
-        .println(restTemplate.getForObject(requestUrl, GeoLocationResponseShort.class).getCity()
-            + " ------- " + restTemplate.getForObject(requestUrl, GeoLocationResponseShort.class)
-            .getCountryName());
 
     return restTemplate.getForObject(requestUrl, GeoLocationResponseShort.class);
 
