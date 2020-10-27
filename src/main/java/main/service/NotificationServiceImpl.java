@@ -39,6 +39,8 @@ public class NotificationServiceImpl implements NotificationService {
     private CommentService commentService;
     private PostService postService;
     private FriendsService friendsService;
+    private DialogService dialogService;
+    private LikesService likesService;
 
     @Autowired
     public void setPostService(@Lazy PostService postService) {
@@ -53,6 +55,16 @@ public class NotificationServiceImpl implements NotificationService {
     @Autowired
     public void setFriendsService(@Lazy FriendsService friendsService) {
         this.friendsService = friendsService;
+    }
+
+    @Autowired
+    public void setDialogService(@Lazy DialogService dialogService) {
+        this.dialogService = dialogService;
+    }
+
+    @Autowired
+    public void setLikesService(@Lazy LikesService likesService) {
+        this.likesService = likesService;
     }
 
     @Override
@@ -121,13 +133,15 @@ public class NotificationServiceImpl implements NotificationService {
         switch (notification.getType().getCode()) {
             case POST_COMMENT:
             case COMMENT_COMMENT:
-                PostComment postComment = commentService.findById(notification.getEntityId());
+                PostComment postComment = commentService.getComment(notification.getEntityId());
                 info = postComment.getCommentText();
                 author = postComment.getAuthor();
                 break;
             case MESSAGE:
-                info = "MESSAGE";
-                author = null;
+                Message message = dialogService.findById(notification.getEntityId());
+                info = message.getMessageText();
+                ;
+                author = message.getAuthor();
                 break;
             case POST:
                 Post post = postService.findById(notification.getEntityId());
@@ -145,6 +159,11 @@ public class NotificationServiceImpl implements NotificationService {
                 Person personDst = friendship.getDst();
                 info = notification.getContact();
                 author = notification.getReceiver().equals(personSrs) ? personDst : personSrs;
+                break;
+            case LIKE:
+                Like like = likesService.findById(notification.getEntityId());
+                info = notification.getContact();
+                author = like.getPerson();
                 break;
             default:
                 info = "";
@@ -166,6 +185,10 @@ public class NotificationServiceImpl implements NotificationService {
         Map<Integer, Boolean> settings = receiver.getNotificationSettings();
         settings.putIfAbsent(notificationTypeId, isEnabled);
         settings.replace(notificationTypeId, isEnabled);
+        // пока на фронте нет переключателя для включения уведомлений по постам и
+        // лайкам, подключаем их принудительно при первом изменении настроек
+        settings.putIfAbsent(1, true);
+        settings.putIfAbsent(7, true);
 
         personService.save(receiver);
 
@@ -258,6 +281,34 @@ public class NotificationServiceImpl implements NotificationService {
                     notifications.add(notification);
                 });
         notificationRepository.saveAll(notifications);
+    }
+
+    @Override
+    public void setNotification(Message message) {
+        Notification notification = new Notification();
+        notification.setReceiver(message.getRecipient());
+        notification.setEntityId(message.getId());
+        notification.setType(getNotificationType(NotificationTypeCode.MESSAGE));
+        notification.setSentTime(message.getTime());
+        notificationRepository.save(notification);
+    }
+
+    @Override
+    public void setNotification(Like like) {
+        Notification notification = new Notification();
+        notification.setEntityId(like.getId());
+        notification.setType(getNotificationType(NotificationTypeCode.LIKE));
+        notification.setSentTime(like.getTime());
+        if (like.getType().equals(LikeType.POST)) {
+            Post post = postService.getPost(like.getItemId());
+            notification.setReceiver(post.getAuthor());
+            notification.setContact("на ваш пост: ".concat(post.getTitle()));
+        } else {
+            PostComment comment = commentService.getComment(like.getItemId());
+            notification.setReceiver(comment.getAuthor());
+            notification.setContact("на ваш комментарий: ".concat(comment.getCommentText()));
+        }
+        notificationRepository.save(notification);
     }
 
     private NotificationType getNotificationType(NotificationTypeCode notificationTypeCode) {
