@@ -65,10 +65,6 @@ public class ApiAccountController {
   @PostMapping(value = "/register")
   public ResponseEntity<RegistrationResponse> registration(
       @RequestBody RegistrationRequest request) {
-
-    String ipAddress = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
-        .getRequest().getRemoteAddr();
-
-    return ResponseEntity.ok(registrationService.registrationNewPerson(request, ipAddress));
+    return ResponseEntity.ok(registrationService.registrationNewPerson(request));
   }
 }
