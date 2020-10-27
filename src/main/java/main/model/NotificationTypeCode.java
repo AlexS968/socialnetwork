@@ -8,7 +8,8 @@ public enum NotificationTypeCode {
   COMMENT_COMMENT("COMMENT_COMMENT"),
   FRIEND_REQUEST("FRIEND_REQUEST"),
   MESSAGE("MESSAGE"),
-  FRIEND_BIRTHDAY("FRIEND_BIRTHDAY");
+  FRIEND_BIRTHDAY("FRIEND_BIRTHDAY"),
+  LIKE("LIKE");
 
   protected String notificationTypeCode;
 

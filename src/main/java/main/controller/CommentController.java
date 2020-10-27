@@ -39,7 +39,7 @@ public class CommentController {
             @PathVariable Integer id,
             @PathVariable(value = "comment_id") Integer commentId,
             @RequestBody CommentRequest request
-    ){
+    ) {
         return ResponseEntity.ok(commentService.editComment(id, commentId, request));
     }
 

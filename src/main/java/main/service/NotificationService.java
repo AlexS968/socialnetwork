@@ -5,7 +5,7 @@ import main.data.response.base.ListResponse;
 import main.data.response.base.Response;
 import main.data.response.type.InfoInResponse;
 import main.data.response.type.NotificationResponse;
-import main.model.PostComment;
+import main.model.*;
 
 public interface NotificationService {
 
@@ -16,4 +16,12 @@ public interface NotificationService {
     Response<InfoInResponse> set(NotificationSettingsRequest request);
 
     void setNotification(PostComment postComment);
+
+    void setNotification(Friendship friendship);
+
+    void setNotification(Post post);
+
+    void setNotification(Message message);
+
+    void setNotification(Like like);
 }

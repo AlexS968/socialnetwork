@@ -21,4 +21,8 @@ public interface CityRepository extends PagingAndSortingRepository<City, Integer
 
   List<Optional<City>> findByTitle(String title);
   List<Optional<City>> findByTitleAndCountryId(String title, Integer countryId);
+
+  @Query(nativeQuery = true, value = "select * from city where country_id = :id limit 1")
+  City findFirstCityFromCountry(int id);
+
 }
