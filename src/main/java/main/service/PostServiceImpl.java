@@ -31,8 +31,9 @@ public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final TagRepository tagRepository;
     private final PostTagRepository postTagRepository;
-    private final CommentServiceImpl commentService;
+    private final CommentService commentService;
     private final PersonService personService;
+    private final NotificationService notificationService;
 
     @Override
     public ListResponse<PostInResponse> getFeeds(String name, int offset, int itemPerPage) {
@@ -53,6 +54,9 @@ public class PostServiceImpl implements PostService {
         try {
             Person person = personService.getById(personId);
             Post post = savePost(null, request, person, pubDate);
+
+            notificationService.setNotification(post);
+
             return new Response<>(new PostInResponse(post, new ArrayList<>(), personId));
         } catch (Exception ex) {
             throw new BadRequestException(new ApiError("invalid_request", "Ошибка создания поста"));

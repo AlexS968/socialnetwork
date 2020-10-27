@@ -61,11 +61,11 @@ public class RegistrationService {
         person.setBirthDate(birthDate);
         personRepository.save(person);
 
-//        SimpleMailMessage message = new SimpleMailMessage();
-//        message.setTo(request.getEmail());
-//        message.setSubject("Успешная регистрация");
-//        message.setText("Вы успешно зарегестрированы в социальной сети");
-//        emailSender.send(message);
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(request.getEmail());
+        message.setSubject("Успешная регистрация");
+        message.setText("Вы успешно зарегестрированы в социальной сети");
+        emailSender.send(message);
 
         return new RegistrationResponse(
                 "",

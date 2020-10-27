@@ -9,10 +9,7 @@ import main.data.request.ListRequest;
 import main.data.response.base.ListResponse;
 import main.data.response.base.Response;
 import main.data.response.type.*;
-import main.model.Dialog;
-import main.model.Message;
-import main.model.Person;
-import main.model.ReadStatus;
+import main.model.*;
 import main.repository.DialogRepository;
 import main.repository.MessageRepository;
 import org.springframework.data.domain.Page;
@@ -21,6 +18,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +30,7 @@ public class DialogServiceImpl implements DialogService {
     private final DialogRepository dialogRepository;
     private final MessageRepository messageRepository;
     private final PersonService personService;
+    private final NotificationService notificationService;
 
     @Override
     public ListResponse<DialogList> list(ListRequest request) {
@@ -130,6 +129,10 @@ public class DialogServiceImpl implements DialogService {
             message.setRecipient(p);
             message.setReadStatus((p.getId() != currentUser.getPerson().getId()) ? ReadStatus.SENT : ReadStatus.READ);
             messageRepository.save(message);
+            // отправляем уведомление только при отправке сообщения
+            if (message.getReadStatus().equals(ReadStatus.SENT)) {
+                notificationService.setNotification(message);
+            }
         });
 
         Response<DialogMessage> response = new Response<>();
@@ -190,5 +193,10 @@ public class DialogServiceImpl implements DialogService {
         messageRepository.save(message);
 
         return new Response<>(new ResponseMessage("ok"));
+    }
+
+    @Override
+    public Message findById(int id){
+        return messageRepository.findById(id);
     }
 }
