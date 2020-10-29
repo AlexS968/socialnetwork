@@ -20,7 +20,6 @@ public class ApiFriendsController {
             @RequestParam(required = false, defaultValue = "") String name,
             @RequestParam(required = false, defaultValue = "0") int offset,
             @RequestParam(required = false, defaultValue = "10") int itemPerPage) {
-
         FriendsResponse response = new FriendsResponse();
         try {
             response = friendsService.getFriends(name, offset, itemPerPage);
@@ -49,13 +48,11 @@ public class ApiFriendsController {
             @RequestParam(required = false, defaultValue = "10") int itemPerPage) {
 
         FriendsResponse response = new FriendsResponse();
-        System.out.println(1234);
         try {
             response = friendsService.getRecommendations(offset, itemPerPage);
         } catch (BadRequestException ex) {
             throw new BadRequestException(new ApiError("invalid_request", "Bad request"));
         }
-
         return new ResponseEntity<>(response, HttpStatus.OK);
 
     }
@@ -73,6 +70,7 @@ public class ApiFriendsController {
 
     @GetMapping(value = "/api/v1/friends/request")
     public ResponseEntity<FriendsResponse> getRequests(
+            @RequestParam(required = false, defaultValue = "") String name,
             @RequestParam(required = false, defaultValue = "0") int offset,
             @RequestParam(required = false, defaultValue = "10") int itemPerPage) {
 
@@ -84,7 +82,7 @@ public class ApiFriendsController {
             throw new BadRequestException(new ApiError("invalid_request", "Bad request"));
         }
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 
     }
 }

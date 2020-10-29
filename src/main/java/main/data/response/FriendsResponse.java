@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Data
 @AllArgsConstructor
@@ -21,38 +22,31 @@ import java.util.List;
 public class FriendsResponse extends ListResponse {
 
     @JsonProperty(value = "data")
-    private List<MeProfile> FriendsList;
-    private List<MeProfile> RecommendedList;
+    private List<MeProfile> FriendsOrRecommendedList;
     private DataMessage dataMessage;
 
-    public FriendsResponse(Page<Friendship> friends, List<Person> recommendedFriends){
+    public FriendsResponse(Page<Friendship> friends){
         this.setOffset(friends.getNumber() * friends.getNumberOfElements());
         this.setPerPage(friends.getNumberOfElements());
         this.setError("");
         this.setTimestamp(Instant.now().toEpochMilli());
         this.setTotal(friends.getTotalElements());
-        FriendsList = new ArrayList<>();
-        //System.out.println(3);
-
-        RecommendedList = new ArrayList<>();
-        for (Person item : recommendedFriends) {
-            RecommendedList.add(new MeProfile(item));
-        }
+        FriendsOrRecommendedList = new ArrayList<>();
 
         for (Friendship item : friends.getContent()) {
-            FriendsList.add(new MeProfile(item.getSrc()));
+            FriendsOrRecommendedList.add(new MeProfile(item.getSrc()));
         }
     }
 
-    public FriendsResponse(List<Person> recommendedFriends, int offset, int itemPerPage){
+    public FriendsResponse(List<Optional<Person>> recommendedFriends, int offset, int itemPerPage){
         this.setOffset(itemPerPage);
         this.setPerPage(itemPerPage);
         this.setError("");
         this.setTimestamp(Instant.now().toEpochMilli());
         this.setTotal(recommendedFriends.size());
-        RecommendedList = new ArrayList<>();
-        for (Person item : recommendedFriends) {
-            RecommendedList.add(new MeProfile(item));
+        FriendsOrRecommendedList = new ArrayList<>();
+        for (Optional<Person> item : recommendedFriends) {
+            FriendsOrRecommendedList.add(new MeProfile(item.get()));
         }
     }
 
