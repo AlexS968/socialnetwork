@@ -1,6 +1,7 @@
 package main.controller;
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import main.data.response.FriendsResponse;
 import main.exception.BadRequestException;
 import main.exception.apierror.ApiError;
@@ -10,10 +11,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ApiFriendsController {
 
-    private FriendsServiceImpl friendsService;
+    private final FriendsServiceImpl friendsService;
 
     @GetMapping(value = "/api/v1/friends")
     public ResponseEntity<FriendsResponse> friends(

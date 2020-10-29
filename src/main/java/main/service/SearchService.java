@@ -39,7 +39,7 @@ public class SearchService {
   private final CityRepository cityRepository;
   private final PostRepository postRepository;
   private final PostCommentRepository postCommentRepository;
-  private final CommentService commentService;
+  private final CommentServiceImpl commentService;
   private final TagRepository tagRepository;
 
   public ListResponse<PersonInPersonList> searchPerson(String firstName, String lastName,
@@ -167,24 +167,28 @@ public class SearchService {
       authorsIds = authorsIdsTemp;
 
     }
-    if (tags.size() > 0) {
+    if (tags != null) {
 
-      List<Optional<Tag>> tagsFound = tagRepository.findTagsByTagNames(tags);
+      if (!tags.isEmpty()) {
 
-      if (tagsFound.isEmpty()) {
-        return new ListResponse<>(searchPostResult, 0, offset, itemPerPage);
+        List<Optional<Tag>> tagsFound = tagRepository.findTagsByTagNames(tags);
+
+        if (tagsFound.isEmpty()) {
+          return new ListResponse<>(searchPostResult, 0, offset, itemPerPage);
+        }
+
+        Set<Integer> tagsIdsTemp = new HashSet<>();
+        tagsFound.forEach(t -> tagsIdsTemp.add(t.get().getId()));
+        tagsIds = tagsIdsTemp;
+
       }
-
-      tagsFound.forEach(t -> tagsIds.add(t.get().getId()));
-
     }
 
     resultPostPage = postRepository
         .findByTextPeriodAuthor(textUpdated, from, to, authorsIds, tagsIds, pageable);
 
     List<CommentInResponse> comments = commentService.getCommentsList(resultPostPage.getContent());
-    resultPostPage
-        .forEach(p -> searchPostResult.add(new PostInResponse(p, comments))); //TODO check necessity
+    resultPostPage.forEach(p -> searchPostResult.add(new PostInResponse(p, comments, -1))); //TODO check necessity
 
     return new ListResponse<>(searchPostResult, resultPostPage.getTotalElements(), offset,
         itemPerPage);

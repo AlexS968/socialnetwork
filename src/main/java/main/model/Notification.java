@@ -34,7 +34,9 @@ public class Notification {
     @Column(name = "read_status", columnDefinition = "enum('SENT', 'READ')", nullable = false)
     private NotificationReadStatusCode readStatus;
 
-    public Notification (){
-        contact="";
+    public Notification() {
+        sentTime = Instant.now();
+        contact = "";
+        readStatus = NotificationReadStatusCode.SENT;
     }
 }

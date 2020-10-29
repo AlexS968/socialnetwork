@@ -12,6 +12,7 @@ import main.repository.LikesRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,8 +24,9 @@ import java.util.Optional;
 public class LikesServiceImpl implements LikesService {
     private final LikesRepository likesRepository;
     private final PersonServiceImpl personService;
-    private final CommentService commentService;
+    private final CommentServiceImpl commentService;
     private final PostService postService;
+    private final NotificationService notificationService;
 
     public Response<LikesWithUsers> isLiked(Integer userId, int itemId, String type) {
         Person person= userId == null ? personService.getAuthUser() : personService.getById(userId);
@@ -50,7 +52,7 @@ public class LikesServiceImpl implements LikesService {
         if (isLiked(person.getId(), request.getItemId(), request.getType()).getData().getLikes() == 0) {
             Like like = new Like();
             if (request.getType().equals("Post")) {
-                Post post = postService.getPost(request.getItemId());
+                Post post = postService.findById(request.getItemId());
                 like.setItemId(post.getId());
                 like.setType(LikeType.POST);
             } else if (request.getType().equals("Comment")) {
@@ -63,6 +65,8 @@ public class LikesServiceImpl implements LikesService {
             like.setPerson(person);
             like.setTime(Instant.now());
             likesRepository.save(like);
+
+            notificationService.setNotification(like);
         }
         return getLikes(request.getItemId(), request.getType());
     }
@@ -94,5 +98,11 @@ public class LikesServiceImpl implements LikesService {
         } else {
             throw new BadRequestException(new ApiError("invalid_request", "Выбран не пост или комментарий"));
         }
+    }
+
+    @Override
+    public Like findById(int id){
+        return likesRepository.findById(id)
+                .orElseThrow(EntityNotFoundException::new);
     }
 }

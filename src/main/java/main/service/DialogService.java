@@ -6,6 +6,7 @@ import main.data.request.ListRequest;
 import main.data.response.base.ListResponse;
 import main.data.response.base.Response;
 import main.data.response.type.*;
+import main.model.Message;
 
 public interface DialogService {
     ListResponse<DialogList> list(ListRequest request);
@@ -14,4 +15,5 @@ public interface DialogService {
     ListResponse<DialogMessage> listMessage(int dialogId, ListRequest request);
     Response<ResponseCount> countUnreadedMessage();
     Response<ResponseMessage> setReadMessage(int messageId);
+    Message findById(int id);
 }

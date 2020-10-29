@@ -19,6 +19,5 @@ reCaptcha:
   secretCode: 6LfacNYZAAAAAJnnrWQoIva5pbnWLXOJgaIuBGKe
   url: https://www.google.com/recaptcha/api/siteverify?secret=%s&response=%s
 
-
-
-
+logging:
+  config: classpath:logback-spring.xml
