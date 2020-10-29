@@ -16,10 +16,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -42,13 +44,14 @@ public class FriendsServiceImpl implements FriendsService {
         int currentUserId = getCurrentUserId();
         Page<Friendship> friends;
         friends = friendsRepository.findByDst_IdAndStatusId(currentUserId, getPage(offset, limit), 2);
-        return new FriendsResponse(friends, personRepository.findAll());
+        return new FriendsResponse(friends);
     }
 
     @Override
     public FriendsResponse addFriend(int id) {
         int currentUserId = getCurrentUserId();
-        if (friendsRepository.findBySrc_idAndDst_IdAndStatusId(currentUserId, id, 1) == null) {
+        if (friendsRepository.findBySrc_idAndDst_IdAndStatusId(currentUserId, id, 1) == null
+                && !(id == currentUserId)) {
             Friendship friendship = friendsRepository.findByDst_IdAndSrc_IdAndStatusId(currentUserId, id, 1);
             if (friendship == null) {
                 friendship = new Friendship();
@@ -105,7 +108,8 @@ public class FriendsServiceImpl implements FriendsService {
 
     @Override
     public FriendsResponse getRecommendations(int offset, int limit) {
-        List<Person> recommendedFriends = personRepository.findAll();
+        List<Optional<Person>> recommendedFriends = personRepository.findByCityId(getCurrentUserCityId());
+        recommendedFriends.remove(personRepository.findById(getCurrentUserId()));
         return new FriendsResponse(recommendedFriends, offset, limit);
     }
 
@@ -113,8 +117,9 @@ public class FriendsServiceImpl implements FriendsService {
     public FriendsResponse getRequests(int offset, int limit) {
         int currentUserId = getCurrentUserId();
         Page<Friendship> requests;
+        System.out.println(111111);
         requests = friendsRepository.findByDst_IdAndStatusId(currentUserId, getPage(offset, limit), 1);
-        return new FriendsResponse(requests, personRepository.findAll());
+        return new FriendsResponse(requests);
     }
 
     @Override
@@ -139,5 +144,10 @@ public class FriendsServiceImpl implements FriendsService {
     private int getCurrentUserId() {
         return ((PersonPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
                 .getPerson().getId();
+    }
+
+    private int getCurrentUserCityId() {
+        return ((PersonPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
+                .getPerson().getCity().getId();
     }
 }
