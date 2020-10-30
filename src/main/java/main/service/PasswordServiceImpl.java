@@ -18,6 +18,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class PasswordServiceImpl implements PasswordService {
@@ -25,16 +27,18 @@ public class PasswordServiceImpl implements PasswordService {
     private final JavaMailSender emailSender;
     private final PasswordEncoder encoder;
     private final JwtUtils jwtUtils;
+    private final PersonService personService;
 
     //send link to restore password
     @Override
     public Response<InfoInResponse> restorePassword(PasswordRecoveryRequest request, String link) {
-        Person person = personRepository.findByEmail(request.getEmail());
-        if (person == null) {
+        Optional<Person> optionalPerson = personRepository.findByEmail(request.getEmail());
+        if (optionalPerson.isEmpty()) {
             throw new BadRequestException(new ApiError(
                     "invalid_request",
                     "Такой email не зарегистрирован"));
         }
+        Person person = optionalPerson.get();
         String confirmationCode = RandomStringUtils.randomAlphanumeric(45);
         person.setConfirmationCode(confirmationCode);
         personRepository.save(person);
@@ -99,6 +103,12 @@ public class PasswordServiceImpl implements PasswordService {
     public Response<InfoInResponse> setEmail(PasswordRecoveryRequest request) {
         Person person = ((PersonPrincipal) SecurityContextHolder.getContext().
                 getAuthentication().getPrincipal()).getPerson();
+
+        if (personRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new BadRequestException(new ApiError(
+                    "invalid_request",
+                    "Такой email уже зарегистрирован в сети"));
+        }
 
         person.setEmail(request.getEmail());
         personRepository.save(person);

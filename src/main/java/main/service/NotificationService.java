@@ -24,4 +24,12 @@ public interface NotificationService {
     void setNotification(Message message);
 
     void setNotification(Like like);
+
+    void deleteNotification(Friendship friendship1, Friendship friendship2);
+
+    void deleteNotification(Post post);
+
+    void deleteNotification(PostComment comment);
+
+    void deleteNotification(Like like);
 }

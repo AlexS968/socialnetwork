@@ -82,9 +82,11 @@ public class FriendsServiceImpl implements FriendsService {
     @Override
     public FriendsResponse deleteFriend(int id) {
         int currentUserId = getCurrentUserId();
-        Friendship friendship = friendsRepository.findByDst_IdAndSrc_IdAndStatusId(currentUserId, id, 2);
-        friendsRepository.delete(friendship);
-        friendsRepository.delete(friendsRepository.findBySrc_idAndDst_IdAndStatusId(currentUserId, id, 2));
+        Friendship friendship1 = friendsRepository.findByDst_IdAndSrc_IdAndStatusId(currentUserId, id, 2);
+        Friendship friendship2 = friendsRepository.findBySrc_idAndDst_IdAndStatusId(currentUserId, id, 2);
+        notificationService.deleteNotification(friendship1,friendship2);
+        friendsRepository.delete(friendship1);
+        friendsRepository.delete(friendship2);
         FriendsResponse friendsResponse = new FriendsResponse();
         friendsResponse.setError("");
         friendsResponse.setDataMessage(new DataMessage("ok"));
