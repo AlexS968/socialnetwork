@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.List;
 
 @Repository
@@ -20,4 +21,8 @@ public interface NotificationRepository extends JpaRepository<Notification, Inte
     @Query(value = "SELECT * FROM notification " +
             "WHERE person_id = ?1 AND type_id IN ?2", nativeQuery = true)
     Page<Notification> findByReceiverAndType(int personId, List<Integer> typeId, Pageable pageable);
+
+    @Query(value = "SELECT * FROM notification " +
+            "WHERE person_id = ?1 AND type_id IN ?2 AND sent_time >= ?3", nativeQuery = true)
+    Page<Notification> findByReceiverAndTypeAndTimeLaterThanEqual(int personId, List<Integer> typeId, Instant sentTime, Pageable pageable);
 }

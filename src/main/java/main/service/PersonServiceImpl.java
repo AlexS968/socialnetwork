@@ -37,11 +37,11 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
 
     @Override
     public UserDetails loadUserByUsername(String email) {
-        Person user = personRepository.findByEmail(email);
-        if (user == null) {
+        Optional<Person> user = personRepository.findByEmail(email);
+        if (user.isEmpty()) {
             throw new UsernameNotFoundException(email);
         }
-        return new PersonPrincipal(user);
+        return new PersonPrincipal(user.get());
     }
 
     @Override

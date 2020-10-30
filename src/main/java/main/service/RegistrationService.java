@@ -42,7 +42,7 @@ public class RegistrationService {
   private final RestTemplate restTemplate;
 
   public RegistrationResponse registrationNewPerson(RegistrationRequest request) {
-    if (personRepository.findByEmail(request.getEmail()) != null) {
+    if (personRepository.findByEmail(request.getEmail()).isPresent()) {
       throw new BadRequestException(new ApiError(
           "invalid_request",
           "такой email уже существует"

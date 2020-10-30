@@ -13,6 +13,7 @@ import main.model.*;
 import main.repository.NotificationRepository;
 import main.repository.NotificationTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 import javax.persistence.EntityNotFoundException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.Period;
 import java.time.Year;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -67,6 +69,9 @@ public class NotificationServiceImpl implements NotificationService {
         this.likesService = likesService;
     }
 
+    @Value("${notifications.storagePeriod}")
+    public String notificationsStoragePeriod;
+
     @Override
     public ListResponse<NotificationResponse> list(int offset, int itemPerPage, boolean needToRead) {
         Person person = personService.getCurrentPerson();
@@ -88,8 +93,10 @@ public class NotificationServiceImpl implements NotificationService {
 
         try {
             // делаем выборку только акцептованных текущим пользователем уведомлений
+            int days = Integer.parseInt (notificationsStoragePeriod.trim ());
             notifications = notificationRepository
-                    .findByReceiverAndType(person.getId(), types, pageable);
+                    .findByReceiverAndTypeAndTimeLaterThanEqual(person.getId(), types,
+                            Instant.now().minus(Period.ofDays(days)),pageable);
         } catch (BadRequestException ex) {
             throw new BadRequestException(new ApiError("invalid_request", "Bad request"));
         }
