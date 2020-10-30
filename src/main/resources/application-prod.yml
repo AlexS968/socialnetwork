@@ -8,3 +8,6 @@ linkToChange:
 
 upload:
   path:  "/home/jvmapps/photos"
+
+log:
+  path: "/var/log"

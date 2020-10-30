@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <property name="root_path" value="/var/log"/>
+    <springProperty scope="context" name="root_path" source="log.path"/>
     <property name="folder" value="/javapro"/>
     <springProperty scope="context" name="profile" source="spring.profiles.active"/>
 
@@ -42,31 +42,43 @@
         </encoder>
     </appender>
 
-
-    <logger name="com.bellisi" level="info" additivity="false">
-        <appender-ref ref="console"/>
-        <appender-ref ref="app_rolling"/>
-    </logger>
-
-    <logger name="org.springframework" level="info" additivity="false">
-        <appender-ref ref="app_rolling"/>
-    </logger>
-
-    <logger name="org.hibernate.SQL" level="debug" additivity="false">
-        <appender-ref ref="console"/>
-        <appender-ref ref="sql_rolling"/>
-    </logger>
-
     <springProfile name="dev">
         <root level="info" additivity="false">
             <appender-ref ref="console"/>
-            <appender-ref ref="app_rolling"/>
         </root>
+
+        <logger name="com.bellisi" level="info" additivity="false">
+            <appender-ref ref="console"/>
+            <appender-ref ref="app_rolling"/>
+        </logger>
+
+        <logger name="org.springframework" level="info" additivity="false">
+            <appender-ref ref="app_rolling"/>
+        </logger>
+
+        <logger name="org.hibernate.SQL" level="debug" additivity="false">
+            <appender-ref ref="console"/>
+            <appender-ref ref="sql_rolling"/>
+        </logger>
     </springProfile>
 
     <springProfile name="prod" additivity="false">
         <root level="warn">
+            <appender-ref ref="console"/>
             <appender-ref ref="app_rolling"/>
         </root>
+
+        <logger name="com.bellisi" level="warn" additivity="false">
+            <appender-ref ref="console"/>
+            <appender-ref ref="app_rolling"/>
+        </logger>
+
+        <logger name="org.springframework" level="info" additivity="false">
+            <appender-ref ref="app_rolling"/>
+        </logger>
+
+        <logger name="org.hibernate.SQL" level="debug" additivity="false">
+            <appender-ref ref="sql_rolling"/>
+        </logger>
     </springProfile>
 </configuration>
