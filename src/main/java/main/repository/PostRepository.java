@@ -1,6 +1,7 @@
 package main.repository;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 import main.model.Person;
 import main.model.Post;
@@ -19,6 +20,8 @@ public interface PostRepository extends CrudRepository<Post, Integer> {
   Page<Post> findByTitle(String name, Pageable pageable);
 
   Page<Post> findByAuthor(Person person, Pageable pageable);
+
+  List<Post> findByAuthor(Person person);
 
   @Query(nativeQuery = true, value =
       "SELECT DISTINCT post.* FROM post "

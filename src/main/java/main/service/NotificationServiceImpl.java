@@ -93,10 +93,10 @@ public class NotificationServiceImpl implements NotificationService {
 
         try {
             // делаем выборку только акцептованных текущим пользователем уведомлений
-            int days = Integer.parseInt (notificationsStoragePeriod.trim ());
+            int days = Integer.parseInt(notificationsStoragePeriod.trim());
             notifications = notificationRepository
                     .findByReceiverAndTypeAndTimeLaterThanEqual(person.getId(), types,
-                            Instant.now().minus(Period.ofDays(days)),pageable);
+                            Instant.now().minus(Period.ofDays(days)), pageable);
         } catch (BadRequestException ex) {
             throw new BadRequestException(new ApiError("invalid_request", "Bad request"));
         }
@@ -147,7 +147,6 @@ public class NotificationServiceImpl implements NotificationService {
             case MESSAGE:
                 Message message = dialogService.findById(notification.getEntityId());
                 info = message.getMessageText();
-                ;
                 author = message.getAuthor();
                 break;
             case POST:
@@ -185,9 +184,7 @@ public class NotificationServiceImpl implements NotificationService {
         Person receiver = personService.getCurrentPerson();
 
         boolean isEnabled = request.getEnable();
-        int notificationTypeId = notificationTypeRepository
-                .findByCode(request.getNotificationType())
-                .orElseThrow(EntityNotFoundException::new).getId();
+        int notificationTypeId = getIdByCode(request.getNotificationType());
 
         Map<Integer, Boolean> settings = receiver.getNotificationSettings();
         settings.putIfAbsent(notificationTypeId, isEnabled);
@@ -318,8 +315,74 @@ public class NotificationServiceImpl implements NotificationService {
         notificationRepository.save(notification);
     }
 
+    @Override
+    public void deleteNotification(Friendship friendship1, Friendship friendship2) {
+        // удаляем уведомления о запросах в друзья и о днях рождения
+        List<Integer> typeId = new ArrayList<>();
+        typeId.add(getIdByCode(NotificationTypeCode.FRIEND_REQUEST.toString()));
+        typeId.add(getIdByCode(NotificationTypeCode.FRIEND_BIRTHDAY.toString()));
+        List<Integer> entityId = new ArrayList<>();
+        entityId.add(friendship1.getId());
+        entityId.add(friendship2.getId());
+        notificationRepository.deleteByTypeIdAndEntityId(typeId, entityId);
+        // удаляем посты бывших друзей
+        typeId.clear();
+        typeId.add(getIdByCode(NotificationTypeCode.POST.toString()));
+        entityId.clear();
+        postService.findByAuthor(friendship1.getDst()).stream()
+                .map(Post::getId).collect(Collectors.toCollection(() -> entityId));
+        postService.findByAuthor(friendship1.getSrc()).stream()
+                .map(Post::getId).collect(Collectors.toCollection(() -> entityId));
+        notificationRepository.deleteByTypeIdAndEntityId(typeId, entityId);
+    }
+
+    @Override
+    public void deleteNotification(Post post) {
+        // удаляем нотификации к посту
+        List<Integer> typeId = new ArrayList<>();
+        typeId.add(getIdByCode(NotificationTypeCode.POST.toString()));
+        List<Integer> entityId = new ArrayList<>();
+        entityId.add(post.getId());
+        notificationRepository.deleteByTypeIdAndEntityId(typeId, entityId);
+        //удаляем нотификации к комментариям
+        typeId.clear();
+        typeId.add(getIdByCode(NotificationTypeCode.POST_COMMENT.toString()));
+        typeId.add(getIdByCode(NotificationTypeCode.COMMENT_COMMENT.toString()));
+        entityId.clear();
+        commentService.findAllByPostId(post.getId()).stream()
+                .map(PostComment::getId).collect(Collectors.toCollection(() -> entityId));
+        notificationRepository.deleteByTypeIdAndEntityId(typeId, entityId);
+    }
+
+    @Override
+    public void deleteNotification(PostComment comment) {
+        List<Integer> typeId = new ArrayList<>();
+        List<Integer> entityId = new ArrayList<>();
+        //удаляем нотификации к комментариям, включая подчиненные по иерархии
+        typeId.add(getIdByCode(NotificationTypeCode.POST_COMMENT.toString()));
+        typeId.add(getIdByCode(NotificationTypeCode.COMMENT_COMMENT.toString()));
+        entityId.add(comment.getId());
+        commentService.subComments(comment).stream().map(PostComment::getId)
+                .collect(Collectors.toCollection(() -> entityId));
+        notificationRepository.deleteByTypeIdAndEntityId(typeId, entityId);
+    }
+
+    @Override
+    public void deleteNotification(Like like) {
+        List<Integer> typeId = new ArrayList<>();
+        typeId.add(getIdByCode(NotificationTypeCode.LIKE.toString()));
+        List<Integer> entityId = new ArrayList<>();
+        entityId.add(like.getId());
+        notificationRepository.deleteByTypeIdAndEntityId(typeId, entityId);
+    }
+
     private NotificationType getNotificationType(NotificationTypeCode notificationTypeCode) {
         return notificationTypeRepository.findByCode(notificationTypeCode.toString())
                 .orElseThrow(EntityNotFoundException::new);
+    }
+
+    private int getIdByCode(String code) {
+        return notificationTypeRepository.findByCode(code)
+                .orElseThrow(EntityNotFoundException::new).getId();
     }
 }

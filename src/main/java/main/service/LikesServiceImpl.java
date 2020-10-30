@@ -75,6 +75,10 @@ public class LikesServiceImpl implements LikesService {
     public Response<LikesWithUsers> deleteLike(int itemId, String type) {
         Person person = personService.getAuthUser();
         if (type.equals("Post") || type.equals("Comment")) {
+            Like like = likesRepository.findByItemIdAndPersonIdAndType(itemId, person.getId(), LikeType.valueOf(type.toUpperCase()))
+                    .orElseThrow(()->new BadRequestException(new ApiError("invalid_request", "Объект не найден")));
+            notificationService.deleteNotification(like);
+
             try {
                 likesRepository.deleteByItemIdAndPersonIdAndType(itemId, person.getId(), LikeType.valueOf(type.toUpperCase()));
             } catch (Exception ex) {

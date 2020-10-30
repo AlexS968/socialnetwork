@@ -26,4 +26,8 @@ public interface CommentService {
     PostComment getComment(int itemId);
 
     PostComment findById(int id);
+
+    List<PostComment> findAllByPostId(int postId);
+
+    List<PostComment> subComments (PostComment comment);
 }

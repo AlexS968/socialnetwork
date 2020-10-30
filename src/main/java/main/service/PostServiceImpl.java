@@ -79,6 +79,7 @@ public class PostServiceImpl implements PostService {
     public Response<PostDelete> delPost(Integer id) {
         try {
             Post post = findById(id);
+            notificationService.deleteNotification(post);
             postRepository.delete(post);
             return new Response<>(new PostDelete(id));
         } catch (BadRequestException ex) {
@@ -145,6 +146,11 @@ public class PostServiceImpl implements PostService {
                 () -> new BadRequestException(new ApiError(
                         "invalid request",
                         "Пост не существует")));
+    }
+
+    @Override
+    public List<Post> findByAuthor(Person author){
+        return  postRepository.findByAuthor(author);
     }
 
     private List<PostInResponse> extractPage(Page<Post> postPage, List<CommentInResponse> comments) {
