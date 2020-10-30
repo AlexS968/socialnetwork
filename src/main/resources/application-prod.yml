@@ -10,4 +10,4 @@ upload:
   path:  "/home/jvmapps/photos"
 
 log:
-  path: "/var/log"
+  path: "/var/log/javapro"
