@@ -7,9 +7,11 @@ import main.data.request.LoginRequest;
 import main.data.request.MeProfileRequest;
 import main.data.response.base.Response;
 import main.data.response.type.*;
+import main.model.BlocksBetweenUsers;
 import main.model.City;
 import main.model.Country;
 import main.model.Person;
+import main.repository.BlocksBetweenUsersRepository;
 import main.repository.CityRepository;
 import main.repository.CountryRepository;
 import main.repository.PersonRepository;
@@ -23,6 +25,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Optional;
 
 @Service
@@ -34,6 +38,7 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
     private final JwtUtils jwtUtils;
     private final CityRepository cityRepository;
     private final CountryRepository countryRepository;
+    private final BlocksBetweenUsersRepository blocksBetweenUsersRepository;
 
     @Override
     public UserDetails loadUserByUsername(String email) {
@@ -159,7 +164,11 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
         } else {
             throw new UsernameNotFoundException("invalid_request");
         }
-
+        BlocksBetweenUsers blocksBetweenUsers = blocksBetweenUsersRepository
+                .findBySrc_IdAndDst_Id(id, getCurrentUserId());
+        if(!(blocksBetweenUsers==null)){
+            person = setToBlocked(person);
+        }
         Response<MeProfile> response = new Response<>();
 
         MeProfile profile = new MeProfile(person);
@@ -170,6 +179,54 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
     @Override
     public Person save(Person person) {
         return personRepository.save(person);
+    }
+
+    public Response unblockUser(int id){
+        int currentUserId = getCurrentUserId();
+        Response<DataMessage> response = new Response();
+        response.setTimestamp(LocalDateTime.now().toEpochSecond(ZoneOffset.UTC));
+        response.setError("");
+        BlocksBetweenUsers blocksBetweenUsers = blocksBetweenUsersRepository.findBySrc_IdAndDst_Id(currentUserId,id);
+        if ( !(blocksBetweenUsers== null)){
+            blocksBetweenUsersRepository.delete(blocksBetweenUsers);
+            response.setData(new DataMessage("ок"));
+            return response;
+        }
+        response.setData(new DataMessage("Профиль уже разблокирован"));
+        return response;
+    }
+
+    public Response blockUser(int id){
+        int currentUserId = getCurrentUserId();
+        Response<DataMessage> response = new Response();
+        response.setTimestamp(LocalDateTime.now().toEpochSecond(ZoneOffset.UTC));
+        response.setError("");
+        if ((blocksBetweenUsersRepository.findBySrc_IdAndDst_Id(currentUserId,id)) == null){
+            BlocksBetweenUsers blocksBetweenUsers = new BlocksBetweenUsers();
+            blocksBetweenUsers.setDst(personRepository.findById(id));
+            blocksBetweenUsers.setSrc(personRepository.findById(currentUserId));
+            blocksBetweenUsersRepository.save(blocksBetweenUsers);
+            response.setData(new DataMessage("ок"));
+            return response;
+        }
+        response.setData(new DataMessage("Профиль уже заблокирован"));
+        return response;
+    }
+
+    private int getCurrentUserId(){
+        return ((PersonPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
+                .getPerson().getId();
+    }
+
+    private Person setToBlocked(Person person){
+        person.setFirstName("Доступ заблокирован");
+        person.setBirthDate(null);
+        person.setCity(new City());
+        person.setCountry(new Country());
+        person.setPhone("");
+        person.setLastName("");
+        person.setAbout("");
+        return person;
     }
 }
 
