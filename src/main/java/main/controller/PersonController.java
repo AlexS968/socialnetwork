@@ -6,7 +6,10 @@ import main.data.response.base.Response;
 import main.data.response.type.InfoInResponse;
 import main.data.response.type.MeProfile;
 import main.data.response.type.MeProfileUpdate;
+import main.exception.BadRequestException;
+import main.exception.apierror.ApiError;
 import main.service.PersonServiceImpl;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,6 +46,26 @@ public class PersonController {
     return ResponseEntity.ok(personServiceImpl.getProfile(id));
   }
 
+  @PutMapping("/block/{id}")
+  public ResponseEntity blockUser(@PathVariable int id){
+    Response response = new Response();
+    try {
+      response = personServiceImpl.blockUser(id);
+    } catch (BadRequestException ex) {
+      throw new BadRequestException(new ApiError("invalid_request", "Bad request"));
+    }
+    return new ResponseEntity<>(response, HttpStatus.OK);
+  }
 
+  @DeleteMapping("/block/{id}")
+  public ResponseEntity unblockUser(@PathVariable int id){
+    Response response = new Response();
+    try {
+      response = personServiceImpl.unblockUser(id);
+    } catch (BadRequestException ex) {
+      throw new BadRequestException(new ApiError("invalid_request", "Bad request"));
+    }
+    return new ResponseEntity<>(response, HttpStatus.OK);
+  }
 
 }

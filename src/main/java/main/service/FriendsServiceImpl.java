@@ -111,7 +111,7 @@ public class FriendsServiceImpl implements FriendsService {
     @Override
     public FriendsResponse getRecommendations(int offset, int limit) {
         List<Optional<Person>> recommendedFriends = personRepository.findByCityId(getCurrentUserCityId());
-        recommendedFriends.remove(personRepository.findById(getCurrentUserId()));
+        recommendedFriends.remove( Optional.ofNullable(personRepository.findById(getCurrentUserId())));
         return new FriendsResponse(recommendedFriends, offset, limit);
     }
 
