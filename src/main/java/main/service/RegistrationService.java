@@ -78,6 +78,9 @@ public class RegistrationService {
       String countryFromIp = response.getCountryName();
       String cityFromIp = response.getCity();
 
+      if (countryFromIp.equals("Соединенные Штаты")) {countryFromIp = "США";}
+      if (countryFromIp.equals("ОАЭ"))  {countryFromIp = "Объединенные Арабские Эмираты";}
+
       Optional<Country> countryOptional = countryRepository.findByTitle(countryFromIp);
 
       if (countryOptional.isEmpty()) {
