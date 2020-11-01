@@ -5,7 +5,10 @@ import main.data.response.base.ListResponse;
 import main.data.response.base.Response;
 import main.data.response.type.PostDelete;
 import main.data.response.type.PostInResponse;
+import main.model.Person;
 import main.model.Post;
+
+import java.util.List;
 
 public interface PostService {
 
@@ -23,4 +26,5 @@ public interface PostService {
 
     Post getPost(int id);
 
+    List<Post> findByAuthor(Person author);
 }

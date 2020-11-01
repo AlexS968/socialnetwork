@@ -9,7 +9,10 @@ import main.data.request.ListRequest;
 import main.data.response.base.ListResponse;
 import main.data.response.base.Response;
 import main.data.response.type.*;
+import main.exception.BadRequestException;
+import main.exception.apierror.ApiError;
 import main.model.*;
+import main.repository.BlocksBetweenUsersRepository;
 import main.repository.DialogRepository;
 import main.repository.MessageRepository;
 import org.springframework.data.domain.Page;
@@ -19,6 +22,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
+import javax.persistence.PrePersist;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +35,7 @@ public class DialogServiceImpl implements DialogService {
     private final MessageRepository messageRepository;
     private final PersonService personService;
     private final NotificationService notificationService;
+    private final BlocksBetweenUsersRepository blocksBetweenUsersRepository;
 
     @Override
     public ListResponse<DialogList> list(ListRequest request) {
@@ -116,30 +121,39 @@ public class DialogServiceImpl implements DialogService {
 
     @Override
     public Response<DialogMessage> addMessage(int dialogId, DialogMessageRequest request) {
+        Response<DialogMessage> response = new Response<>();
         PersonPrincipal currentUser = (PersonPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
         Dialog dialog = dialogRepository.findById(dialogId);
 
-        dialog.getPersons().forEach(p -> {
-            Message message = new Message();
-            message.setMessageText(request.getMessageText());
-            message.setDialog(dialog);
-            message.setTime(Instant.now());
-            message.setAuthor(currentUser.getPerson());
-            message.setRecipient(p);
-            message.setReadStatus((p.getId() != currentUser.getPerson().getId()) ? ReadStatus.SENT : ReadStatus.READ);
-            messageRepository.save(message);
-            // отправляем уведомление только при отправке сообщения
-            if (message.getReadStatus().equals(ReadStatus.SENT)) {
-                notificationService.setNotification(message);
-            }
-        });
+        List<Person> personsInDialog = dialog.getPersons();
+        Person currentPerson = getCurrentPerson();
+        Person anotherPersonInDialog = getAntherPersonInDialog(personsInDialog, currentPerson);
+        BlocksBetweenUsers blocksBetweenUsers = blocksBetweenUsersRepository
+                .findBySrc_IdAndDst_Id(anotherPersonInDialog.getId(), currentPerson.getId());
 
-        Response<DialogMessage> response = new Response<>();
-        DialogMessage dialogMessage = new DialogMessage();
-        dialogMessage.setMessageText(request.getMessageText());
-        response.setData(dialogMessage);
-        return response;
+        if (blocksBetweenUsers == null) {
+            dialog.getPersons().forEach(p -> {
+                Message message = new Message();
+                message.setMessageText(request.getMessageText());
+                message.setDialog(dialog);
+                message.setTime(Instant.now());
+                message.setAuthor(currentUser.getPerson());
+                message.setRecipient(p);
+                message.setReadStatus((p.getId() != currentUser.getPerson().getId()) ? ReadStatus.SENT : ReadStatus.READ);
+                messageRepository.save(message);
+                // отправляем уведомление только при отправке сообщения
+                if (message.getReadStatus().equals(ReadStatus.SENT)) {
+                    notificationService.setNotification(message);
+                }
+            });
+
+            DialogMessage dialogMessage = new DialogMessage();
+            dialogMessage.setMessageText(request.getMessageText());
+            response.setData(dialogMessage);
+            return response;
+        } else {
+            throw new BadRequestException(new ApiError("Access blocked", ""));
+        }
     }
 
     @Override
@@ -196,7 +210,27 @@ public class DialogServiceImpl implements DialogService {
     }
 
     @Override
-    public Message findById(int id){
+    public Message findById(int id) {
         return messageRepository.findById(id);
     }
+
+    private int getCurrentUserId() {
+        return ((PersonPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
+                .getPerson().getId();
+    }
+
+    private Person getCurrentPerson() {
+        return ((PersonPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
+                .getPerson();
+    }
+
+    private Person getAntherPersonInDialog(List<Person> persons, Person currentPerson) {
+        for (Person person : persons) {
+            if (!(person.getId() == currentPerson.getId())) {
+                return person;
+            }
+        }
+        return null;
+    }
+
 }

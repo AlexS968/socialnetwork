@@ -21,3 +21,6 @@ reCaptcha:
 
 logging:
   config: classpath:logback-spring.xml
+
+notifications:
+  storagePeriod: 3

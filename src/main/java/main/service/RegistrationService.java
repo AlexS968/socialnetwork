@@ -42,7 +42,7 @@ public class RegistrationService {
   private final RestTemplate restTemplate;
 
   public RegistrationResponse registrationNewPerson(RegistrationRequest request) {
-    if (personRepository.findByEmail(request.getEmail()) != null) {
+    if (personRepository.findByEmail(request.getEmail()).isPresent()) {
       throw new BadRequestException(new ApiError(
           "invalid_request",
           "такой email уже существует"
@@ -77,6 +77,9 @@ public class RegistrationService {
 
       String countryFromIp = response.getCountryName();
       String cityFromIp = response.getCity();
+
+      if (countryFromIp.equals("Соединенные Штаты")) {countryFromIp = "США";}
+      if (countryFromIp.equals("ОАЭ"))  {countryFromIp = "Объединенные Арабские Эмираты";}
 
       Optional<Country> countryOptional = countryRepository.findByTitle(countryFromIp);
 

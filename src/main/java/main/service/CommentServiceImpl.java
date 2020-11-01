@@ -124,6 +124,7 @@ public class CommentServiceImpl implements CommentService {
         ItemDelete response = new ItemDelete();
 
         PostComment comment = getComment(commentId);
+        notificationService.deleteNotification(comment);
         deleteSubComment(commentId);
         commentRepository.delete(comment);
         response.setId(commentId);
@@ -146,9 +147,19 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public PostComment findById(int id){
+    public PostComment findById(int id) {
         return commentRepository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
+    }
+
+    @Override
+    public List<PostComment> findAllByPostId(int postId) {
+        return commentRepository.findAllByPostId(postId);
+    }
+
+    @Override
+    public List<PostComment> subComments(PostComment comment){
+        return new ArrayList<>(commentRepository.subCommentsG(comment.getId()));
     }
 }
 

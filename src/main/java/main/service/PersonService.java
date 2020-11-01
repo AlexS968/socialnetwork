@@ -18,4 +18,6 @@ public interface PersonService {
     Person checkAuthUser(int id);
     boolean isAuthenticated();
     Person save(Person person);
+    Response unblockUser(int id);
+    Response blockUser(int id);
 }

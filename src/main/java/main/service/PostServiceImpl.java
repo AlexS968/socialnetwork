@@ -2,6 +2,7 @@ package main.service;
 
 import lombok.RequiredArgsConstructor;
 import main.core.OffsetPageRequest;
+import main.data.PersonPrincipal;
 import main.data.request.PostRequest;
 import main.data.response.base.ListResponse;
 import main.data.response.base.Response;
@@ -11,17 +12,20 @@ import main.data.response.type.PostInResponse;
 import main.exception.BadRequestException;
 import main.exception.apierror.ApiError;
 import main.model.*;
+import main.repository.BlocksBetweenUsersRepository;
 import main.repository.PostRepository;
 import main.repository.PostTagRepository;
 import main.repository.TagRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,6 +38,7 @@ public class PostServiceImpl implements PostService {
     private final CommentService commentService;
     private final PersonService personService;
     private final NotificationService notificationService;
+    private final BlocksBetweenUsersRepository blocksBetweenUsersRepository;
 
     @Override
     public ListResponse<PostInResponse> getFeeds(String name, int offset, int itemPerPage) {
@@ -44,8 +49,9 @@ public class PostServiceImpl implements PostService {
         } else {
             postPage = postRepository.findAll(pageable);
         }
-        List<CommentInResponse> commentsList = commentService.getCommentsList(postPage.getContent());
-        return new ListResponse<>(extractPage(postPage, commentsList), postPage.getTotalElements(), offset, itemPerPage);
+        List<Post> postsList = cleanBlockedPosts(postPage);
+        List<CommentInResponse> commentsList = commentService.getCommentsList(postsList);
+        return new ListResponse<>(extractPostList(postsList, commentsList), postsList.size(), offset, itemPerPage);
     }
 
     @Override
@@ -79,6 +85,7 @@ public class PostServiceImpl implements PostService {
     public Response<PostDelete> delPost(Integer id) {
         try {
             Post post = findById(id);
+            notificationService.deleteNotification(post);
             postRepository.delete(post);
             return new Response<>(new PostDelete(id));
         } catch (BadRequestException ex) {
@@ -147,20 +154,71 @@ public class PostServiceImpl implements PostService {
                         "Пост не существует")));
     }
 
+    @Override
+    public List<Post> findByAuthor(Person author){
+        return  postRepository.findByAuthor(author);
+    }
+
     private List<PostInResponse> extractPage(Page<Post> postPage, List<CommentInResponse> comments) {
         List<PostInResponse> posts = new ArrayList<>();
         int userId = personService.getAuthUser().getId();
         for (Post item : postPage.getContent()) {
-            PostInResponse postInResponse = new PostInResponse(item, comments, 0); // need a Person?
-            if (item.getTime().isBefore(Instant.now())) {
-                postInResponse.setType(PostType.POSTED);
-            } else {
-                postInResponse.setType(PostType.QUEUED);
-            }
-            if (!(postInResponse.getType() == PostType.QUEUED && postInResponse.getAuthor().getId() != personService.getAuthUser().getId())) {
-                posts.add(postInResponse);
-            }
+            AddPostInResponseToPosts(comments, posts, item);
         }
         return posts;
     }
+
+    private int getCurrentUserId(){
+        return ((PersonPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
+                .getPerson().getId();
+    }
+
+    private HashSet<Integer> getBlockedUsers(List<BlocksBetweenUsers> BlocksList){
+        HashSet<Integer> blockedUsers = new HashSet<>();
+        for (BlocksBetweenUsers block : BlocksList){
+            blockedUsers.add(block.getDst().getId());
+        }
+        return blockedUsers;
+    }
+
+    private List<Post> cleanBlockedPosts(Page<Post> OriginPosts){
+        int currentUserId = getCurrentUserId();
+        List<BlocksBetweenUsers> blocksBetweenUsers = blocksBetweenUsersRepository.findBySrc_Id(currentUserId);
+        List<Post> postsList = OriginPosts.getContent();
+        ArrayList<Post> cleanedPosts = new ArrayList<>();
+        if (!(blocksBetweenUsers.isEmpty())){
+            HashSet<Integer> blockedUsers = getBlockedUsers(blocksBetweenUsers);
+            int size = postsList.size();
+            for (int i = 0; i < size; i++){
+                if (!blockedUsers.contains(postsList.get(i).getAuthor().getId())){
+                    cleanedPosts.add(postsList.get(i));
+                }
+            }
+        }else {
+            return postsList;
+        }
+        return cleanedPosts;
+    }
+
+    private List<PostInResponse> extractPostList(List<Post> postList, List<CommentInResponse> comments) {
+        List<PostInResponse> posts = new ArrayList<>();
+        for (Post item : postList) {
+            AddPostInResponseToPosts(comments, posts, item);
+        }
+        return posts;
+    }
+
+    private void AddPostInResponseToPosts(List<CommentInResponse> comments, List<PostInResponse> posts, Post item) {
+        PostInResponse postInResponse = new PostInResponse(item, comments, 0);
+        if (item.getTime().isBefore(Instant.now())) {
+            postInResponse.setType(PostType.POSTED);
+        } else {
+            postInResponse.setType(PostType.QUEUED);
+        }
+        if (!(postInResponse.getType() == PostType.QUEUED && postInResponse.getAuthor().getId()
+                != personService.getAuthUser().getId())) {
+            posts.add(postInResponse);
+        }
+    }
+
 }

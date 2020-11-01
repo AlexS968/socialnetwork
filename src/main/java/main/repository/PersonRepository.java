@@ -15,9 +15,11 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PersonRepository extends JpaRepository<Person, Integer> {
 
-  Person findByEmail(String email);
+  Optional<Person> findByEmail(String email);
 
   Person findById(int id);
+
+  //Optional<Person> findById(int id);
 
   Optional<Person> findByConfirmationCode(String confirmationCode);
 
