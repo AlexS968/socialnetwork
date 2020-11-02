@@ -4,9 +4,11 @@ import lombok.AllArgsConstructor;
 import main.data.PersonPrincipal;
 import main.data.response.FriendsResponse;
 import main.data.response.type.DataMessage;
+import main.model.BlocksBetweenUsers;
 import main.model.Friendship;
 import main.model.FriendshipStatus;
 import main.model.Person;
+import main.repository.BlocksBetweenUsersRepository;
 import main.repository.FriendsRepository;
 import main.repository.FriendshipStatusRepository;
 import main.repository.PersonRepository;
@@ -31,6 +33,7 @@ public class FriendsServiceImpl implements FriendsService {
     private final PersonRepository personRepository;
     private final FriendsRepository friendsRepository;
     private final FriendshipStatusRepository friendshipStatusRepository;
+    private final BlocksBetweenUsersRepository blocksBetweenUsersRepository;
 
     private NotificationService notificationService;
 
@@ -44,6 +47,15 @@ public class FriendsServiceImpl implements FriendsService {
         int currentUserId = getCurrentUserId();
         Page<Friendship> friends;
         friends = friendsRepository.findByDst_IdAndStatusId(currentUserId, getPage(offset, limit), 2);
+        friends.forEach(friendship ->{
+            BlocksBetweenUsers blocksBetweenUsers = blocksBetweenUsersRepository
+                    .findBySrc_IdAndDst_Id(currentUserId, friendship.getSrc().getId());
+            if (!(blocksBetweenUsers == null)) {
+                friendship.getSrc().setBlocked(true);
+            } else {
+                friendship.getSrc().setBlocked(false);
+            }
+        });
         return new FriendsResponse(friends);
     }
 

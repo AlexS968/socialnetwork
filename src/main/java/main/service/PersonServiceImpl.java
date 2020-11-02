@@ -164,10 +164,19 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
         } else {
             throw new UsernameNotFoundException("invalid_request");
         }
+        //Проверка на блокировку профиля
         BlocksBetweenUsers blocksBetweenUsers = blocksBetweenUsersRepository
                 .findBySrc_IdAndDst_Id(id, getCurrentUserId());
         if(!(blocksBetweenUsers==null)){
             person = setToBlocked(person);
+        }
+        //Проверка на блокировку от текущего профиля
+        blocksBetweenUsers = blocksBetweenUsersRepository
+                .findBySrc_IdAndDst_Id(getCurrentUserId(), id);
+        if(!(blocksBetweenUsers==null)){
+            person.setBlocked(true);
+        }else {
+            person.setBlocked(false);
         }
         Response<MeProfile> response = new Response<>();
 
