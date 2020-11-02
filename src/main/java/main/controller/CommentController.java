@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import main.data.request.CommentRequest;
 import main.data.response.CommentResponse;
 import main.data.response.base.ListResponse;
+import main.data.response.base.Response;
 import main.data.response.type.CommentInResponse;
 import main.data.response.type.ItemDelete;
 import main.service.CommentService;
@@ -52,7 +53,7 @@ public class CommentController {
     }
 
     @DeleteMapping("{id}/comments/{comment_id}")
-    public ResponseEntity<ItemDelete> deletePostComment(
+    public ResponseEntity<Response<ItemDelete>> deletePostComment(
             @PathVariable Integer id,
             @PathVariable(value = "comment_id") Integer commentId
     ) {
