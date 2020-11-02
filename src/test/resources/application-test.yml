@@ -13,4 +13,7 @@ linkToChange:
   email: "http://localhost:8080/shift-email"
 
 upload:
-  path: "C:/Users/Flutman/Desktop/Storage"
+  path: "imgs"
+
+log:
+  path: "log/javapro"
