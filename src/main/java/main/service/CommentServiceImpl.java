@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import main.data.request.CommentRequest;
 import main.data.response.CommentResponse;
 import main.data.response.base.ListResponse;
+import main.data.response.base.Response;
 import main.data.response.type.CommentInResponse;
 import main.data.response.type.ItemDelete;
 import main.exception.BadRequestException;
@@ -120,14 +121,16 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public ItemDelete deleteComment(Integer postId, Integer commentId) {
-        ItemDelete response = new ItemDelete();
+    public Response<ItemDelete> deleteComment(Integer postId, Integer commentId) {
+        Response<ItemDelete> response = new Response<>();
+        ItemDelete item = new ItemDelete();
+        item.setId(commentId);
 
         PostComment comment = getComment(commentId);
         notificationService.deleteNotification(comment);
         deleteSubComment(commentId);
         commentRepository.delete(comment);
-        response.setId(commentId);
+        response.setData(item);
         return response;
     }
 
