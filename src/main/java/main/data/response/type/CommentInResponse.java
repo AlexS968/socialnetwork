@@ -41,7 +41,7 @@ public class CommentInResponse {
         commentText = comment.getCommentText();
         id = comment.getId();
         postId = comment.getPost().getId();
-        time = Instant.now().toEpochMilli();
+        time = comment.getTime().toEpochMilli();
         authorId = new MeProfile(comment.getAuthor());
         blocked = comment.isBlocked();
         this.subComments = subComments;
