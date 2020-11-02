@@ -1,2 +1,0 @@
-DELETE FROM post2tag;
-DELETE FROM tag;
