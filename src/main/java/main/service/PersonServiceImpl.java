@@ -125,8 +125,10 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
 
     @Override
     public Person getCurrentPerson() {
-        return ((PersonPrincipal) SecurityContextHolder.getContext().
-                getAuthentication().getPrincipal()).getPerson();
+        int id = getCurrentUserId();
+        Person person = personRepository.findById(id);
+
+        return person;
     }
 
 
