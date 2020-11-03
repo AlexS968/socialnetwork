@@ -79,13 +79,12 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
 
     @Override
     public Response<MeProfile> getMe() {
-
-        Person person = getCurrentPerson();
+        int id = getCurrentUserId();
+        Person person = personRepository.findById(id);
         Response<MeProfile> response = new Response<>();
         MeProfile profile = new MeProfile(person);
         response.setData(profile);
         return response;
-
     }
 
     @Override

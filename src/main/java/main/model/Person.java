@@ -3,6 +3,8 @@ package main.model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
@@ -51,12 +53,12 @@ public class Person {
     @Column(columnDefinition = "text")
     private String about;
 
-    @ManyToOne
-    @JoinColumn(name = "country_id", referencedColumnName = "id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "country_id", referencedColumnName = "id", nullable = false)
     private Country country;
 
-    @ManyToOne
-    @JoinColumn(name = "city_id", referencedColumnName = "id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "city_id", referencedColumnName = "id", nullable = false)
     private City city;
 
     @Column(name = "confirmation_code")
