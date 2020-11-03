@@ -12,7 +12,6 @@ public interface PersonService {
     Response<MeProfile> getMe();
     Response<MeProfileUpdate> putMe(MeProfileRequest updatedCurrentPerson);
     Response<InfoInResponse> deleteMe();
-    Person getCurrentPerson();
     Person getById(int personId);
     Person getAuthUser();
     Person checkAuthUser(int id);

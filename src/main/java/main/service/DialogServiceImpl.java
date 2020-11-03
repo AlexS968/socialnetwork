@@ -1,6 +1,7 @@
 package main.service;
 
 import lombok.AllArgsConstructor;
+import main.core.ContextUtilities;
 import main.core.OffsetPageRequest;
 import main.data.PersonPrincipal;
 import main.data.request.DialogAddRequest;
@@ -21,8 +22,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityNotFoundException;
-import javax.persistence.PrePersist;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +38,7 @@ public class DialogServiceImpl implements DialogService {
 
     @Override
     public ListResponse<DialogList> list(ListRequest request) {
-        Person currentPerson = personService.getCurrentPerson();
+        Person currentPerson = ContextUtilities.getCurrentPerson();
         int currentUserId = currentPerson.getId();
 
         List<DialogList> dialogs = new ArrayList<>();
@@ -82,7 +81,7 @@ public class DialogServiceImpl implements DialogService {
 
     @Override
     public Response<DialogNew> add(DialogAddRequest request) {
-        Person currentPerson = personService.getCurrentPerson();
+        Person currentPerson = ContextUtilities.getCurrentPerson();
 
         Dialog dialog = null;
         boolean isGroupDialog = request.getUserIds().size() > 1;
@@ -126,10 +125,10 @@ public class DialogServiceImpl implements DialogService {
         Dialog dialog = dialogRepository.findById(dialogId);
 
         List<Person> personsInDialog = dialog.getPersons();
-        Person currentPerson = getCurrentPerson();
+        Person currentPerson = ContextUtilities.getCurrentPerson();
         Person anotherPersonInDialog = getAntherPersonInDialog(personsInDialog, currentPerson);
         BlocksBetweenUsers blocksBetweenUsers = blocksBetweenUsersRepository
-                .findBySrc_IdAndDst_Id(anotherPersonInDialog.getId(), currentPerson.getId());
+                .findBySrc_IdAndDst_Id(anotherPersonInDialog != null ? anotherPersonInDialog.getId() : 0, currentPerson.getId());
 
         if (blocksBetweenUsers == null) {
             dialog.getPersons().forEach(p -> {
@@ -212,16 +211,6 @@ public class DialogServiceImpl implements DialogService {
     @Override
     public Message findById(int id) {
         return messageRepository.findById(id);
-    }
-
-    private int getCurrentUserId() {
-        return ((PersonPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
-                .getPerson().getId();
-    }
-
-    private Person getCurrentPerson() {
-        return ((PersonPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
-                .getPerson();
     }
 
     private Person getAntherPersonInDialog(List<Person> persons, Person currentPerson) {
