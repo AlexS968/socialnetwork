@@ -90,7 +90,7 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
     }
 
     @Override
-    public Response<MeProfileUpdate> putMe(MeProfileRequest updatedCurrentPerson) {
+    public Response<MeProfile> putMe(MeProfileRequest updatedCurrentPerson) {
         Person personUpdated = personRepository.findById(ContextUtilities.getCurrentUserId());
         personUpdated.setLastName(updatedCurrentPerson.getLastName());
         personUpdated.setFirstName(updatedCurrentPerson.getFirstName());
@@ -106,8 +106,8 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
 
         personRepository.save(personUpdated);
 
-        MeProfileUpdate updatedPerson = new MeProfileUpdate(personUpdated);
-        Response<MeProfileUpdate> response = new Response<>();
+        MeProfile updatedPerson = new MeProfile(personUpdated);
+        Response<MeProfile> response = new Response<>();
         response.setData(updatedPerson);
         return response;
     }

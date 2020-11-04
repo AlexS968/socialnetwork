@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import main.model.PostComment;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,8 +21,7 @@ public class CommentInResponse {
     @JsonProperty(value = "post_id")
     private Integer postId;
     private long time;
-    @JsonProperty(value = "author")
-    private MeProfile authorId;
+    private PersonProfile author;
     @JsonProperty(value = "is_blocked")
     private boolean blocked;
 
@@ -42,12 +40,12 @@ public class CommentInResponse {
         id = comment.getId();
         postId = comment.getPost().getId();
         time = comment.getTime().toEpochMilli();
-        authorId = new MeProfile(comment.getAuthor());
+        author = new PersonProfile(comment.getAuthor());
         blocked = comment.isBlocked();
         this.subComments = subComments;
-        if (comment.getLikes() != null){
-            likeCount = comment.getLikes() != null ? comment.getLikes().size() : 0;;
-            isMyLike = comment.getLikes().stream().anyMatch(l -> l.getPerson().getId() == userId);;
+        if (comment.getLikes() != null) {
+            likeCount = comment.getLikes() != null ? comment.getLikes().size() : 0;
+            isMyLike = comment.getLikes().stream().anyMatch(l -> l.getPerson().getId() == userId);
         }
     }
 
@@ -57,12 +55,12 @@ public class CommentInResponse {
         id = comment.getId();
         postId = comment.getPost().getId();
         time = comment.getTime().toEpochMilli();
-        authorId = new MeProfile(comment.getAuthor());
+        author = new PersonProfile(comment.getAuthor());
         blocked = comment.isBlocked();
         subComments = new ArrayList<>();
-        if (comment.getLikes() != null){
-            likeCount = comment.getLikes() != null ? comment.getLikes().size() : 0;;
-            isMyLike = comment.getLikes().stream().anyMatch(l -> l.getPerson().getId() == userId);;
+        if (comment.getLikes() != null) {
+            likeCount = comment.getLikes() != null ? comment.getLikes().size() : 0;
+            isMyLike = comment.getLikes().stream().anyMatch(l -> l.getPerson().getId() == userId);
         }
     }
 }
