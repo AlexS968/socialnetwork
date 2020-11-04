@@ -5,9 +5,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
-@AllArgsConstructor
 public class ApiError {
     String error;
     @JsonProperty("error_description")
     String errorDescription;
+    String statusText;
+
+    public ApiError(String error, String errorDescription){
+        this.error = error;
+        this.errorDescription = errorDescription;
+        statusText = errorDescription;
+    }
 }
