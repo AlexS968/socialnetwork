@@ -81,10 +81,12 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional
     public Response<PostDelete> delPost(Integer id) {
         try {
             Post post = findById(id);
             notificationService.deleteNotification(post);
+            commentService.deleteAllComments(post.getId());
             postRepository.delete(post);
             return new Response<>(new PostDelete(id));
         } catch (BadRequestException ex) {

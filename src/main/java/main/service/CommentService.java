@@ -24,6 +24,8 @@ public interface CommentService {
 
     Response<ItemDelete> deleteComment(Integer postId, Integer commentId);
 
+    void deleteAllComments(Integer postId);
+
     PostComment getComment(int itemId);
 
     PostComment findById(int id);
