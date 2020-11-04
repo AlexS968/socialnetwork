@@ -121,7 +121,6 @@ public class DialogServiceImpl implements DialogService {
     @Override
     public Response<DialogMessage> addMessage(int dialogId, DialogMessageRequest request) {
         Response<DialogMessage> response = new Response<>();
-        PersonPrincipal currentUser = (PersonPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Dialog dialog = dialogRepository.findById(dialogId);
 
         List<Person> personsInDialog = dialog.getPersons();
@@ -136,9 +135,9 @@ public class DialogServiceImpl implements DialogService {
                 message.setMessageText(request.getMessageText());
                 message.setDialog(dialog);
                 message.setTime(Instant.now());
-                message.setAuthor(currentUser.getPerson());
+                message.setAuthor(currentPerson);
                 message.setRecipient(p);
-                message.setReadStatus((p.getId() != currentUser.getPerson().getId()) ? ReadStatus.SENT : ReadStatus.READ);
+                message.setReadStatus((p.getId() != currentPerson.getId()) ? ReadStatus.SENT : ReadStatus.READ);
                 messageRepository.save(message);
                 // отправляем уведомление только при отправке сообщения
                 if (message.getReadStatus().equals(ReadStatus.SENT)) {
@@ -157,8 +156,7 @@ public class DialogServiceImpl implements DialogService {
 
     @Override
     public ListResponse<DialogMessage> listMessage(int dialogId, ListRequest request) {
-        PersonPrincipal currentUser = (PersonPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        int currentUserId = currentUser.getPerson().getId();
+        int currentUserId = ContextUtilities.getCurrentUserId();
 
         List<DialogMessage> messages = new ArrayList<>();
         Pageable pageable;
@@ -189,11 +187,9 @@ public class DialogServiceImpl implements DialogService {
 
     @Override
     public Response<ResponseCount> countUnreadedMessage() {
-        PersonPrincipal currentUser = (PersonPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
         long count = messageRepository.countByReadStatusAndRecipient_id(
                 ReadStatus.SENT,
-                currentUser.getPerson().getId()
+                ContextUtilities.getCurrentUserId()
         );
 
         return new Response<>(new ResponseCount(count));

@@ -11,8 +11,6 @@ import main.model.Tag;
 import main.repository.TagRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -21,7 +19,7 @@ import java.util.Optional;
 
 @Service
 @AllArgsConstructor
-public class TagServiceImpl implements TagService{
+public class TagServiceImpl implements TagService {
 
     private final TagRepository tagRepository;
 
@@ -37,13 +35,10 @@ public class TagServiceImpl implements TagService{
 
     @Override
     public ListResponse<SingleTag> getPostTags(String tag, Integer offset, Integer itemsPerPage) {
-        if(!SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
-            throw new UsernameNotFoundException("invalid_request");
-        }
         List<SingleTag> tags = new ArrayList<>();
         if (offset == null || itemsPerPage == null) {
             Iterable<Tag> tagIterable = tag == null ? tagRepository.findAll() : tagRepository.findByTagLike(tag);
-            for (Tag t: tagIterable) {
+            for (Tag t : tagIterable) {
                 tags.add(new SingleTag(t.getId(), t.getTag()));
             }
         } else {
@@ -59,9 +54,6 @@ public class TagServiceImpl implements TagService{
 
     @Override
     public Response<SingleTag> createTag(TagRequest request) {
-        if(!SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
-            throw new UsernameNotFoundException("invalid_request");
-        }
         Optional<Tag> optionalTag = tagRepository.findTagByTag(request.getTag());
         SingleTag singleTag;
         Tag tag;
@@ -78,9 +70,6 @@ public class TagServiceImpl implements TagService{
 
     @Override
     public Response<DataMessage> deleteTag(int id) {
-        if(!SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
-            throw new UsernameNotFoundException("invalid_request");
-        }
         tagRepository.deleteById(id);
         return new Response<>(new DataMessage("ok"));
     }

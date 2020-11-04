@@ -1,8 +1,8 @@
 package main.service;
 
 import lombok.RequiredArgsConstructor;
+import main.core.ContextUtilities;
 import main.core.OffsetPageRequest;
-import main.data.PersonPrincipal;
 import main.data.request.PostRequest;
 import main.data.response.base.ListResponse;
 import main.data.response.base.Response;
@@ -19,7 +19,6 @@ import main.repository.TagRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -155,46 +154,40 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<Post> findByAuthor(Person author){
-        return  postRepository.findByAuthor(author);
+    public List<Post> findByAuthor(Person author) {
+        return postRepository.findByAuthor(author);
     }
 
     private List<PostInResponse> extractPage(Page<Post> postPage, List<CommentInResponse> comments) {
         List<PostInResponse> posts = new ArrayList<>();
-        int userId = personService.getAuthUser().getId();
         for (Post item : postPage.getContent()) {
             AddPostInResponseToPosts(comments, posts, item);
         }
         return posts;
     }
 
-    private int getCurrentUserId(){
-        return ((PersonPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
-                .getPerson().getId();
-    }
-
-    private HashSet<Integer> getBlockedUsers(List<BlocksBetweenUsers> BlocksList){
+    private HashSet<Integer> getBlockedUsers(List<BlocksBetweenUsers> BlocksList) {
         HashSet<Integer> blockedUsers = new HashSet<>();
-        for (BlocksBetweenUsers block : BlocksList){
+        for (BlocksBetweenUsers block : BlocksList) {
             blockedUsers.add(block.getDst().getId());
         }
         return blockedUsers;
     }
 
-    private List<Post> cleanBlockedPosts(Page<Post> OriginPosts){
-        int currentUserId = getCurrentUserId();
+    private List<Post> cleanBlockedPosts(Page<Post> OriginPosts) {
+        int currentUserId = ContextUtilities.getCurrentUserId();
         List<BlocksBetweenUsers> blocksBetweenUsers = blocksBetweenUsersRepository.findBySrc_Id(currentUserId);
         List<Post> postsList = OriginPosts.getContent();
         ArrayList<Post> cleanedPosts = new ArrayList<>();
-        if (!(blocksBetweenUsers.isEmpty())){
+        if (!(blocksBetweenUsers.isEmpty())) {
             HashSet<Integer> blockedUsers = getBlockedUsers(blocksBetweenUsers);
             int size = postsList.size();
-            for (int i = 0; i < size; i++){
-                if (!blockedUsers.contains(postsList.get(i).getAuthor().getId())){
+            for (int i = 0; i < size; i++) {
+                if (!blockedUsers.contains(postsList.get(i).getAuthor().getId())) {
                     cleanedPosts.add(postsList.get(i));
                 }
             }
-        }else {
+        } else {
             return postsList;
         }
         return cleanedPosts;

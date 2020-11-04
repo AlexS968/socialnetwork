@@ -1,8 +1,8 @@
 package main.service;
 
 import lombok.AllArgsConstructor;
+import main.core.ContextUtilities;
 import main.core.OffsetPageRequest;
-import main.data.PersonPrincipal;
 import main.data.response.base.ListResponse;
 import main.data.response.type.CommentInResponse;
 import main.data.response.type.MeProfile;
@@ -12,7 +12,6 @@ import main.repository.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -108,7 +107,7 @@ public class SearchService {
                 .findPersonByNameLastNameAgeCityCountry(firstName, lastName, ageFromToDate, ageToToDate,
                         countryId, cityIds, pageable);
 
-        int currentUserId = getCurrentUserId();
+        int currentUserId = ContextUtilities.getCurrentUserId();
         resultPage.forEach(r -> {
             BlocksBetweenUsers blocksBetweenUsers = blocksBetweenUsersRepository.findBySrc_IdAndDst_Id(currentUserId, r.getId());
             r.setBlocked(!(blocksBetweenUsers == null));
@@ -197,10 +196,4 @@ public class SearchService {
         return Date.from(from.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
     }
-
-    private int getCurrentUserId() {
-        return ((PersonPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
-                .getPerson().getId();
-    }
-
 }

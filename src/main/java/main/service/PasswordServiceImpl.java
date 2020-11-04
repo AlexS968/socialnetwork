@@ -1,6 +1,7 @@
 package main.service;
 
 import lombok.RequiredArgsConstructor;
+import main.core.ContextUtilities;
 import main.core.auth.JwtUtils;
 import main.data.PersonPrincipal;
 import main.data.request.PasswordRecoveryRequest;
@@ -82,8 +83,7 @@ public class PasswordServiceImpl implements PasswordService {
     //send link to change password or email address
     @Override
     public Response<InfoInResponse> changePassOrEmail(String subject, String link) {
-        Person person = ((PersonPrincipal) SecurityContextHolder.getContext().
-                getAuthentication().getPrincipal()).getPerson();
+        Person person = ContextUtilities.getCurrentPerson();
 
         String confirmationCode = RandomStringUtils.randomAlphanumeric(45);
         person.setConfirmationCode(confirmationCode);
@@ -101,8 +101,7 @@ public class PasswordServiceImpl implements PasswordService {
     //set new email address
     @Override
     public Response<InfoInResponse> setEmail(PasswordRecoveryRequest request) {
-        Person person = ((PersonPrincipal) SecurityContextHolder.getContext().
-                getAuthentication().getPrincipal()).getPerson();
+        Person person = ContextUtilities.getCurrentPerson();
 
         if (personRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new BadRequestException(new ApiError(
