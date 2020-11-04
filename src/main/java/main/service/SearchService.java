@@ -1,20 +1,11 @@
 package main.service;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
 import lombok.AllArgsConstructor;
 import main.core.OffsetPageRequest;
 import main.data.PersonPrincipal;
 import main.data.response.base.ListResponse;
 import main.data.response.type.CommentInResponse;
-import main.data.response.type.PersonInPersonList;
+import main.data.response.type.MeProfile;
 import main.data.response.type.PostInResponse;
 import main.model.*;
 import main.repository.*;
@@ -24,6 +15,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.*;
+
 @Service
 @AllArgsConstructor
 public class SearchService {
@@ -32,15 +27,14 @@ public class SearchService {
     private final CountryRepository countryRepository;
     private final CityRepository cityRepository;
     private final PostRepository postRepository;
-    private final PostCommentRepository postCommentRepository;
     private final CommentServiceImpl commentService;
     private final TagRepository tagRepository;
     private final BlocksBetweenUsersRepository blocksBetweenUsersRepository;
 
-    public ListResponse<PersonInPersonList> searchPerson(String firstName, String lastName,
-                                                         Integer ageFrom,
-                                                         Integer ageTo, String country,
-                                                         String city, Integer offset, Integer itemPerPage) {
+    public ListResponse<MeProfile> searchPerson(String firstName, String lastName,
+                                                Integer ageFrom,
+                                                Integer ageTo, String country,
+                                                String city, Integer offset, Integer itemPerPage) {
 
         Pageable pageable;
 
@@ -50,7 +44,7 @@ public class SearchService {
             pageable = new OffsetPageRequest(offset, itemPerPage, Sort.unsorted());
         }
 
-        List<PersonInPersonList> searchResult = new ArrayList<>();
+        List<MeProfile> searchResult = new ArrayList<>();
 
         Page<Person> resultPage;
 
@@ -117,12 +111,8 @@ public class SearchService {
         int currentUserId = getCurrentUserId();
         resultPage.forEach(r -> {
             BlocksBetweenUsers blocksBetweenUsers = blocksBetweenUsersRepository.findBySrc_IdAndDst_Id(currentUserId, r.getId());
-            if (!(blocksBetweenUsers == null)) {
-                r.setBlocked(true);
-            } else {
-                r.setBlocked(false);
-            }
-            searchResult.add(new PersonInPersonList(r));
+            r.setBlocked(!(blocksBetweenUsers == null));
+            searchResult.add(new MeProfile(r));
         });
 
         return new ListResponse<>(searchResult, resultPage.getTotalElements(),

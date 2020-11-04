@@ -12,13 +12,11 @@ import main.repository.BlocksBetweenUsersRepository;
 import main.repository.FriendsRepository;
 import main.repository.FriendshipStatusRepository;
 import main.repository.PersonRepository;
-import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
@@ -47,14 +45,10 @@ public class FriendsServiceImpl implements FriendsService {
         int currentUserId = getCurrentUserId();
         Page<Friendship> friends;
         friends = friendsRepository.findByDst_IdAndStatusId(currentUserId, getPage(offset, limit), 2);
-        friends.forEach(friendship ->{
+        friends.forEach(friendship -> {
             BlocksBetweenUsers blocksBetweenUsers = blocksBetweenUsersRepository
                     .findBySrc_IdAndDst_Id(currentUserId, friendship.getSrc().getId());
-            if (!(blocksBetweenUsers == null)) {
-                friendship.getSrc().setBlocked(true);
-            } else {
-                friendship.getSrc().setBlocked(false);
-            }
+            friendship.getSrc().setBlocked(!(blocksBetweenUsers == null));
         });
         return new FriendsResponse(friends);
     }
@@ -96,7 +90,7 @@ public class FriendsServiceImpl implements FriendsService {
         int currentUserId = getCurrentUserId();
         Friendship friendship1 = friendsRepository.findByDst_IdAndSrc_IdAndStatusId(currentUserId, id, 2);
         Friendship friendship2 = friendsRepository.findBySrc_idAndDst_IdAndStatusId(currentUserId, id, 2);
-        notificationService.deleteNotification(friendship1,friendship2);
+        notificationService.deleteNotification(friendship1, friendship2);
         friendsRepository.delete(friendship1);
         friendsRepository.delete(friendship2);
         FriendsResponse friendsResponse = new FriendsResponse();
@@ -123,7 +117,7 @@ public class FriendsServiceImpl implements FriendsService {
     @Override
     public FriendsResponse getRecommendations(int offset, int limit) {
         List<Optional<Person>> recommendedFriends = personRepository.findByCityId(getCurrentUserCityId());
-        recommendedFriends.remove( Optional.ofNullable(personRepository.findById(getCurrentUserId())));
+        recommendedFriends.remove(Optional.ofNullable(personRepository.findById(getCurrentUserId())));
         return new FriendsResponse(recommendedFriends, offset, limit);
     }
 
@@ -142,7 +136,7 @@ public class FriendsServiceImpl implements FriendsService {
     }
 
     @Override
-    public List<Friendship> findByDst_IdAndStatusId(int dstId, int statusId){
+    public List<Friendship> findByDst_IdAndStatusId(int dstId, int statusId) {
         return friendsRepository.findByDst_IdAndStatusId(dstId, statusId);
     }
 
