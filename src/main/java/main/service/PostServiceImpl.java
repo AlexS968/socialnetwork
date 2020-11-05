@@ -60,7 +60,7 @@ public class PostServiceImpl implements PostService {
             Person person = personService.getById(personId);
             Post post = savePost(null, request, person, pubDate);
 
-            notificationService.setNotification(post);
+            //notificationService.setNotification(post);
 
             return new Response<>(new PostInResponse(post, new ArrayList<>(), personId));
         } catch (Exception ex) {
