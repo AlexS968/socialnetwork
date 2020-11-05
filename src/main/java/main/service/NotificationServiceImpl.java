@@ -208,16 +208,23 @@ public class NotificationServiceImpl implements NotificationService {
         Notification notification = new Notification();
         if (postComment.getParent() != null) {
             //комментарий на комментарий
-            notification.setReceiver(postComment.getParent().getAuthor());
-            notification.setEntityId(postComment.getId());
-            notification.setType(getNotificationType(NotificationTypeCode.COMMENT_COMMENT));
+            Person parentCommentAuthor = postComment.getParent().getAuthor();
+            if (postComment.getAuthor().getId() != parentCommentAuthor.getId()) {
+                notification.setReceiver(postComment.getParent().getAuthor());
+                notification.setEntityId(postComment.getId());
+                notification.setType(getNotificationType(NotificationTypeCode.COMMENT_COMMENT));
+                notificationRepository.save(notification);
+            }
         } else {
             //комментарий на пост
-            notification.setReceiver(postComment.getPost().getAuthor());
-            notification.setEntityId(postComment.getId());
-            notification.setType(getNotificationType(NotificationTypeCode.POST_COMMENT));
+            Person postAuthor = postComment.getPost().getAuthor();
+            if (postComment.getAuthor().getId() != postAuthor.getId()) {
+                notification.setReceiver(postComment.getPost().getAuthor());
+                notification.setEntityId(postComment.getId());
+                notification.setType(getNotificationType(NotificationTypeCode.POST_COMMENT));
+                notificationRepository.save(notification);
+            }
         }
-        notificationRepository.save(notification);
     }
 
     @Override
@@ -306,14 +313,19 @@ public class NotificationServiceImpl implements NotificationService {
         notification.setSentTime(like.getTime());
         if (like.getType().equals(LikeType.POST)) {
             Post post = postService.getPost(like.getItemId());
-            notification.setReceiver(post.getAuthor());
-            notification.setContact("на ваш пост: ".concat(post.getTitle()));
+            if (post.getAuthor().getId() != like.getPerson().getId()) {
+                notification.setReceiver(post.getAuthor());
+                notification.setContact("на ваш пост: ".concat(post.getTitle()));
+                notificationRepository.save(notification);
+            }
         } else {
             PostComment comment = commentService.getComment(like.getItemId());
-            notification.setReceiver(comment.getAuthor());
-            notification.setContact("на ваш комментарий: ".concat(comment.getCommentText()));
+            if (comment.getAuthor().getId() != like.getPerson().getId()) {
+                notification.setReceiver(comment.getAuthor());
+                notification.setContact("на ваш комментарий: ".concat(comment.getCommentText()));
+                notificationRepository.save(notification);
+            }
         }
-        notificationRepository.save(notification);
     }
 
     @Override
@@ -372,7 +384,7 @@ public class NotificationServiceImpl implements NotificationService {
         typeId.add(getIdByCode(NotificationTypeCode.POST_COMMENT.toString()));
         typeId.add(getIdByCode(NotificationTypeCode.COMMENT_COMMENT.toString()));
         entityId.add(comment.getId());
-        List<PostComment> comments =commentService.subComments(comment);
+        List<PostComment> comments = commentService.subComments(comment);
         comments.add(comment);
         comments.stream().map(PostComment::getId)
                 .collect(Collectors.toCollection(() -> entityId));
