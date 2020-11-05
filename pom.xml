@@ -30,6 +30,7 @@
             </activation>
             <properties>
                 <spring.profiles.active>dev</spring.profiles.active>
+                <jdbc.url>jdbc:mysql://localhost:3306/networktst?serverTimezone=UTC</jdbc.url>
             </properties>
         </profile>
         <profile>

@@ -7,8 +7,7 @@ stages:
 test:
   stage: test
   script:
-    - echo ARG1=--spring.datasource.url=$TEST_DB_URL > /opt/network/prod/.progconf
-    - mvn clean test -DskipTests=false
+    - mvn clean test -Pdev -Djdbc.url=$TEST_DB_URL -DskipTests=false
   only:
     - dev
   except:
