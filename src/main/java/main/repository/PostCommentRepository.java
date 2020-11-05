@@ -23,7 +23,7 @@ public interface PostCommentRepository extends CrudRepository<PostComment, Integ
 
     @Query(value = "SELECT DISTINCT * FROM post_comment WHERE `parent_id` = (:commentId)",
             nativeQuery = true)
-    Set<PostComment> subCommentsG(Integer commentId);
+    List<PostComment> subCommentsG(Integer commentId);
 
     @Modifying
     @Transactional

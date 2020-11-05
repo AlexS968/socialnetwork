@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import main.core.ContextUtilities;
 import main.core.OffsetPageRequest;
 import main.data.request.NotificationSettingsRequest;
+import main.data.response.NotificationSettingsResponse;
+import main.data.response.NotificationsResponse;
 import main.data.response.base.ListResponse;
 import main.data.response.base.Response;
 import main.data.response.type.InfoInResponse;
@@ -26,10 +28,7 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.Period;
 import java.time.Year;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -190,10 +189,6 @@ public class NotificationServiceImpl implements NotificationService {
         Map<Integer, Boolean> settings = receiver.getNotificationSettings();
         settings.putIfAbsent(notificationTypeId, isEnabled);
         settings.replace(notificationTypeId, isEnabled);
-        // пока на фронте нет переключателя для включения уведомлений по постам и
-        // лайкам, подключаем их принудительно при первом изменении настроек
-        settings.putIfAbsent(1, true);
-        settings.putIfAbsent(7, true);
 
         personService.save(receiver);
 
@@ -201,6 +196,22 @@ public class NotificationServiceImpl implements NotificationService {
         Response<InfoInResponse> response = new Response<>();
         response.setData(info);
         return response;
+    }
+
+    public NotificationsResponse getSettings() {
+
+        Person receiver = ContextUtilities.getCurrentPerson();
+        Map<Integer, Boolean> settings = receiver.getNotificationSettings();
+        NotificationsResponse result = new NotificationsResponse();
+        result.setNotifications(
+                settings.entrySet().stream().map(
+                s -> {
+                    int id = s.getKey();
+                    return new NotificationSettingsResponse(
+                            getNotificationTypeById(id).getCode().toString(),
+                            s.getValue());
+                }).collect(Collectors.toSet()));
+        return result;
     }
 
     @Override
@@ -415,5 +426,10 @@ public class NotificationServiceImpl implements NotificationService {
     private int getIdByCode(String code) {
         return notificationTypeRepository.findByCode(code)
                 .orElseThrow(EntityNotFoundException::new).getId();
+    }
+
+    private NotificationType getNotificationTypeById(int id) {
+        return notificationTypeRepository.findById(id)
+                .orElseThrow(EntityNotFoundException::new);
     }
 }
