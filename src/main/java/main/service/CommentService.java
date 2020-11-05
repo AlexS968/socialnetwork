@@ -3,6 +3,7 @@ package main.service;
 import main.data.request.CommentRequest;
 import main.data.response.CommentResponse;
 import main.data.response.base.ListResponse;
+import main.data.response.base.Response;
 import main.data.response.type.CommentInResponse;
 import main.data.response.type.ItemDelete;
 import main.model.Post;
@@ -21,7 +22,9 @@ public interface CommentService {
 
     CommentResponse recoverComment(Integer postId, Integer commentId);
 
-    ItemDelete deleteComment(Integer postId, Integer commentId);
+    Response<ItemDelete> deleteComment(Integer postId, Integer commentId);
+
+    void deleteAllComments(Integer postId);
 
     PostComment getComment(int itemId);
 

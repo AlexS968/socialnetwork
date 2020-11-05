@@ -1,6 +1,7 @@
 package main.service;
 
 import lombok.RequiredArgsConstructor;
+import main.core.ContextUtilities;
 import main.core.OffsetPageRequest;
 import main.data.request.NotificationSettingsRequest;
 import main.data.response.base.ListResponse;
@@ -74,7 +75,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public ListResponse<NotificationResponse> list(int offset, int itemPerPage, boolean needToRead) {
-        Person person = personService.getCurrentPerson();
+        Person person = ContextUtilities.getCurrentPerson();
 
         // получаем для текущего пользователя list с перечнем id типов уведомлений, которые он акцептовал
         List<Integer> types = person.getNotificationSettings().entrySet().stream()
@@ -181,7 +182,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public Response<InfoInResponse> set(NotificationSettingsRequest request) {
 
-        Person receiver = personService.getCurrentPerson();
+        Person receiver = ContextUtilities.getCurrentPerson();
 
         boolean isEnabled = request.getEnable();
         int notificationTypeId = getIdByCode(request.getNotificationType());

@@ -1,6 +1,7 @@
 package main.service;
 
 import lombok.AllArgsConstructor;
+import main.core.ContextUtilities;
 import main.core.auth.JwtUtils;
 import main.data.PersonPrincipal;
 import main.data.request.LoginRequest;
@@ -79,18 +80,18 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
 
     @Override
     public Response<MeProfile> getMe() {
+        int id = ContextUtilities.getCurrentUserId();
+        Person person = getById(id);
 
-        Person person = getCurrentPerson();
         Response<MeProfile> response = new Response<>();
         MeProfile profile = new MeProfile(person);
         response.setData(profile);
         return response;
-
     }
 
     @Override
-    public Response<MeProfileUpdate> putMe(MeProfileRequest updatedCurrentPerson) {
-        Person personUpdated = personRepository.findById(getCurrentPerson().getId());
+    public Response<MeProfile> putMe(MeProfileRequest updatedCurrentPerson) {
+        Person personUpdated = personRepository.findById(ContextUtilities.getCurrentUserId());
         personUpdated.setLastName(updatedCurrentPerson.getLastName());
         personUpdated.setFirstName(updatedCurrentPerson.getFirstName());
         personUpdated.setBirthDate(updatedCurrentPerson.getBirthDate());
@@ -105,17 +106,15 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
 
         personRepository.save(personUpdated);
 
-        MeProfileUpdate updatedPerson = new MeProfileUpdate(personUpdated);
-        Response<MeProfileUpdate> response = new Response<>();
+        MeProfile updatedPerson = new MeProfile(personUpdated);
+        Response<MeProfile> response = new Response<>();
         response.setData(updatedPerson);
         return response;
     }
 
     @Override
     public Response<InfoInResponse> deleteMe() {
-
-        int id = getCurrentPerson().getId();
-        personRepository.deleteById(id);
+        personRepository.deleteById(ContextUtilities.getCurrentUserId());
 
         InfoInResponse info = new InfoInResponse("ok");
         Response<InfoInResponse> response = new Response<>();
@@ -123,13 +122,6 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
         return response;
 
     }
-
-    @Override
-    public Person getCurrentPerson() {
-        return ((PersonPrincipal) SecurityContextHolder.getContext().
-                getAuthentication().getPrincipal()).getPerson();
-    }
-
 
     @Override
     public Person getById(int personId) {
@@ -145,7 +137,7 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
 
     public Person getAuthUser() {
         isAuthenticated();
-        return getCurrentPerson();
+        return ContextUtilities.getCurrentPerson();
     }
 
     public Person checkAuthUser(int id) {
@@ -157,18 +149,23 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
     }
 
     public Response<MeProfile> getProfile(Integer id) {
-        Person person = new Person();
+        Person person;
         Optional<Person> personOpt = personRepository.findById(id);
         if (personOpt.isPresent()) {
             person = personOpt.get();
         } else {
             throw new UsernameNotFoundException("invalid_request");
         }
+        //Проверка на блокировку профиля
         BlocksBetweenUsers blocksBetweenUsers = blocksBetweenUsersRepository
-                .findBySrc_IdAndDst_Id(id, getCurrentUserId());
-        if(!(blocksBetweenUsers==null)){
-            person = setToBlocked(person);
+                .findBySrc_IdAndDst_Id(id, ContextUtilities.getCurrentUserId());
+        if (!(blocksBetweenUsers == null)) {
+            setToBlocked(person);
         }
+        //Проверка на блокировку от текущего профиля
+        blocksBetweenUsers = blocksBetweenUsersRepository
+                .findBySrc_IdAndDst_Id(ContextUtilities.getCurrentUserId(), id);
+        person.setBlocked(!(blocksBetweenUsers == null));
         Response<MeProfile> response = new Response<>();
 
         MeProfile profile = new MeProfile(person);
@@ -181,13 +178,13 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
         return personRepository.save(person);
     }
 
-    public Response unblockUser(int id){
-        int currentUserId = getCurrentUserId();
-        Response<DataMessage> response = new Response();
+    public Response<DataMessage> unblockUser(int id) {
+        int currentUserId = ContextUtilities.getCurrentUserId();
+        Response<DataMessage> response = new Response<>();
         response.setTimestamp(LocalDateTime.now().toEpochSecond(ZoneOffset.UTC));
         response.setError("");
-        BlocksBetweenUsers blocksBetweenUsers = blocksBetweenUsersRepository.findBySrc_IdAndDst_Id(currentUserId,id);
-        if ( !(blocksBetweenUsers== null)){
+        BlocksBetweenUsers blocksBetweenUsers = blocksBetweenUsersRepository.findBySrc_IdAndDst_Id(currentUserId, id);
+        if (!(blocksBetweenUsers == null)) {
             blocksBetweenUsersRepository.delete(blocksBetweenUsers);
             response.setData(new DataMessage("ок"));
             return response;
@@ -196,12 +193,12 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
         return response;
     }
 
-    public Response blockUser(int id){
-        int currentUserId = getCurrentUserId();
-        Response<DataMessage> response = new Response();
+    public Response<DataMessage> blockUser(int id) {
+        int currentUserId = ContextUtilities.getCurrentUserId();
+        Response<DataMessage> response = new Response<>();
         response.setTimestamp(LocalDateTime.now().toEpochSecond(ZoneOffset.UTC));
         response.setError("");
-        if ((blocksBetweenUsersRepository.findBySrc_IdAndDst_Id(currentUserId,id)) == null){
+        if ((blocksBetweenUsersRepository.findBySrc_IdAndDst_Id(currentUserId, id)) == null) {
             BlocksBetweenUsers blocksBetweenUsers = new BlocksBetweenUsers();
             blocksBetweenUsers.setDst(personRepository.findById(id));
             blocksBetweenUsers.setSrc(personRepository.findById(currentUserId));
@@ -213,12 +210,7 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
         return response;
     }
 
-    private int getCurrentUserId(){
-        return ((PersonPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
-                .getPerson().getId();
-    }
-
-    private Person setToBlocked(Person person){
+    private void setToBlocked(Person person) {
         person.setFirstName("Доступ заблокирован");
         person.setBirthDate(null);
         person.setCity(new City());
@@ -226,7 +218,6 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
         person.setPhone("");
         person.setLastName("");
         person.setAbout("");
-        return person;
     }
 }
 
