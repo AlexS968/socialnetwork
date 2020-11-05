@@ -14,6 +14,7 @@
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <skipTests>true</skipTests>
+        <jdbcUrl2>jdbc:mysql://localhost:3306/networktst?serverTimezone=UTC</jdbcUrl2>
     </properties>
 
     <parent>
@@ -30,7 +31,7 @@
             </activation>
             <properties>
                 <spring.profiles.active>dev</spring.profiles.active>
-                <jdbc.url>jdbc:mysql://localhost:3306/networktst?serverTimezone=UTC</jdbc.url>
+                <jdbcUrl>jdbc:mysql://localhost:3306/networktst?serverTimezone=UTC</jdbcUrl>
             </properties>
         </profile>
         <profile>

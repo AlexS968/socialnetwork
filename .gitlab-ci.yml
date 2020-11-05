@@ -1,17 +1,17 @@
 stages:
-  - test
+#  - test
   - build
   - backup
   - deploy
 # --------------------------- tests ------------------------------
-test:
-  stage: test
-  script:
-    - mvn clean test -Pdev -Djdbc.url=$TEST_DB_URL -DskipTests=false
-  only:
-    - dev
-  except:
-    - schedules
+#test:
+#  stage: test
+#  script:
+#    - mvn clean test -Pdev -DjdbcUrl=$TEST_DB_URL -DskipTests=false
+#  only:
+#    - dev
+#  except:
+#    - schedules
 
 # -------------------------- deploy ------------------------------
 
