@@ -1,7 +1,20 @@
 stages:
+  - test
   - build
   - backup
   - deploy
+# --------------------------- tests ------------------------------
+test:
+  stage: test
+  script:
+    - echo ARG1=--spring.datasource.url=$TEST_DB_URL > /opt/network/prod/.progconf
+    - mvn clean test -DskipTests=false
+  only:
+    - dev
+  except:
+    - schedules
+
+# -------------------------- deploy ------------------------------
 
 build:
   stage: build
