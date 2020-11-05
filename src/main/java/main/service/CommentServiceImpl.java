@@ -138,7 +138,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     private void deleteSubComment(Integer commentId) {
-        Set<PostComment> subComments = commentRepository.subCommentsG(commentId);
+        List<PostComment> subComments = commentRepository.subCommentsG(commentId);
         commentRepository.deleteAll(subComments);
     }
 

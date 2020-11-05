@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import main.core.ContextUtilities;
 import main.core.OffsetPageRequest;
 import main.data.request.NotificationSettingsRequest;
+import main.data.response.NotificationSettingsResponse;
+import main.data.response.NotificationsResponse;
 import main.data.response.base.ListResponse;
 import main.data.response.base.Response;
 import main.data.response.type.InfoInResponse;
@@ -26,10 +28,7 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.Period;
 import java.time.Year;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -190,10 +189,6 @@ public class NotificationServiceImpl implements NotificationService {
         Map<Integer, Boolean> settings = receiver.getNotificationSettings();
         settings.putIfAbsent(notificationTypeId, isEnabled);
         settings.replace(notificationTypeId, isEnabled);
-        // пока на фронте нет переключателя для включения уведомлений по постам и
-        // лайкам, подключаем их принудительно при первом изменении настроек
-        settings.putIfAbsent(1, true);
-        settings.putIfAbsent(7, true);
 
         personService.save(receiver);
 
@@ -203,21 +198,44 @@ public class NotificationServiceImpl implements NotificationService {
         return response;
     }
 
+    public NotificationsResponse getSettings() {
+
+        Person receiver = ContextUtilities.getCurrentPerson();
+        Map<Integer, Boolean> settings = receiver.getNotificationSettings();
+        NotificationsResponse result = new NotificationsResponse();
+        result.setNotifications(
+                settings.entrySet().stream().map(
+                s -> {
+                    int id = s.getKey();
+                    return new NotificationSettingsResponse(
+                            getNotificationTypeById(id).getCode().toString(),
+                            s.getValue());
+                }).collect(Collectors.toSet()));
+        return result;
+    }
+
     @Override
     public void setNotification(PostComment postComment) {
         Notification notification = new Notification();
         if (postComment.getParent() != null) {
             //комментарий на комментарий
-            notification.setReceiver(postComment.getParent().getAuthor());
-            notification.setEntityId(postComment.getId());
-            notification.setType(getNotificationType(NotificationTypeCode.COMMENT_COMMENT));
+            Person parentCommentAuthor = postComment.getParent().getAuthor();
+            if (postComment.getAuthor().getId() != parentCommentAuthor.getId()) {
+                notification.setReceiver(postComment.getParent().getAuthor());
+                notification.setEntityId(postComment.getId());
+                notification.setType(getNotificationType(NotificationTypeCode.COMMENT_COMMENT));
+                notificationRepository.save(notification);
+            }
         } else {
             //комментарий на пост
-            notification.setReceiver(postComment.getPost().getAuthor());
-            notification.setEntityId(postComment.getId());
-            notification.setType(getNotificationType(NotificationTypeCode.POST_COMMENT));
+            Person postAuthor = postComment.getPost().getAuthor();
+            if (postComment.getAuthor().getId() != postAuthor.getId()) {
+                notification.setReceiver(postComment.getPost().getAuthor());
+                notification.setEntityId(postComment.getId());
+                notification.setType(getNotificationType(NotificationTypeCode.POST_COMMENT));
+                notificationRepository.save(notification);
+            }
         }
-        notificationRepository.save(notification);
     }
 
     @Override
@@ -306,14 +324,19 @@ public class NotificationServiceImpl implements NotificationService {
         notification.setSentTime(like.getTime());
         if (like.getType().equals(LikeType.POST)) {
             Post post = postService.getPost(like.getItemId());
-            notification.setReceiver(post.getAuthor());
-            notification.setContact("на ваш пост: ".concat(post.getTitle()));
+            if (post.getAuthor().getId() != like.getPerson().getId()) {
+                notification.setReceiver(post.getAuthor());
+                notification.setContact("на ваш пост: ".concat(post.getTitle()));
+                notificationRepository.save(notification);
+            }
         } else {
             PostComment comment = commentService.getComment(like.getItemId());
-            notification.setReceiver(comment.getAuthor());
-            notification.setContact("на ваш комментарий: ".concat(comment.getCommentText()));
+            if (comment.getAuthor().getId() != like.getPerson().getId()) {
+                notification.setReceiver(comment.getAuthor());
+                notification.setContact("на ваш комментарий: ".concat(comment.getCommentText()));
+                notificationRepository.save(notification);
+            }
         }
-        notificationRepository.save(notification);
     }
 
     @Override
@@ -342,17 +365,26 @@ public class NotificationServiceImpl implements NotificationService {
         // удаляем нотификации к посту
         List<Integer> typeId = new ArrayList<>();
         typeId.add(getIdByCode(NotificationTypeCode.POST.toString()));
-        List<Integer> entityId = new ArrayList<>();
-        entityId.add(post.getId());
-        notificationRepository.deleteByTypeIdAndEntityId(typeId, entityId);
+        List<Integer> postsId = new ArrayList<>();
+        postsId.add(post.getId());
+        notificationRepository.deleteByTypeIdAndEntityId(typeId, postsId);
         //удаляем нотификации к комментариям
         typeId.clear();
         typeId.add(getIdByCode(NotificationTypeCode.POST_COMMENT.toString()));
         typeId.add(getIdByCode(NotificationTypeCode.COMMENT_COMMENT.toString()));
-        entityId.clear();
-        commentService.findAllByPostId(post.getId()).stream()
-                .map(PostComment::getId).collect(Collectors.toCollection(() -> entityId));
-        notificationRepository.deleteByTypeIdAndEntityId(typeId, entityId);
+        List<Integer> commentsId = new ArrayList<>();
+        List<PostComment> comments = commentService.findAllByPostId(post.getId());
+        comments.stream().map(PostComment::getId).collect(Collectors.toCollection(() -> commentsId));
+        notificationRepository.deleteByTypeIdAndEntityId(typeId, commentsId);
+        //удаляем нотификации к лайкам к посту и к комментариям к посту
+        typeId.clear();
+        typeId.add(getIdByCode(NotificationTypeCode.LIKE.toString()));
+        List<Integer> likesId = new ArrayList<>();
+        comments.forEach(comment -> comment.getLikes().stream()
+                .map(Like::getId).collect(Collectors.toCollection(() -> likesId)));
+        post.getLikes().stream()
+                .map(Like::getId).collect(Collectors.toCollection(() -> likesId));
+        notificationRepository.deleteByTypeIdAndEntityId(typeId, likesId);
     }
 
     @Override
@@ -363,9 +395,18 @@ public class NotificationServiceImpl implements NotificationService {
         typeId.add(getIdByCode(NotificationTypeCode.POST_COMMENT.toString()));
         typeId.add(getIdByCode(NotificationTypeCode.COMMENT_COMMENT.toString()));
         entityId.add(comment.getId());
-        commentService.subComments(comment).stream().map(PostComment::getId)
+        List<PostComment> comments = commentService.subComments(comment);
+        comments.add(comment);
+        comments.stream().map(PostComment::getId)
                 .collect(Collectors.toCollection(() -> entityId));
         notificationRepository.deleteByTypeIdAndEntityId(typeId, entityId);
+        //удаляем нотификации к лайкам к комментариям, включая подчиненные по иерархии
+        typeId.clear();
+        typeId.add(getIdByCode(NotificationTypeCode.LIKE.toString()));
+        List<Integer> likesId = new ArrayList<>();
+        comments.forEach(comm -> comm.getLikes().stream()
+                .map(Like::getId).collect(Collectors.toCollection(() -> likesId)));
+        notificationRepository.deleteByTypeIdAndEntityId(typeId, likesId);
     }
 
     @Override
@@ -385,5 +426,10 @@ public class NotificationServiceImpl implements NotificationService {
     private int getIdByCode(String code) {
         return notificationTypeRepository.findByCode(code)
                 .orElseThrow(EntityNotFoundException::new).getId();
+    }
+
+    private NotificationType getNotificationTypeById(int id) {
+        return notificationTypeRepository.findById(id)
+                .orElseThrow(EntityNotFoundException::new);
     }
 }
