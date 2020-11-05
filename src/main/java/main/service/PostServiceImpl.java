@@ -54,6 +54,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional
     public Response<PostInResponse> addNewPost(Integer personId, PostRequest request, Long pubDate) {
         try {
             Person person = personService.getById(personId);
