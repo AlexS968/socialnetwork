@@ -54,13 +54,12 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    @Transactional
     public Response<PostInResponse> addNewPost(Integer personId, PostRequest request, Long pubDate) {
         try {
             Person person = personService.getById(personId);
             Post post = savePost(null, request, person, pubDate);
 
-            //notificationService.setNotification(post);
+            notificationService.setNotification(post);
 
             return new Response<>(new PostInResponse(post, new ArrayList<>(), personId));
         } catch (Exception ex) {
