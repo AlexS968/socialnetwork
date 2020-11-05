@@ -5,7 +5,6 @@ import main.data.request.PasswordRecoveryRequest;
 import main.data.request.PasswordSetRequest;
 import main.data.request.RegistrationRequest;
 import main.data.response.NotificationSettingsResponse;
-import main.data.response.NotificationsResponse;
 import main.data.response.RegistrationResponse;
 import main.data.response.base.Response;
 import main.data.response.type.InfoInResponse;
@@ -16,7 +15,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
 import java.util.Set;
 
 @RestController
@@ -34,7 +32,7 @@ public class ApiAccountController {
     public String emailChangeLink;
 
     @GetMapping("/notifications")
-    public ResponseEntity<NotificationsResponse> getListOfNotifications() {
+    public ResponseEntity<Response<Set<NotificationSettingsResponse>>> getListOfNotifications() {
         return ResponseEntity.ok(notificationService.getSettings());
     }
 
