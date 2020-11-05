@@ -1,7 +1,7 @@
 package main.service;
 
 import lombok.AllArgsConstructor;
-import main.data.PersonPrincipal;
+import main.core.ContextUtilities;
 import main.data.response.FriendsResponse;
 import main.data.response.type.DataMessage;
 import main.model.BlocksBetweenUsers;
@@ -12,13 +12,10 @@ import main.repository.BlocksBetweenUsersRepository;
 import main.repository.FriendsRepository;
 import main.repository.FriendshipStatusRepository;
 import main.repository.PersonRepository;
-import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
@@ -44,24 +41,20 @@ public class FriendsServiceImpl implements FriendsService {
 
     @Override
     public FriendsResponse getFriends(String name, int offset, int limit) {
-        int currentUserId = getCurrentUserId();
+        int currentUserId = ContextUtilities.getCurrentUserId();
         Page<Friendship> friends;
         friends = friendsRepository.findByDst_IdAndStatusId(currentUserId, getPage(offset, limit), 2);
-        friends.forEach(friendship ->{
+        friends.forEach(friendship -> {
             BlocksBetweenUsers blocksBetweenUsers = blocksBetweenUsersRepository
                     .findBySrc_IdAndDst_Id(currentUserId, friendship.getSrc().getId());
-            if (!(blocksBetweenUsers == null)) {
-                friendship.getSrc().setBlocked(true);
-            } else {
-                friendship.getSrc().setBlocked(false);
-            }
+            friendship.getSrc().setBlocked(!(blocksBetweenUsers == null));
         });
         return new FriendsResponse(friends);
     }
 
     @Override
     public FriendsResponse addFriend(int id) {
-        int currentUserId = getCurrentUserId();
+        int currentUserId = ContextUtilities.getCurrentUserId();
         if (friendsRepository.findBySrc_idAndDst_IdAndStatusId(currentUserId, id, 1) == null
                 && !(id == currentUserId)) {
             Friendship friendship = friendsRepository.findByDst_IdAndSrc_IdAndStatusId(currentUserId, id, 1);
@@ -93,10 +86,10 @@ public class FriendsServiceImpl implements FriendsService {
 
     @Override
     public FriendsResponse deleteFriend(int id) {
-        int currentUserId = getCurrentUserId();
+        int currentUserId = ContextUtilities.getCurrentUserId();
         Friendship friendship1 = friendsRepository.findByDst_IdAndSrc_IdAndStatusId(currentUserId, id, 2);
         Friendship friendship2 = friendsRepository.findBySrc_idAndDst_IdAndStatusId(currentUserId, id, 2);
-        notificationService.deleteNotification(friendship1,friendship2);
+        notificationService.deleteNotification(friendship1, friendship2);
         friendsRepository.delete(friendship1);
         friendsRepository.delete(friendship2);
         FriendsResponse friendsResponse = new FriendsResponse();
@@ -107,7 +100,7 @@ public class FriendsServiceImpl implements FriendsService {
 
     @Override
     public FriendsResponse blockFriend(int id) {
-        int currentUserId = getCurrentUserId();
+        int currentUserId = ContextUtilities.getCurrentUserId();
         Friendship friendship = friendsRepository.findByDst_IdAndSrc_IdAndStatusId(currentUserId, id, 2);
         friendship.setStatus(friendshipStatusRepository.findById(3));
         friendsRepository.save(friendship);
@@ -123,13 +116,13 @@ public class FriendsServiceImpl implements FriendsService {
     @Override
     public FriendsResponse getRecommendations(int offset, int limit) {
         List<Optional<Person>> recommendedFriends = personRepository.findByCityId(getCurrentUserCityId());
-        recommendedFriends.remove( Optional.ofNullable(personRepository.findById(getCurrentUserId())));
+        recommendedFriends.remove(Optional.ofNullable(personRepository.findById(ContextUtilities.getCurrentUserId())));
         return new FriendsResponse(recommendedFriends, offset, limit);
     }
 
     @Override
     public FriendsResponse getRequests(int offset, int limit) {
-        int currentUserId = getCurrentUserId();
+        int currentUserId = ContextUtilities.getCurrentUserId();
         Page<Friendship> requests;
         System.out.println(111111);
         requests = friendsRepository.findByDst_IdAndStatusId(currentUserId, getPage(offset, limit), 1);
@@ -142,7 +135,7 @@ public class FriendsServiceImpl implements FriendsService {
     }
 
     @Override
-    public List<Friendship> findByDst_IdAndStatusId(int dstId, int statusId){
+    public List<Friendship> findByDst_IdAndStatusId(int dstId, int statusId) {
         return friendsRepository.findByDst_IdAndStatusId(dstId, statusId);
     }
 
@@ -155,13 +148,7 @@ public class FriendsServiceImpl implements FriendsService {
         return PageRequest.of(offset / limit, limit);
     }
 
-    private int getCurrentUserId() {
-        return ((PersonPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
-                .getPerson().getId();
-    }
-
     private int getCurrentUserCityId() {
-        return ((PersonPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
-                .getPerson().getCity().getId();
+        return ContextUtilities.getCurrentPerson().getCity().getId();
     }
 }

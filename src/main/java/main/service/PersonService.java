@@ -10,9 +10,8 @@ public interface PersonService {
     Response<PersonInLogin> login(LoginRequest request);
     Response<ResponseMessage> logout();
     Response<MeProfile> getMe();
-    Response<MeProfileUpdate> putMe(MeProfileRequest updatedCurrentPerson);
+    Response<MeProfile> putMe(MeProfileRequest updatedCurrentPerson);
     Response<InfoInResponse> deleteMe();
-    Person getCurrentPerson();
     Person getById(int personId);
     Person getAuthUser();
     Person checkAuthUser(int id);

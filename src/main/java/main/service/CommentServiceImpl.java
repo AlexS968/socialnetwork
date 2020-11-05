@@ -35,6 +35,9 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public CommentResponse createComment(Integer postId, CommentRequest request) {
+        if (request.getCommentText().isBlank()) {
+            throw new BadRequestException(new ApiError("invalid_request", "текст комментария отсутствует"));
+        }
         CommentResponse response = new CommentResponse();
 
         PostComment postComment = new PostComment();
@@ -135,8 +138,13 @@ public class CommentServiceImpl implements CommentService {
     }
 
     private void deleteSubComment(Integer commentId) {
-        Set<PostComment> subComments = commentRepository.subCommentsG(commentId);
+        List<PostComment> subComments = commentRepository.subCommentsG(commentId);
         commentRepository.deleteAll(subComments);
+    }
+
+    @Override
+    public void deleteAllComments(Integer postId) {
+        commentRepository.deleteAllByPostId(postId);
     }
 
     @Override

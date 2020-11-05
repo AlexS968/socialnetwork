@@ -2,9 +2,11 @@ package main.repository;
 
 import main.model.Post;
 import main.model.PostComment;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
@@ -21,5 +23,11 @@ public interface PostCommentRepository extends CrudRepository<PostComment, Integ
 
     @Query(value = "SELECT DISTINCT * FROM post_comment WHERE `parent_id` = (:commentId)",
             nativeQuery = true)
-    Set<PostComment> subCommentsG(Integer commentId);
+    List<PostComment> subCommentsG(Integer commentId);
+
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM post_comment where post_id = ?1",
+            nativeQuery = true)
+    void deleteAllByPostId(Integer postId);
 }

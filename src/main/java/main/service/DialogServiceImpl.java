@@ -1,6 +1,7 @@
 package main.service;
 
 import lombok.AllArgsConstructor;
+import main.core.ContextUtilities;
 import main.core.OffsetPageRequest;
 import main.data.PersonPrincipal;
 import main.data.request.DialogAddRequest;
@@ -21,8 +22,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityNotFoundException;
-import javax.persistence.PrePersist;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +38,7 @@ public class DialogServiceImpl implements DialogService {
 
     @Override
     public ListResponse<DialogList> list(ListRequest request) {
-        Person currentPerson = personService.getCurrentPerson();
+        Person currentPerson = ContextUtilities.getCurrentPerson();
         int currentUserId = currentPerson.getId();
 
         List<DialogList> dialogs = new ArrayList<>();
@@ -82,7 +81,7 @@ public class DialogServiceImpl implements DialogService {
 
     @Override
     public Response<DialogNew> add(DialogAddRequest request) {
-        Person currentPerson = personService.getCurrentPerson();
+        Person currentPerson = ContextUtilities.getCurrentPerson();
 
         Dialog dialog = null;
         boolean isGroupDialog = request.getUserIds().size() > 1;
@@ -122,14 +121,13 @@ public class DialogServiceImpl implements DialogService {
     @Override
     public Response<DialogMessage> addMessage(int dialogId, DialogMessageRequest request) {
         Response<DialogMessage> response = new Response<>();
-        PersonPrincipal currentUser = (PersonPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Dialog dialog = dialogRepository.findById(dialogId);
 
         List<Person> personsInDialog = dialog.getPersons();
-        Person currentPerson = getCurrentPerson();
+        Person currentPerson = ContextUtilities.getCurrentPerson();
         Person anotherPersonInDialog = getAntherPersonInDialog(personsInDialog, currentPerson);
         BlocksBetweenUsers blocksBetweenUsers = blocksBetweenUsersRepository
-                .findBySrc_IdAndDst_Id(anotherPersonInDialog.getId(), currentPerson.getId());
+                .findBySrc_IdAndDst_Id(anotherPersonInDialog != null ? anotherPersonInDialog.getId() : 0, currentPerson.getId());
 
         if (blocksBetweenUsers == null) {
             dialog.getPersons().forEach(p -> {
@@ -137,9 +135,9 @@ public class DialogServiceImpl implements DialogService {
                 message.setMessageText(request.getMessageText());
                 message.setDialog(dialog);
                 message.setTime(Instant.now());
-                message.setAuthor(currentUser.getPerson());
+                message.setAuthor(currentPerson);
                 message.setRecipient(p);
-                message.setReadStatus((p.getId() != currentUser.getPerson().getId()) ? ReadStatus.SENT : ReadStatus.READ);
+                message.setReadStatus((p.getId() != currentPerson.getId()) ? ReadStatus.SENT : ReadStatus.READ);
                 messageRepository.save(message);
                 // отправляем уведомление только при отправке сообщения
                 if (message.getReadStatus().equals(ReadStatus.SENT)) {
@@ -158,8 +156,7 @@ public class DialogServiceImpl implements DialogService {
 
     @Override
     public ListResponse<DialogMessage> listMessage(int dialogId, ListRequest request) {
-        PersonPrincipal currentUser = (PersonPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        int currentUserId = currentUser.getPerson().getId();
+        int currentUserId = ContextUtilities.getCurrentUserId();
 
         List<DialogMessage> messages = new ArrayList<>();
         Pageable pageable;
@@ -190,11 +187,9 @@ public class DialogServiceImpl implements DialogService {
 
     @Override
     public Response<ResponseCount> countUnreadedMessage() {
-        PersonPrincipal currentUser = (PersonPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
         long count = messageRepository.countByReadStatusAndRecipient_id(
                 ReadStatus.SENT,
-                currentUser.getPerson().getId()
+                ContextUtilities.getCurrentUserId()
         );
 
         return new Response<>(new ResponseCount(count));
@@ -212,16 +207,6 @@ public class DialogServiceImpl implements DialogService {
     @Override
     public Message findById(int id) {
         return messageRepository.findById(id);
-    }
-
-    private int getCurrentUserId() {
-        return ((PersonPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
-                .getPerson().getId();
-    }
-
-    private Person getCurrentPerson() {
-        return ((PersonPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
-                .getPerson();
     }
 
     private Person getAntherPersonInDialog(List<Person> persons, Person currentPerson) {
