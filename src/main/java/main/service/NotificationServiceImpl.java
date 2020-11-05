@@ -5,7 +5,6 @@ import main.core.ContextUtilities;
 import main.core.OffsetPageRequest;
 import main.data.request.NotificationSettingsRequest;
 import main.data.response.NotificationSettingsResponse;
-import main.data.response.NotificationsResponse;
 import main.data.response.base.ListResponse;
 import main.data.response.base.Response;
 import main.data.response.type.InfoInResponse;
@@ -198,20 +197,20 @@ public class NotificationServiceImpl implements NotificationService {
         return response;
     }
 
-    public NotificationsResponse getSettings() {
+    @Override
+    public Response<Set<NotificationSettingsResponse>> getSettings() {
 
         Person receiver = ContextUtilities.getCurrentPerson();
         Map<Integer, Boolean> settings = receiver.getNotificationSettings();
-        NotificationsResponse result = new NotificationsResponse();
-        result.setNotifications(
-                settings.entrySet().stream().map(
+
+        Set<NotificationSettingsResponse> res = settings.entrySet().stream().map(
                 s -> {
                     int id = s.getKey();
                     return new NotificationSettingsResponse(
                             getNotificationTypeById(id).getCode().toString(),
                             s.getValue());
-                }).collect(Collectors.toSet()));
-        return result;
+                }).collect(Collectors.toSet());
+        return new Response<>(res);
     }
 
     @Override
