@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: '@jdbc.url@'
-    username: root
-    password: testtest
+    url: jdbc:mysql://root:iddqd@localhost:3306/networktst?serverTimezone=UTC&createDatabaseIfNotExist=true
+    #username: root
+    #password: testtest
   jpa:
     show-sql: false
     hibernate:
