@@ -197,7 +197,7 @@ public class NotificationServiceImpl implements NotificationService {
         personService.save(receiver);
 
         InfoInResponse info = new InfoInResponse("ok");
-        Response<InfoInResponse> response = new Response<InfoInResponse>();
+        Response<InfoInResponse> response = new Response<>();
         response.setData(info);
         return response;
     }
@@ -341,17 +341,26 @@ public class NotificationServiceImpl implements NotificationService {
         // удаляем нотификации к посту
         List<Integer> typeId = new ArrayList<>();
         typeId.add(getIdByCode(NotificationTypeCode.POST.toString()));
-        List<Integer> entityId = new ArrayList<>();
-        entityId.add(post.getId());
-        notificationRepository.deleteByTypeIdAndEntityId(typeId, entityId);
+        List<Integer> postsId = new ArrayList<>();
+        postsId.add(post.getId());
+        notificationRepository.deleteByTypeIdAndEntityId(typeId, postsId);
         //удаляем нотификации к комментариям
         typeId.clear();
         typeId.add(getIdByCode(NotificationTypeCode.POST_COMMENT.toString()));
         typeId.add(getIdByCode(NotificationTypeCode.COMMENT_COMMENT.toString()));
-        entityId.clear();
-        commentService.findAllByPostId(post.getId()).stream()
-                .map(PostComment::getId).collect(Collectors.toCollection(() -> entityId));
-        notificationRepository.deleteByTypeIdAndEntityId(typeId, entityId);
+        List<Integer> commentsId = new ArrayList<>();
+        List<PostComment> comments = commentService.findAllByPostId(post.getId());
+        comments.stream().map(PostComment::getId).collect(Collectors.toCollection(() -> commentsId));
+        notificationRepository.deleteByTypeIdAndEntityId(typeId, commentsId);
+        //удаляем нотификации к лайкам к посту и к комментариям к посту
+        typeId.clear();
+        typeId.add(getIdByCode(NotificationTypeCode.LIKE.toString()));
+        List<Integer> likesId = new ArrayList<>();
+        comments.forEach(comment -> comment.getLikes().stream()
+                .map(Like::getId).collect(Collectors.toCollection(() -> likesId)));
+        post.getLikes().stream()
+                .map(Like::getId).collect(Collectors.toCollection(() -> likesId));
+        notificationRepository.deleteByTypeIdAndEntityId(typeId, likesId);
     }
 
     @Override
@@ -362,9 +371,18 @@ public class NotificationServiceImpl implements NotificationService {
         typeId.add(getIdByCode(NotificationTypeCode.POST_COMMENT.toString()));
         typeId.add(getIdByCode(NotificationTypeCode.COMMENT_COMMENT.toString()));
         entityId.add(comment.getId());
-        commentService.subComments(comment).stream().map(PostComment::getId)
+        List<PostComment> comments =commentService.subComments(comment);
+        comments.add(comment);
+        comments.stream().map(PostComment::getId)
                 .collect(Collectors.toCollection(() -> entityId));
         notificationRepository.deleteByTypeIdAndEntityId(typeId, entityId);
+        //удаляем нотификации к лайкам к комментариям, включая подчиненные по иерархии
+        typeId.clear();
+        typeId.add(getIdByCode(NotificationTypeCode.LIKE.toString()));
+        List<Integer> likesId = new ArrayList<>();
+        comments.forEach(comm -> comm.getLikes().stream()
+                .map(Like::getId).collect(Collectors.toCollection(() -> likesId)));
+        notificationRepository.deleteByTypeIdAndEntityId(typeId, likesId);
     }
 
     @Override
