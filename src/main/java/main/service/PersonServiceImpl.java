@@ -1,5 +1,6 @@
 package main.service;
 
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import main.core.ContextUtilities;
 import main.core.auth.JwtUtils;
@@ -11,11 +12,13 @@ import main.data.response.type.*;
 import main.model.BlocksBetweenUsers;
 import main.model.City;
 import main.model.Country;
+import main.model.MessagesPermission;
 import main.model.Person;
 import main.repository.BlocksBetweenUsersRepository;
 import main.repository.CityRepository;
 import main.repository.CountryRepository;
 import main.repository.PersonRepository;
+import main.repository.PostRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -40,6 +43,7 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
     private final CityRepository cityRepository;
     private final CountryRepository countryRepository;
     private final BlocksBetweenUsersRepository blocksBetweenUsersRepository;
+    private final PostRepository postRepository;
 
     @Override
     public UserDetails loadUserByUsername(String email) {
@@ -114,7 +118,56 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
 
     @Override
     public Response<InfoInResponse> deleteMe() {
-        personRepository.deleteById(ContextUtilities.getCurrentUserId());
+
+        // деактивировать кнопки 'сообщение/ добавить в друзья' если профиль удален
+        // переписать блокировку всех пользователей после добавления MessagesPermission
+
+        int id = ContextUtilities.getCurrentUserId();
+
+        Person personToDetele = personRepository.findById(id);
+
+        postRepository.deleteByAuthorId(id);
+
+        personToDetele.setBirthDate(null);
+        personToDetele.setAbout(personToDetele.getFirstName() + " " + personToDetele.getLastName() +" решил удалить свою страницу");
+
+        // city country not null по этому добавлена страна и город с пустой срокой
+
+        personToDetele.setCountry(countryRepository.findById(239));
+        personToDetele.setCity(cityRepository.findById(5471206));
+
+
+        personToDetele.setPhone(" ");
+
+        // изменить емейл и пароль чтобы пользователь не смог зайти в удаленную учетку
+
+        personToDetele.setEmail("deletedId" + id);
+        personToDetele.setPasswordHash(UUID.randomUUID().toString());
+
+        personToDetele.setPhotoURL("/static/img/page_deleted.jpg");
+       // personToDetele.setMessagesPermission(MessagesPermission.NONE); // 1) нет на фронте 2) нет проверк
+
+        //---- временное решение тк нет реализации MessagesPermission
+//        personRepository.findAll().forEach( p -> {
+//
+//         int destId = p.getId();
+//
+//            if ((blocksBetweenUsersRepository.findBySrc_IdAndDst_Id(id, destId)) == null) {
+//                BlocksBetweenUsers blocksBetweenUsers = new BlocksBetweenUsers();
+//                blocksBetweenUsers.setDst(p);
+//                blocksBetweenUsers.setSrc(personToDetele);
+//                blocksBetweenUsersRepository.save(blocksBetweenUsers);
+//            }
+//
+//
+//        });
+
+
+
+       // дружбу и сообщения не удалять тк у 2 хранинтся
+        // доделать - нельзя добавить в друзья и написать со стр польз и из диалогов если были
+
+        personRepository.save(personToDetele);
 
         InfoInResponse info = new InfoInResponse("ok");
         Response<InfoInResponse> response = new Response<>();
