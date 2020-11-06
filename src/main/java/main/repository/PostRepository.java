@@ -7,10 +7,12 @@ import main.model.Person;
 import main.model.Post;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public interface PostRepository extends CrudRepository<Post, Integer> {
@@ -22,6 +24,11 @@ public interface PostRepository extends CrudRepository<Post, Integer> {
   Page<Post> findByAuthor(Person person, Pageable pageable);
 
   List<Post> findByAuthor(Person person);
+
+  @Modifying
+  @Transactional
+  @Query(nativeQuery = true, value = "delete from post where (author_id = :authorId and id > 0)")
+  void deleteByAuthorId( @Param("authorId")Integer authorId);
 
   @Query(nativeQuery = true, value =
       "SELECT DISTINCT post.* FROM post "
