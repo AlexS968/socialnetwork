@@ -29,8 +29,17 @@
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
+            <build>
+                <testResources>
+                    <testResource>
+                        <directory>src/test/resources</directory>
+                        <filtering>true</filtering>
+                    </testResource>
+                </testResources>
+            </build>
             <properties>
                 <spring.profiles.active>dev</spring.profiles.active>
+                <spring.datasource.url>${jdbcUrl}</spring.datasource.url>
             </properties>
         </profile>
         <profile>
@@ -38,7 +47,7 @@
             <build>
                 <resources>
                     <resource>
-                        <directory>src\test\resources</directory>
+                        <directory>src/test/resources</directory>
                         <filtering>true</filtering>
                     </resource>
                 </resources>
