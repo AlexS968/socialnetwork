@@ -291,10 +291,8 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public void setNotification(Post post) {
-        int authorId = post.getAuthor().getId();
         List<Notification> notifications = new ArrayList<>();
-
-        friendsService.findByDst_IdAndStatusId(authorId, 2)
+        post.getAuthor().getRequestFr()
                 .forEach(friendship -> {
                     Notification notification = new Notification();
                     notification.setReceiver(friendship.getSrc());
