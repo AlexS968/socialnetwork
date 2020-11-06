@@ -3,8 +3,6 @@ package main.model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
@@ -13,7 +11,6 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @Entity
 @Table(name = "person")
@@ -98,9 +95,9 @@ public class Person {
 
     @JsonBackReference
     @OneToMany(mappedBy = "dst", fetch = FetchType.LAZY)
-    private Set<Friendship> requestFr;
+    private List<Friendship> requestFr;
 
     @JsonBackReference
     @OneToMany(mappedBy = "src", fetch = FetchType.LAZY)
-    private Set<Friendship> sendFr;
+    private List<Friendship> sendFr;
 }
