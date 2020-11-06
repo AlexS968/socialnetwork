@@ -65,8 +65,17 @@
         </profile>
         <profile>
             <id>prod</id>
+            <build>
+                <testResources>
+                    <testResource>
+                        <directory>src/test/resources</directory>
+                        <filtering>true</filtering>
+                    </testResource>
+                </testResources>
+            </build>
             <properties>
                 <spring.profiles.active>prod</spring.profiles.active>
+                <spring.datasource.url>${jdbcUrl}</spring.datasource.url>
             </properties>
         </profile>
     </profiles>
