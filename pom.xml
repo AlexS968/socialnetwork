@@ -14,7 +14,7 @@
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <skipTests>true</skipTests>
-        <jdbcUrl2>jdbc:mysql://localhost:3306/networktst?serverTimezone=UTC</jdbcUrl2>
+        <jdbcUrl>jdbc:mysql://localhost:3306/networktst?serverTimezone=UTC</jdbcUrl>
     </properties>
 
     <parent>
@@ -29,9 +29,32 @@
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
+            <build>
+                <testResources>
+                    <testResource>
+                        <directory>src/test/resources</directory>
+                        <filtering>true</filtering>
+                    </testResource>
+                </testResources>
+            </build>
             <properties>
                 <spring.profiles.active>dev</spring.profiles.active>
-                <jdbcUrl>jdbc:mysql://localhost:3306/networktst?serverTimezone=UTC</jdbcUrl>
+                <spring.datasource.url>${jdbcUrl}</spring.datasource.url>
+            </properties>
+        </profile>
+        <profile>
+            <id>test</id>
+            <build>
+                <resources>
+                    <resource>
+                        <directory>src/test/resources</directory>
+                        <filtering>true</filtering>
+                    </resource>
+                </resources>
+            </build>
+            <properties>
+                <spring.profiles.active>test</spring.profiles.active>
+                <spring.datasource.url>${jdbcUrl}</spring.datasource.url>
             </properties>
         </profile>
         <profile>
