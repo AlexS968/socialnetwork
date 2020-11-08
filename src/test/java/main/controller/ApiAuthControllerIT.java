@@ -1,6 +1,6 @@
 package main.controller;
 
-import main.AbstractIntegrationTest;
+import main.AbstractIntegrationIT;
 import main.data.request.LoginRequest;
 import org.junit.Test;
 import org.springframework.http.MediaType;
@@ -9,7 +9,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class ApiAuthControllerTest extends AbstractIntegrationTest {
+public class ApiAuthControllerIT extends AbstractIntegrationIT {
 
     @Test
     public void tryShowLogin() throws Exception {

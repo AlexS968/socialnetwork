@@ -1,14 +1,12 @@
 package main.controller;
 
-import main.AbstractIntegrationTest;
+import main.AbstractIntegrationIT;
 import main.data.request.PostRequest;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithUserDetails;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.ArrayList;
@@ -22,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WithUserDetails(value = "user@user.ru")
-public class ProfileControllerTest extends AbstractIntegrationTest {
+public class ProfileControllerIT extends AbstractIntegrationIT {
 
     private PostRequest request;
     private List<String> tags;

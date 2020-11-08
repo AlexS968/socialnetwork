@@ -17,7 +17,7 @@ import org.springframework.web.context.WebApplicationContext;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
+@ActiveProfiles("itest")
 @Sql(value = {
         "/sql_injection/create-user-before.sql",
         "/sql_injection/create-post-before.sql",
@@ -29,7 +29,7 @@ import org.springframework.web.context.WebApplicationContext;
         "/sql_injection/create-post-after.sql",
         "/sql_injection/create-user-after.sql"
 }, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-public abstract class AbstractIntegrationTest {
+public abstract class AbstractIntegrationIT {
     /**
      * Web application context.
      */
