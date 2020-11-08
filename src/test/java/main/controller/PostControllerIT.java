@@ -1,17 +1,16 @@
 package main.controller;
 
-import main.AbstractIntegrationTest;
+import main.AbstractIntegrationIT;
 import org.junit.Test;
 import org.springframework.security.test.context.support.WithUserDetails;
 
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
-import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class PostControllerTest extends AbstractIntegrationTest {
+public class PostControllerIT extends AbstractIntegrationIT {
 
     @Test
     @WithUserDetails(value = "user@user.ru")

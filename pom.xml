@@ -13,7 +13,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
-        <skipTests>true</skipTests>
+        <skip.integration.tests>true</skip.integration.tests>
+        <skip.unit.tests>false</skip.unit.tests>
         <jdbcUrl>jdbc:mysql://localhost:3306/networktst?serverTimezone=UTC</jdbcUrl>
     </properties>
 
@@ -24,6 +25,26 @@
     </parent>
 
     <profiles>
+        <profile>
+            <id>integration-tests</id>
+            <properties>
+                <spring.profiles.active>integration-test</spring.profiles.active>
+                <spring.datasource.url>${jdbcUrl}</spring.datasource.url>
+                <skip.integration.tests>false</skip.integration.tests>
+                <skip.unit.tests>true</skip.unit.tests>
+            </properties>
+            <build>
+                <plugins>
+
+                </plugins>
+                <testResources>
+                    <testResource>
+                        <directory>src/test/resources</directory>
+                        <filtering>true</filtering>
+                    </testResource>
+                </testResources>
+            </build>
+        </profile>
         <profile>
             <id>dev</id>
             <activation>
@@ -39,21 +60,6 @@
             </build>
             <properties>
                 <spring.profiles.active>dev</spring.profiles.active>
-                <spring.datasource.url>${jdbcUrl}</spring.datasource.url>
-            </properties>
-        </profile>
-        <profile>
-            <id>test</id>
-            <build>
-                <resources>
-                    <resource>
-                        <directory>src/test/resources</directory>
-                        <filtering>true</filtering>
-                    </resource>
-                </resources>
-            </build>
-            <properties>
-                <spring.profiles.active>test</spring.profiles.active>
                 <spring.datasource.url>${jdbcUrl}</spring.datasource.url>
             </properties>
         </profile>
@@ -76,6 +82,7 @@
             <properties>
                 <spring.profiles.active>prod</spring.profiles.active>
                 <spring.datasource.url>${jdbcUrl}</spring.datasource.url>
+                <skip.integration.tests>false</skip.integration.tests>
             </properties>
         </profile>
     </profiles>
@@ -175,9 +182,16 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <skipTests>${skip.unit.tests}</skipTests>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
-                    <skipTests>${skipTests}</skipTests>
+                    <skipTests>${skip.integration.tests}</skipTests>
                 </configuration>
             </plugin>
         </plugins>

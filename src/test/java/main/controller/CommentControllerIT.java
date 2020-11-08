@@ -1,17 +1,10 @@
 package main.controller;
 
-import main.AbstractIntegrationTest;
+import main.AbstractIntegrationIT;
 import main.data.request.CommentRequest;
-import main.data.response.CommentResponse;
-import main.model.PostComment;
-import main.repository.PostCommentRepository;
-import main.service.CommentService;
 import main.service.NotificationService;
-import org.junit.Assert;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -23,7 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @WithUserDetails("user@user.ru")
-public class CommentControllerTest extends AbstractIntegrationTest {
+public class CommentControllerIT extends AbstractIntegrationIT {
 
     @Autowired
     private NotificationService notificationService;

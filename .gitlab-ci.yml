@@ -4,10 +4,10 @@ stages:
   - backup
   - deploy
 # --------------------------- tests ------------------------------
-test:
+integration_tests:
   stage: test
   script:
-    - mvn clean test -Pprod -DjdbcUrl=$TEST_DB_URL -DskipTests=false
+    - mvn clean verify -Pintegration-tests -DjdbcUrl=$TEST_DB_URL
   only:
     - dev
   except:
