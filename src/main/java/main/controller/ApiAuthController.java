@@ -1,5 +1,6 @@
 package main.controller;
 
+import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import main.data.request.LoginRequest;
 import main.data.response.CaptchaResponse;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
+@Api
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/auth")

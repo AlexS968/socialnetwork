@@ -1,5 +1,6 @@
 package main.controller;
 
+import io.swagger.annotations.Api;
 import lombok.AllArgsConstructor;
 import main.data.request.ListCityRequest;
 import main.data.request.ListCountryRequest;
@@ -13,7 +14,7 @@ import main.service.CountryServiceImpl;
 import main.service.LanguageServiceImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+@Api
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/platform")

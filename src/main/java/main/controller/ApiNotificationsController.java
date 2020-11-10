@@ -1,5 +1,6 @@
 package main.controller;
 
+import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import main.data.request.NotificationSettingsRequest;
 import main.data.response.base.ListResponse;
@@ -9,7 +10,7 @@ import main.data.response.type.NotificationResponse;
 import main.service.NotificationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+@Api
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
