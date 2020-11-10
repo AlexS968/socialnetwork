@@ -1,5 +1,6 @@
 package main.controller;
 
+import io.swagger.annotations.Api;
 import lombok.AllArgsConstructor;
 import main.data.response.base.ListResponse;
 import main.data.response.type.MeProfile;
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
-
+@Api
 @Controller
 @AllArgsConstructor
 public class SearchController {

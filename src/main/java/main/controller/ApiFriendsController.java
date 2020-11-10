@@ -1,5 +1,6 @@
 package main.controller;
 
+import io.swagger.annotations.Api;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import main.data.response.FriendsResponse;
@@ -9,7 +10,7 @@ import main.service.FriendsServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+@Api
 @RestController
 @RequiredArgsConstructor
 public class ApiFriendsController {
