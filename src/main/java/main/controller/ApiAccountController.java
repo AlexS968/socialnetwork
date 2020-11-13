@@ -1,5 +1,6 @@
 package main.controller;
 
+import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import main.data.request.PasswordRecoveryRequest;
 import main.data.request.PasswordSetRequest;
@@ -16,7 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
-
+@Api
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/account")

@@ -1,5 +1,6 @@
 package main.controller;
 
+import io.swagger.annotations.Api;
 import lombok.AllArgsConstructor;
 import main.data.request.DialogAddRequest;
 import main.data.request.DialogMessageRequest;
@@ -10,7 +11,7 @@ import main.data.response.type.*;
 import main.service.DialogServiceImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+@Api
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/dialogs")

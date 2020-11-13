@@ -1,5 +1,6 @@
 package main.controller;
 
+import io.swagger.annotations.Api;
 import lombok.AllArgsConstructor;
 import main.data.request.PostRequest;
 import main.data.response.base.ListResponse;
@@ -10,7 +11,7 @@ import main.service.PostServiceImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
+@Api
 @Controller
 @AllArgsConstructor
 @RequestMapping("/api/v1")

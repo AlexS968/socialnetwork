@@ -1,5 +1,6 @@
 package main.controller;
 
+import io.swagger.annotations.Api;
 import lombok.AllArgsConstructor;
 import main.data.request.CommentRequest;
 import main.data.response.CommentResponse;
@@ -11,7 +12,7 @@ import main.service.CommentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
+@Api
 @AllArgsConstructor
 @Controller
 @RequestMapping("/api/v1/post")
