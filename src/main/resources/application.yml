@@ -7,6 +7,12 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+  boot:
+    admin:
+      client:
+        url: http://localhost:9080
+        username: admin
+        password: admin
 server:
   port: ${PORT:8080}
 app:
@@ -24,3 +30,12 @@ logging:
 
 notifications:
   storagePeriod: 3
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
