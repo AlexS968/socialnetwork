@@ -9,6 +9,8 @@ import main.data.request.LoginRequest;
 import main.data.request.MeProfileRequest;
 import main.data.response.base.Response;
 import main.data.response.type.*;
+import main.exception.BadRequestException;
+import main.exception.apierror.ApiError;
 import main.model.BlocksBetweenUsers;
 import main.model.City;
 import main.model.Country;
@@ -85,7 +87,15 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
     @Override
     public Response<MeProfile> getMe() {
         int id = ContextUtilities.getCurrentUserId();
+        if(id == 0) {throw new BadRequestException(new ApiError(
+            "invalid_request",
+            "на авторизован"
+        ));}
         Person person = getById(id);
+        if(person == null) {throw new BadRequestException(new ApiError(
+            "invalid_request",
+            "нет аккаунта с таким айди"
+        ));}
 
         Response<MeProfile> response = new Response<>();
         MeProfile profile = new MeProfile(person);
@@ -96,6 +106,13 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
     @Override
     public Response<MeProfile> putMe(MeProfileRequest updatedCurrentPerson) {
         Person personUpdated = personRepository.findById(ContextUtilities.getCurrentUserId());
+
+        if(personUpdated == null) {throw new BadRequestException(new ApiError(
+            "invalid_request",
+            "нет аккаунта с таким айди"
+        ));}
+
+
         personUpdated.setLastName(updatedCurrentPerson.getLastName());
         personUpdated.setFirstName(updatedCurrentPerson.getFirstName());
         personUpdated.setBirthDate(updatedCurrentPerson.getBirthDate());
@@ -124,6 +141,11 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
 
         int id = ContextUtilities.getCurrentUserId();
 
+        if(id == 0) {throw new BadRequestException(new ApiError(
+            "invalid_request",
+            "на авторизован"
+        ));}
+
         Person personToDetele = personRepository.findById(id);
 
         postRepository.deleteByAuthorId(id);
@@ -145,7 +167,7 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
         personToDetele.setPasswordHash(UUID.randomUUID().toString());
 
         personToDetele.setPhotoURL("/static/img/page_deleted.jpg");
-       // personToDetele.setMessagesPermission(MessagesPermission.NONE); // 1) нет на фронте 2) нет проверк
+        // personToDetele.setMessagesPermission(MessagesPermission.NONE); // 1) нет на фронте 2) нет проверк
 
         //---- временное решение тк нет реализации MessagesPermission
 //        personRepository.findAll().forEach( p -> {
@@ -164,7 +186,7 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
 
 
 
-       // дружбу и сообщения не удалять тк у 2 хранинтся
+        // дружбу и сообщения не удалять тк у 2 хранинтся
         // доделать - нельзя добавить в друзья и написать со стр польз и из диалогов если были
 
         personRepository.save(personToDetele);
