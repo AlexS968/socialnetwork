@@ -10,6 +10,7 @@ import main.data.response.type.NotificationResponse;
 import main.service.NotificationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 @Api
 @RestController
 @RequiredArgsConstructor
@@ -35,7 +36,6 @@ public class ApiNotificationsController {
     @PutMapping("/account/notifications")
     public ResponseEntity<Response<InfoInResponse>> setNotifications(
             @RequestBody NotificationSettingsRequest request) {
-
         return ResponseEntity.ok(notificationService.set(request));
     }
 }
