@@ -57,7 +57,6 @@ public class RegistrationService {
 
     String ip = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
         .getRequest().getRemoteAddr();
-
     Person person = new Person();
     person.setEmail(request.getEmail());
     person.setPasswordHash(String.valueOf(cryptoService.encode(request.getPasswd1())));

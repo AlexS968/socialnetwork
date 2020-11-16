@@ -51,12 +51,12 @@ public class ApiAccountController {
     }
 
     @PutMapping(value = "/password/change")
-    public ResponseEntity<Response<InfoInResponse>> passChange() {
+    public ResponseEntity<Response<InfoInResponse>> sendLinkToChangePassword() {
         return ResponseEntity.ok(passwordService.changePassOrEmail("пароля", passwordChangeLink));
     }
 
     @PutMapping(value = "/email/change")
-    public ResponseEntity<Response<InfoInResponse>> emailChange() {
+    public ResponseEntity<Response<InfoInResponse>> sendLinkToChangeEmail() {
         return ResponseEntity.ok(passwordService.changePassOrEmail("email", emailChangeLink));
     }
 
