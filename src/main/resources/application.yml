@@ -10,7 +10,7 @@ spring:
   boot:
     admin:
       client:
-        url: http://localhost:9080
+        url: http://zerone.network:9080
         username: admin
         password: admin
 server:
