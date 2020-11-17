@@ -3,7 +3,6 @@ package main.service;
 import lombok.AllArgsConstructor;
 import main.core.ContextUtilities;
 import main.core.OffsetPageRequest;
-import main.data.PersonPrincipal;
 import main.data.request.DialogAddRequest;
 import main.data.request.DialogMessageRequest;
 import main.data.request.ListRequest;
@@ -19,7 +18,6 @@ import main.repository.MessageRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -211,7 +209,7 @@ public class DialogServiceImpl implements DialogService {
 
     private Person getAntherPersonInDialog(List<Person> persons, Person currentPerson) {
         for (Person person : persons) {
-            if (!(person.getId() == currentPerson.getId())) {
+            if (person.getId() != currentPerson.getId()) {
                 return person;
             }
         }

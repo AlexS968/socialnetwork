@@ -40,7 +40,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/api/v1/platform/**", "/api/v1/auth/logout","/api/v1/account/password/set", "/api/v1/log").permitAll()
                 .antMatchers("/api/v1/auth/login", "/api/v1/account/register","/api/v1/account/password/recovery", "/api/v1/auth/captcha").not().authenticated()
-                .antMatchers("/api/v1/**","/api/v1/account/password/change").authenticated()
+                .antMatchers("/api/v1/**").authenticated()
                 .and()
                 .addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class)
         ;
