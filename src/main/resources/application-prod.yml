@@ -6,10 +6,7 @@ spring:
       client:
         instance:
           prefer-ip: true
-          management-url: http://zerone.network:9000/
           management-base-url: http://zerone.network:9000/
-          service-url: http://zerone.network:9000/actuator
-          health-url: http://zerone.network:9000/actuator/health
 
 linkToChange:
   password: "http://zerone.network:9000/change-password"
