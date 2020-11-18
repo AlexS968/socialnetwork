@@ -27,13 +27,11 @@ public class DialogList {
         id = dialog.getId();
         name = dialog.getName();
 
-        isGroupDialog = !(dialog.getPersons().size() == 2);
+        isGroupDialog = dialog.getPersons().size() != 2;
 
         persons = new ArrayList<>();
 
-        dialog.getPersons().forEach(p -> {
-            persons.add(new PersonInDialog(p));
-        });
+        dialog.getPersons().forEach(p -> persons.add(new PersonInDialog(p)));
     }
 }
 
