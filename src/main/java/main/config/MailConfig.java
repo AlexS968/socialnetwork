@@ -10,9 +10,7 @@ import java.util.Properties;
 
 @Configuration
 public class MailConfig {
-
-    private Object MyConstants;
-
+    
     @Value("${appEmail.email}")
     public String email;
 

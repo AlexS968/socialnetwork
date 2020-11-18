@@ -71,6 +71,8 @@ public class NotificationServiceImpl implements NotificationService {
     @Value("${notifications.storagePeriod}")
     public String notificationsStoragePeriod;
 
+    private static final String INVALID_REQUEST = "invalid_request";
+
     @Override
     public ListResponse<NotificationResponse> list(int offset, int itemPerPage, boolean needToRead) {
         Person person = ContextUtilities.getCurrentPerson();
@@ -97,7 +99,7 @@ public class NotificationServiceImpl implements NotificationService {
                     .findByReceiverAndTypeAndTimeLaterThanEqual(person.getId(), types,
                             Instant.now().minus(Period.ofDays(days)), pageable);
         } catch (BadRequestException ex) {
-            throw new BadRequestException(new ApiError("invalid_request", "Bad request"));
+            throw new BadRequestException(new ApiError(INVALID_REQUEST, "Bad request"));
         }
 
         if (needToRead) {
@@ -123,8 +125,7 @@ public class NotificationServiceImpl implements NotificationService {
             return list(0, 20, true);
         } else {
             Notification notification = notificationRepository.findById(id).orElseThrow(
-                    () -> new BadRequestException(new ApiError(
-                            "invalid request",
+                    () -> new BadRequestException(new ApiError(INVALID_REQUEST,
                             "post is not found")));
             List<NotificationResponse> notificationResponses = new ArrayList<>();
             NotificationResponse notificationResponse = convertToDto(notification);
@@ -191,7 +192,7 @@ public class NotificationServiceImpl implements NotificationService {
 
         personService.save(receiver);
 
-        InfoInResponse info = new InfoInResponse("ok");
+        InfoInResponse info = new InfoInResponse("Успешная смена статуса");
         Response<InfoInResponse> response = new Response<>();
         response.setData(info);
         return response;

@@ -11,10 +11,10 @@ public enum NotificationTypeCode {
   FRIEND_BIRTHDAY("FRIEND_BIRTHDAY"),
   LIKE("LIKE");
 
-  protected String notificationTypeCode;
+  protected String notificationType;
 
-  NotificationTypeCode(String notificationTypeCode) {
-    this.notificationTypeCode = notificationTypeCode;
+  NotificationTypeCode(String notificationType) {
+    this.notificationType = notificationType;
   }
 
 }
