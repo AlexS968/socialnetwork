@@ -1,5 +1,6 @@
 package main.data.response.base;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,9 +11,12 @@ import java.util.List;
 @NoArgsConstructor
 public class ListResponse<T> {
     private String error = "";
+    @ApiModelProperty(value = "timestamp", example = "1559751301818")
     private long timestamp = Instant.now().toEpochMilli();
+    @ApiModelProperty(value = "total", example = "40")
     private long total;
     private int offset;
+    @ApiModelProperty(value = "perPage", example = "10")
     private int perPage;
     private List<T> data;
 

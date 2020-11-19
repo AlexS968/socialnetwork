@@ -1,9 +1,7 @@
 package main.controller;
 
 import main.AbstractIntegrationIT;
-import main.data.request.NotificationSettingsRequest;
 import org.junit.Test;
-import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithUserDetails;
 
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
@@ -49,23 +47,5 @@ public class ApiNotificationsControllerIT extends AbstractIntegrationIT {
                 .andExpect(jsonPath("$.data[0].read_status").value("READ"))
                 .andExpect(jsonPath("$.data[0].info").value("first comment to the post"))
                 .andExpect(jsonPath("$.data[0].event_type").value("POST_COMMENT"));
-    }
-
-    @Test
-    @WithUserDetails(value = "user@user.ru")
-    public void shouldSetNotifications() throws Exception {
-        NotificationSettingsRequest request = new NotificationSettingsRequest();
-        request.setNotificationType("POST");
-        request.setEnable(true);
-
-        String requestJson = mapper.writer().withDefaultPrettyPrinter().writeValueAsString(request);
-
-        mockMvc.perform(put("/api/v1/account/notifications")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestJson))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(authenticated())
-                .andExpect(jsonPath("$.data.message").value("ok"));
     }
 }

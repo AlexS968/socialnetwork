@@ -2,6 +2,7 @@ package main.data.response.type;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,9 +18,12 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public class PostInResponse {
     private Integer id;
+    @ApiModelProperty(value = "time", example = "1559751301818")
     private long time;
     private PersonProfile author;
+    @ApiModelProperty(value = "title", example = "Заголовок поста")
     private String title;
+    @ApiModelProperty(value = "post_text", example = "Текст поста")
     @JsonProperty(value = "post_text")
     private String postText;
     @JsonProperty(value = "is_blocked")

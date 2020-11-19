@@ -77,14 +77,12 @@ public class ApiFriendsController {
             @RequestParam(required = false, defaultValue = "10") int itemPerPage) {
 
         FriendsResponse response = new FriendsResponse();
-        System.out.println(1);
         try {
             response = friendsService.getRequests(offset, itemPerPage);
         } catch (BadRequestException ex) {
             throw new BadRequestException(new ApiError("invalid_request", "Bad request"));
         }
 
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

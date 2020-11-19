@@ -129,7 +129,7 @@ public class RegistrationService {
             toEpochSecond(ZoneOffset.UTC),
         new
 
-            DataMessage("ok")
+            DataMessage("Успешная регистрация")
     );
   }
 
