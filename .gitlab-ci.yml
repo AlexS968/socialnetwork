@@ -77,6 +77,6 @@ sonar_dev:
   only:
     - dev
   script:
-    - mvn -Pprod clean verify sonar:sonar
+    - mvn -Pprod clean sonar:sonar
   except:
     - schedules
