@@ -9,6 +9,8 @@ import main.data.request.LoginRequest;
 import main.data.request.MeProfileRequest;
 import main.data.response.base.Response;
 import main.data.response.type.*;
+import main.exception.BadRequestException;
+import main.exception.apierror.ApiError;
 import main.model.BlocksBetweenUsers;
 import main.model.City;
 import main.model.Country;
@@ -213,7 +215,8 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
         BlocksBetweenUsers blocksBetweenUsers = blocksBetweenUsersRepository
                 .findBySrc_IdAndDst_Id(id, ContextUtilities.getCurrentUserId());
         if (!(blocksBetweenUsers == null)) {
-            setToBlocked(person);
+            throw new BadRequestException(new ApiError("Access blocked", "Доступ к профилю заблокирован"));
+            //setToBlocked(person);
         }
         //Проверка на блокировку от текущего профиля
         blocksBetweenUsers = blocksBetweenUsersRepository
