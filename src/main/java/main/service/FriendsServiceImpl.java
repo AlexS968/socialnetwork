@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import main.core.ContextUtilities;
 import main.data.response.FriendsResponse;
 import main.data.response.type.DataMessage;
+import main.exception.BadRequestException;
+import main.exception.apierror.ApiError;
 import main.model.BlocksBetweenUsers;
 import main.model.Friendship;
 import main.model.FriendshipStatus;
@@ -55,6 +57,12 @@ public class FriendsServiceImpl implements FriendsService {
     @Override
     public FriendsResponse addFriend(int id) {
         int currentUserId = ContextUtilities.getCurrentUserId();
+        BlocksBetweenUsers blocksBetweenUsers = blocksBetweenUsersRepository
+                .findBySrc_IdAndDst_Id(id, currentUserId);
+        if (!(blocksBetweenUsers == null)) {
+            throw new BadRequestException(new ApiError("Access blocked", "Добавление в друзья заблокировано"));
+            //setToBlocked(person);
+        }
         if (friendsRepository.findBySrc_idAndDst_IdAndStatusId(currentUserId, id, 1) == null
                 && !(id == currentUserId)) {
             Friendship friendship = friendsRepository.findByDst_IdAndSrc_IdAndStatusId(currentUserId, id, 1);
