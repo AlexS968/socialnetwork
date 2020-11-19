@@ -61,13 +61,7 @@ public class ApiFriendsController {
 
     @PostMapping(value = "/api/v1/friends/{id}")
     public ResponseEntity addFriend(@PathVariable int id) {
-        FriendsResponse response = new FriendsResponse();
-        try {
-            response = friendsService.addFriend(id);
-        } catch (BadRequestException ex) {
-            throw new BadRequestException(new ApiError("invalid_request", "Bad request"));
-        }
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.ok(friendsService.addFriend(id));
     }
 
     @GetMapping(value = "/api/v1/friends/request")
