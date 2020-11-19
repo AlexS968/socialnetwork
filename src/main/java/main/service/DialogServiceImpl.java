@@ -148,7 +148,7 @@ public class DialogServiceImpl implements DialogService {
             response.setData(dialogMessage);
             return response;
         } else {
-            throw new BadRequestException(new ApiError("Access blocked", ""));
+            throw new BadRequestException(new ApiError("Access blocked", "Отправка сообщений заюлокирована"));
         }
     }
 
