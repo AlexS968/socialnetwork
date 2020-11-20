@@ -10,7 +10,7 @@ integration_tests:
   script:
     - mvn clean verify -Pintegration-tests -DjdbcUrl=$TEST_DB_URL
   only:
-    - dev
+    - merge_requests
   except:
     - schedules
 
@@ -75,7 +75,7 @@ backup_dev:
 sonar_dev:
   stage: sonar
   only:
-    - dev
+    - merge_requests
   script:
     - mvn -Pprod clean package sonar:sonar
   except:
