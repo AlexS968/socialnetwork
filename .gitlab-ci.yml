@@ -74,7 +74,7 @@ backup_dev:
 sonar_dev:
   stage: sonar
   only:
-    - merge_requests
+    - dev
   script:
     - mvn -Pprod clean package sonar:sonar
   except:
