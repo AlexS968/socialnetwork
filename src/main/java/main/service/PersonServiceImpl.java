@@ -235,7 +235,8 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
         BlocksBetweenUsers blocksBetweenUsers = blocksBetweenUsersRepository
                 .findBySrc_IdAndDst_Id(id, ContextUtilities.getCurrentUserId());
         if (!(blocksBetweenUsers == null)) {
-            setToBlocked(person);
+            throw new BadRequestException(new ApiError("Access blocked", "Доступ к профилю заблокирован"));
+            //setToBlocked(person);
         }
         //Проверка на блокировку от текущего профиля
         blocksBetweenUsers = blocksBetweenUsersRepository

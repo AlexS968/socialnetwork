@@ -2,6 +2,7 @@ package main.controller;
 
 import main.AbstractIntegrationIT;
 import main.core.auth.JwtUtils;
+import main.data.request.NotificationSettingsRequest;
 import main.data.request.PasswordRecoveryRequest;
 import main.data.request.PasswordSetRequest;
 import main.data.request.RegistrationRequest;
@@ -56,6 +57,24 @@ public class ApiAccountControllerIT extends AbstractIntegrationIT {
     }
 
     @Test
+    @WithUserDetails(value = "user@user.ru")
+    public void shouldSetNotifications() throws Exception {
+        NotificationSettingsRequest request = new NotificationSettingsRequest();
+        request.setNotificationType("POST");
+        request.setEnable(true);
+
+        String requestJson = mapper.writer().withDefaultPrettyPrinter().writeValueAsString(request);
+
+        mockMvc.perform(put("/api/v1/account/notifications")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestJson))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(authenticated())
+                .andExpect(jsonPath("$.data.message").value("Успешная смена статуса"));
+    }
+
+    @Test
     public void shouldSetPasswordWhenPersonIsUnauthenticated() throws Exception {
         PasswordSetRequest request = new PasswordSetRequest();
         request.setToken("");
@@ -72,7 +91,7 @@ public class ApiAccountControllerIT extends AbstractIntegrationIT {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(unauthenticated())
-                .andExpect(jsonPath("$.data.message").value("ok"));
+                .andExpect(jsonPath("$.data.message").value("Успешная смена пароля"));
     }
 
     @Test
@@ -95,7 +114,7 @@ public class ApiAccountControllerIT extends AbstractIntegrationIT {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(authenticated())
-                .andExpect(jsonPath("$.data.message").value("ok"));
+                .andExpect(jsonPath("$.data.message").value("Успешная смена пароля"));
     }
 
     @Test
@@ -110,7 +129,7 @@ public class ApiAccountControllerIT extends AbstractIntegrationIT {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(unauthenticated())
-                .andExpect(jsonPath("$.data.message").value("ok"));
+                .andExpect(jsonPath("$.data.message").value("Успешный запрос"));
     }
 
     @Test
@@ -137,7 +156,7 @@ public class ApiAccountControllerIT extends AbstractIntegrationIT {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(authenticated())
-                .andExpect(jsonPath("$.data.message").value("ok"));
+                .andExpect(jsonPath("$.data.message").value("Успешный запрос"));
     }
 
     @Test
@@ -157,7 +176,7 @@ public class ApiAccountControllerIT extends AbstractIntegrationIT {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(authenticated())
-                .andExpect(jsonPath("$.data.message").value("ok"));
+                .andExpect(jsonPath("$.data.message").value("Успешный запрос"));
     }
 
     @Test
@@ -182,7 +201,7 @@ public class ApiAccountControllerIT extends AbstractIntegrationIT {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(authenticated())
-                .andExpect(jsonPath("$.data.message").value("ok"));
+                .andExpect(jsonPath("$.data.message").value("Успешная смена email"));
     }
 
     @Test
@@ -239,7 +258,7 @@ public class ApiAccountControllerIT extends AbstractIntegrationIT {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(unauthenticated())
-                .andExpect(jsonPath("$.data.message").value("ok"));
+                .andExpect(jsonPath("$.data.message").value("Успешная регистрация"));
     }
 
     @Test

@@ -13,6 +13,7 @@ import java.time.Instant;
 public class Response<T> {
 
     private String error = "";
+    @ApiModelProperty(value = "timestamp", example = "1559751301818")
     private long timestamp = Instant.now().toEpochMilli();
     @ApiModelProperty(value = "data", example = "{ "
         + "message: ok"

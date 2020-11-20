@@ -62,6 +62,7 @@
             <properties>
                 <spring.profiles.active>dev</spring.profiles.active>
                 <spring.datasource.url>${jdbcUrl}</spring.datasource.url>
+                <sonar.host.url>http://zerone.network:9596</sonar.host.url>
             </properties>
         </profile>
         <profile>
@@ -219,6 +220,11 @@
                 <configuration>
                     <skipTests>${skip.integration.tests}</skipTests>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>3.6.0.1398</version>
             </plugin>
         </plugins>
     </build>

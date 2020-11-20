@@ -30,13 +30,14 @@ public class PasswordServiceImpl implements PasswordService {
     private final JwtUtils jwtUtils;
     private final PersonService personService;
 
+    private static final String INVALID_REQUEST = "invalid_request";
+
     //send link to restore password
     @Override
     public Response<InfoInResponse> restorePassword(PasswordRecoveryRequest request, String link) {
         Optional<Person> optionalPerson = personRepository.findByEmail(request.getEmail());
         if (optionalPerson.isEmpty()) {
-            throw new BadRequestException(new ApiError(
-                    "invalid_request",
+            throw new BadRequestException(new ApiError(INVALID_REQUEST,
                     "Такой email не зарегистрирован"));
         }
         Person person = optionalPerson.get();
@@ -49,7 +50,7 @@ public class PasswordServiceImpl implements PasswordService {
         message.setSubject("Ссылка на восстановление пароля на SocialNetwork (group 8)");
         message.setText(link + "?code=" + confirmationCode);
         emailSender.send(message);
-        return new Response<>(new InfoInResponse("ok"));
+        return new Response<>(new InfoInResponse("Успешный запрос"));
     }
 
     //set new password by restoring or changing
@@ -60,8 +61,7 @@ public class PasswordServiceImpl implements PasswordService {
         if (SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal().toString().equals("anonymousUser")) {
             person = personRepository.findByConfirmationCode(referer.split("=")[1]
-            ).orElseThrow(() -> new BadRequestException(new ApiError(
-                    "invalid_request",
+            ).orElseThrow(() -> new BadRequestException(new ApiError(INVALID_REQUEST,
                     "Аутентификация не пройдена.")));
         }
         //if password is changed (person is authenticated)
@@ -70,14 +70,13 @@ public class PasswordServiceImpl implements PasswordService {
             if (jwtUtils.validateJwtToken(request.getToken())) {
                 person = ((PersonPrincipal) SecurityContextHolder.getContext().
                         getAuthentication().getPrincipal()).getPerson();
-            } else throw new BadRequestException(new ApiError(
-                    "invalid_request",
+            } else throw new BadRequestException(new ApiError(INVALID_REQUEST,
                     "Аутентификация не пройдена."));
         }
         person.setPasswordHash(encoder.encode(request.getPassword()));
         personRepository.save(person);
 
-        return new Response<>(new InfoInResponse("ok"));
+        return new Response<>(new InfoInResponse("Успешная смена пароля"));
     }
 
     //send link to change password or email address
@@ -95,7 +94,7 @@ public class PasswordServiceImpl implements PasswordService {
                 .concat(" на SocialNetwork (group 8)"));
         message.setText(link + "?code=" + confirmationCode);
         emailSender.send(message);
-        return new Response<>(new InfoInResponse("ok"));
+        return new Response<>(new InfoInResponse("Успешный запрос"));
     }
 
     //set new email address
@@ -104,8 +103,7 @@ public class PasswordServiceImpl implements PasswordService {
         Person person = ContextUtilities.getCurrentPerson();
 
         if (personRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new BadRequestException(new ApiError(
-                    "invalid_request",
+            throw new BadRequestException(new ApiError(INVALID_REQUEST,
                     "Такой email уже зарегистрирован в сети"));
         }
 
@@ -117,7 +115,7 @@ public class PasswordServiceImpl implements PasswordService {
         message.setSubject("Подтверждение изменения email на SocialNetwork (group 8)");
         message.setText("Ваш email успешно изменен.");
         emailSender.send(message);
-        return new Response<>(new InfoInResponse("ok"));
+        return new Response<>(new InfoInResponse("Успешная смена email"));
     }
 }
 

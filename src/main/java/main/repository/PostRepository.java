@@ -31,7 +31,7 @@ public interface PostRepository extends CrudRepository<Post, Integer> {
   void deleteByAuthorId( @Param("authorId")Integer authorId);
 
   @Query(nativeQuery = true, value =
-      "SELECT DISTINCT post.* FROM post "
+      "SELECT DISTINCT post.id, post.author_id, post.is_blocked, post.post_text, post.time, post.title FROM post "
           + "JOIN person ON person.id = post.author_id "
           + "JOIN post2tag ON post2tag.post_id = post.id "
           + "WHERE "
