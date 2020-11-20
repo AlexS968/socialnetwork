@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Api(description = "Работа утентификацией", tags = {"Auth"})
+@Api(description = "Работа аутентификацией", tags = {"Auth"})
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/auth")
