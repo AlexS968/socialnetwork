@@ -3,6 +3,7 @@ stages:
   - build
   - backup
   - deploy
+  - sonar
 # --------------------------- tests ------------------------------
 integration_tests:
   stage: test
@@ -74,7 +75,7 @@ backup_dev:
 sonar_dev:
   stage: sonar
   only:
-    - dev
+    - merge_requests
   script:
     - mvn -Pprod clean package sonar:sonar
   except:
