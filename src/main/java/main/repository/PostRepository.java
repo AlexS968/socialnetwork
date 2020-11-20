@@ -31,14 +31,14 @@ public interface PostRepository extends CrudRepository<Post, Integer> {
   void deleteByAuthorId( @Param("authorId")Integer authorId);
 
   @Query(nativeQuery = true, value =
-      "SELECT DISTINCT po.* FROM post po "
-          + "INNER JOIN person pe  ON pe.id = po.author_id "
-          + "INNER JOIN post2tag pt ON pt.post_id = po.id "
+      "SELECT DISTINCT post.id, post.author_id, post.is_blocked, post.post_text, post.time, post.title FROM post "
+          + "JOIN person ON person.id = post.author_id "
+          + "JOIN post2tag ON post2tag.post_id = post.id "
           + "WHERE "
-          + "((:text is null) OR (po.post_text LIKE :text) OR (po.title LIKE :text)) AND "
-          + "((:dateFrom is null AND :dateTo is null) or (po.time >= :dateFrom AND po.time <= :dateTo)) AND  "
-          + "(COALESCE(:authorId) is null or (po.author_id IN (:authorId))) AND "
-          + "(COALESCE(:tagId) is null or (pt.tag_id IN (:tagId)))")
+          + "((:text is null) OR (post_text LIKE :text) OR (title LIKE :text)) AND "
+          + "((:dateFrom is null AND :dateTo is null) or (time >= :dateFrom AND time <= :dateTo)) AND  "
+          + "(COALESCE(:authorId) is null or (author_id IN (:authorId))) AND "
+          + "(COALESCE(:tagId) is null or (post2tag.tag_id IN (:tagId)))")
   Page<Post> findByTextPeriodAuthor(
       @Param("text") String text,
       @Param("dateFrom") Date dateFrom,
