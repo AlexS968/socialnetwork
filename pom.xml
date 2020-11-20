@@ -32,6 +32,7 @@
                 <spring.datasource.url>${jdbcUrl}</spring.datasource.url>
                 <skip.integration.tests>false</skip.integration.tests>
                 <skip.unit.tests>true</skip.unit.tests>
+                <sonar.host.url>http://localhost:9596</sonar.host.url>
             </properties>
             <build>
                 <plugins>
