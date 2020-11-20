@@ -84,6 +84,7 @@
                 <spring.profiles.active>prod</spring.profiles.active>
                 <spring.datasource.url>${jdbcUrl}</spring.datasource.url>
                 <skip.integration.tests>false</skip.integration.tests>
+                <sonar.host.url>http://localhost:9596</sonar.host.url>
             </properties>
         </profile>
     </profiles>
