@@ -42,10 +42,10 @@ public class ProfileControllerIT extends AbstractIntegrationIT {
         String jsonRequest = mapper.writer().withDefaultPrettyPrinter().writeValueAsString(request);
 
         mockMvc.perform(post("/api/v1/users/{id}/wall", "1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonRequest)).andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.title").value("Test Post"))
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(jsonRequest)).andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data.title").value("Test Post"))
         ;
     }
 
@@ -55,23 +55,23 @@ public class ProfileControllerIT extends AbstractIntegrationIT {
         String jsonRequest = mapper.writer().withDefaultPrettyPrinter().writeValueAsString(request);
 
         mockMvc.perform(post("/api/v1/users/{id}/wall", "1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonRequest)).andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.title").value("Test Post"))
-                .andExpect(jsonPath("$.data.tags[1]").value("duper"))
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(jsonRequest)).andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data.title").value("Test Post"))
+            .andExpect(jsonPath("$.data.tags[1]").value("duper"))
         ;
 
-        checkWallAfterPost().andExpect(jsonPath("$.total").value("5"));
+        checkWallAfterPost().andExpect(jsonPath("$.total").value("7"));
 
     }
 
     private ResultActions checkWallAfterPost() throws Exception{
         return mockMvc.perform(get("/api/v1/feeds")
-                .param("name", "")
-                .param("offset", "0")
-                .param("itemPerPage", "20")
-                .accept("application/json"));
+            .param("name", "")
+            .param("offset", "0")
+            .param("itemPerPage", "20")
+            .accept("application/json"));
     }
 
     @Test
@@ -79,10 +79,10 @@ public class ProfileControllerIT extends AbstractIntegrationIT {
         String jsonRequest = mapper.writer().withDefaultPrettyPrinter().writeValueAsString(request);
 
         mockMvc.perform(post("/api/v1/users/{id}/wall", "1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonRequest)).andDo(print())
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error_description").isNotEmpty())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(jsonRequest)).andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.error_description").isNotEmpty())
         ;
     }
 
@@ -105,23 +105,23 @@ public class ProfileControllerIT extends AbstractIntegrationIT {
         String jsonRequest = mapper.writer().withDefaultPrettyPrinter().writeValueAsString(request);
 
         mockMvc.perform(post("/api/v1/users/{id}/wall")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonRequest)).andDo(print())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(jsonRequest)).andDo(print())
         ;
     }
 
     @Test
     public void showPersonWall() throws Exception {
         mockMvc.perform(get("/api/v1/users/{id}/wall", "1")
-                .param("offset", "0")
-                .param("itemPerPage", "20")
-                .accept("application/json"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(authenticated())
-                .andExpect(jsonPath("$.total").value("4"))
-                .andExpect(jsonPath("$.data[0].author.email").value("user@user.ru"))
-                .andExpect(jsonPath("$.data[1].title").value("Hello, Post Two"))
+            .param("offset", "0")
+            .param("itemPerPage", "20")
+            .accept("application/json"))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(authenticated())
+            .andExpect(jsonPath("$.total").value("4"))
+            .andExpect(jsonPath("$.data[0].author.email").value("user@user.ru"))
+            .andExpect(jsonPath("$.data[1].title").value("Hello, Post Two"))
         ;
     }
 }

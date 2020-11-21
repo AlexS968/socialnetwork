@@ -28,24 +28,38 @@ public class SearchControllerIT extends AbstractIntegrationIT {
 
   }
 
-//  @Test
-//  public void shouldFindPost() throws Exception {
-//
-//    mockMvc.perform(get("/api/v1/post")
-//        .param("text", "Post")
-//        .param("date_from", "1605796920354") //
-//        .param("date_to", "1574175437043") //
-//        .param("author", "Иван")
-//        .param("tags", "")
-//       // .param("offset", "0")
-//      //  .param("itemPerPage", "20")
-//        .accept("application/json"))
-//        .andDo(print())
-//        .andExpect(status().isOk())
-//        .andExpect(jsonPath("$.total").value("2"))
-//       // .andExpect(jsonPath("$.data[0].author.email").value("user03@user.ru"))
-//    ;
-//
-//  }
+  @Test
+  public void shouldFindPostWithoutTags () throws Exception {
+
+    mockMvc.perform(get("/api/v1/post")
+        .param("text", "Post")
+        .param("date_from", "1605337922372")
+        .param("date_to", "1605942714281")
+        .param("author", "Иван")
+        .param("tags", ""))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.total").value("2"))
+        .andExpect(jsonPath("$.data[0].author.email").value("user02@user.ru"))
+    ;
+
+  }
+
+  @Test
+  public void shouldFindPostWithTags () throws Exception {
+
+    mockMvc.perform(get("/api/v1/post")
+        .param("text", "Post")
+        .param("date_from", "1605337922372")
+        .param("date_to", "1605942714281")
+        .param("author", "Иван")
+        .param("tags", "tag1, tag2"))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.total").value("1"))
+        .andExpect(jsonPath("$.data[0].author.email").value("user03@user.ru"))
+    ;
+
+  }
 
 }

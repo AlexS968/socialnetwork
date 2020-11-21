@@ -31,7 +31,7 @@ public interface PostRepository extends CrudRepository<Post, Integer> {
   void deleteByAuthorId( @Param("authorId")Integer authorId);
 
   @Query(nativeQuery = true, value =
-      "SELECT DISTINCT post.id, post.author_id, post.is_blocked, post.post_text, post.time, post.title FROM post "
+      "SELECT DISTINCT post.* FROM post "
           + "JOIN person ON person.id = post.author_id "
           + "JOIN post2tag ON post2tag.post_id = post.id "
           + "WHERE "
@@ -39,12 +39,27 @@ public interface PostRepository extends CrudRepository<Post, Integer> {
           + "((:dateFrom is null AND :dateTo is null) or (time >= :dateFrom AND time <= :dateTo)) AND  "
           + "(COALESCE(:authorId) is null or (author_id IN (:authorId))) AND "
           + "(COALESCE(:tagId) is null or (post2tag.tag_id IN (:tagId)))")
-  Page<Post> findByTextPeriodAuthor(
+  Page<Post> findByTextPeriodAuthorTags(
       @Param("text") String text,
       @Param("dateFrom") Date dateFrom,
       @Param("dateTo") Date dateTo,
       @Param("authorId") Set<Integer> authorId,
       @Param("tagId") Set<Integer> tags,
+      Pageable pagable
+  );
+
+  @Query(nativeQuery = true, value =
+      "SELECT DISTINCT post.* FROM post "
+          + "JOIN person ON person.id = post.author_id "
+          + "WHERE "
+          + "((:text is null) OR (post_text LIKE :text) OR (title LIKE :text)) AND "
+          + "((:dateFrom is null AND :dateTo is null) or (time >= :dateFrom AND time <= :dateTo)) AND  "
+          + "(COALESCE(:authorId) is null or (author_id IN (:authorId)))")
+  Page<Post> findByTextPeriodAuthorNoTags(
+      @Param("text") String text,
+      @Param("dateFrom") Date dateFrom,
+      @Param("dateTo") Date dateTo,
+      @Param("authorId") Set<Integer> authorId,
       Pageable pagable
   );
 
