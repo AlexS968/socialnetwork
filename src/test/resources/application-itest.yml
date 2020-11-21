@@ -2,11 +2,11 @@ spring:
   datasource:
     url: @spring.datasource.url@
     username: root
-    password: 12345678
+    password: 1234567
   jpa:
     show-sql: false
     hibernate:
-      ddl-auto: create
+      ddl-auto: validate
 
 linkToChange:
   password: "http://localhost:8080/change-password"

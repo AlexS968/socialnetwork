@@ -138,7 +138,7 @@ public class SearchService {
         Date from = null;
         Date to = null;
         Set<Integer> authorsIds = new HashSet<>();
-        if (text != null) { text = "%" + text + "%";}
+        String textUpdated = "%" + text + "%";
         Set<Integer> tagsIds = new HashSet<>();
 
         if (dateFrom != null && dateTo != null) {
@@ -177,8 +177,14 @@ public class SearchService {
             }
         }
 
-        resultPostPage = postRepository
-                .findByTextPeriodAuthor(text, from, to, authorsIds, tagsIds, pageable);
+        if (tagsIds.isEmpty()) {
+            resultPostPage = postRepository
+                .findByTextPeriodAuthorNoTags(textUpdated, from, to, authorsIds, pageable);
+        }
+        else {
+            resultPostPage = postRepository
+                .findByTextPeriodAuthorTags(textUpdated, from, to, authorsIds, tagsIds, pageable);
+        }
 
         List<CommentInResponse> comments = commentService.getCommentsList(resultPostPage.getContent());
         resultPostPage.forEach(p -> searchPostResult.add(new PostInResponse(p, comments, -1))); //TODO check necessity
