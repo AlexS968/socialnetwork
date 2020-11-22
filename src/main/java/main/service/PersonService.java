@@ -12,6 +12,7 @@ public interface PersonService {
     Response<MeProfile> getMe();
     Response<MeProfile> putMe(MeProfileRequest updatedCurrentPerson);
     Response<InfoInResponse> deleteMe();
+    boolean loginTelegram(long chatId);
     Person getById(int personId);
     Person getAuthUser();
     Person checkAuthUser(int id);

@@ -74,6 +74,9 @@ public class Person {
     @Column(name = "is_blocked", nullable = false, columnDefinition = "TINYINT")
     private boolean isBlocked = false;
 
+    @Column(name = "telegram_id", columnDefinition = "UNSIGNED BIGINT(19)")
+    private long telegramId;
+
     @ElementCollection
     @LazyCollection(LazyCollectionOption.FALSE)
     @CollectionTable(name = "notification_settings",

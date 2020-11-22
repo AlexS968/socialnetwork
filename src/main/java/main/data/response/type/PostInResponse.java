@@ -38,7 +38,7 @@ public class PostInResponse {
 
     public PostInResponse(Post post, List<CommentInResponse> commentsList, int currentUserId) {
         id = post.getId();
-        time = post.getTime().toEpochMilli();
+        time = post.getTime().getEpochSecond();
         author = new PersonProfile(post.getAuthor());
         title = post.getTitle();
         postText = post.getPostText();
