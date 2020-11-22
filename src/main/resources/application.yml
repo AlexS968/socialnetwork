@@ -39,3 +39,7 @@ management:
   endpoint:
     health:
       show-details: always
+
+bot:
+  name: ${BOT_NAME:ZeromeNotifyBot}
+  token: ${BOT_TOKEN:1470644484:AAF2b6XpQapfsS9PZE7EibHnlGKsPemfU-w}

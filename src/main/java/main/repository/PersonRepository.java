@@ -43,4 +43,8 @@ public interface PersonRepository extends JpaRepository<Person, Integer> {
             @Param("cityIds") Set<Integer> cityIds,
             Pageable pagable
     );
+
+  Optional<Person> findByPhone(String phone);
+
+  Optional<Person> findByTelegramId(long chatId);
 }

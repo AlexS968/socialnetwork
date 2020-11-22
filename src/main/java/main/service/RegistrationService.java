@@ -100,10 +100,7 @@ public class RegistrationService {
         } else {
           person.setCity(cityOptional.get(0).get());
         }
-
       }
-
-
     }
 
     person.setAbout("");
@@ -143,6 +140,16 @@ public class RegistrationService {
 
   }
 
+  public boolean registerTelegram(String phone, long chatId) {
+    Optional<Person> optionalPerson = personRepository.findByPhone(phone);
+    if (optionalPerson.isPresent()) {
+      Person person = optionalPerson.get();
+      person.setTelegramId(chatId);
+      personRepository.save(person);
+      return true;
+    }
+    return false;
+  }
 }
 
 

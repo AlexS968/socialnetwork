@@ -33,6 +33,8 @@ production:
     - echo ARG1=--spring.datasource.url=$PROD_DB_URL > /opt/network/prod/.progconf
     - echo ARG2=--app.jwtSecret=$PROD_JWT_SECRET >> /opt/network/prod/.progconf
     - echo ARG3=--server.port=$PROD_PORT >> /opt/network/prod/.progconf
+    - echo ARG4=--bot.name=$BOT_NAME >> /opt/network/prod/.progconf
+    - echo ARG5=--bot.token=$BOT_TOKEN >> /opt/network/prod/.progconf
     - sudo systemctl start networkapp
   only:
     - master
@@ -56,6 +58,8 @@ production_dev:
     - echo ARG1=--spring.datasource.url=$DEV_DB_URL > /opt/network/dev/.progconf
     - echo ARG2=--app.jwtSecret=$DEV_JWT_SECRET >> /opt/network/dev/.progconf
     - echo ARG3=--server.port=$DEV_PORT >> /opt/network/dev/.progconf
+    - echo ARG4=--bot.name=$BOT_NAME >> /opt/network/prod/.progconf
+    - echo ARG5=--bot.token=$BOT_TOKEN >> /opt/network/prod/.progconf
     - sudo systemctl start networkapp_dev
   only:
     - dev

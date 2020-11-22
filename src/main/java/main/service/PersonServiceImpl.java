@@ -80,6 +80,26 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
     }
 
     @Override
+    public boolean loginTelegram(long chatId) {
+        Optional<Person> optionalPerson = personRepository.findByTelegramId(chatId);
+        if (optionalPerson.isPresent()) {
+            String phone = optionalPerson.get().getPhone();
+            if (!phone.isEmpty()) {
+                Authentication authentication
+                        = authenticationManager.authenticate(
+                        new UsernamePasswordAuthenticationToken(chatId, phone)
+                );
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public Response<ResponseMessage> logout() {
         return new Response<>(new ResponseMessage("ok"));
     }
@@ -195,7 +215,6 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
         Response<InfoInResponse> response = new Response<>();
         response.setData(info);
         return response;
-
     }
 
     @Override
