@@ -105,7 +105,7 @@ public class SearchService {
 
         resultPage = personRepository
                 .findPersonByNameLastNameAgeCityCountry(firstName, lastName, ageFromToDate, ageToToDate,
-                        countryId, cityIds, pageable);
+                        countryId, cityIds, Pageable.unpaged());
 
         int currentUserId = ContextUtilities.getCurrentUserId();
         resultPage.forEach(r -> {
@@ -179,11 +179,11 @@ public class SearchService {
 
         if (tagsIds.isEmpty()) {
             resultPostPage = postRepository
-                .findByTextPeriodAuthorNoTags(textUpdated, from, to, authorsIds, pageable);
+                .findByTextPeriodAuthorNoTags(textUpdated, from, to, authorsIds, Pageable.unpaged());
         }
         else {
             resultPostPage = postRepository
-                .findByTextPeriodAuthorTags(textUpdated, from, to, authorsIds, tagsIds, pageable);
+                .findByTextPeriodAuthorTags(textUpdated, from, to, authorsIds, tagsIds, Pageable.unpaged());
         }
 
         List<CommentInResponse> comments = commentService.getCommentsList(resultPostPage.getContent());
