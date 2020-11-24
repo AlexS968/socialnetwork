@@ -190,19 +190,19 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
         // personToDetele.setMessagesPermission(MessagesPermission.NONE); // 1) нет на фронте 2) нет проверк
 
         //---- временное решение тк нет реализации MessagesPermission
-        personRepository.findAll().forEach( p -> {
-
-         int destId = p.getId();
-
-            if ((blocksBetweenUsersRepository.findBySrc_IdAndDst_Id(id, destId)) == null) {
-                BlocksBetweenUsers blocksBetweenUsers = new BlocksBetweenUsers();
-                blocksBetweenUsers.setDst(p);
-                blocksBetweenUsers.setSrc(personToDetele);
-                blocksBetweenUsersRepository.save(blocksBetweenUsers);
-            }
-
-
-        });
+//        personRepository.findAll().forEach( p -> {
+//
+//         int destId = p.getId();
+//
+//            if ((blocksBetweenUsersRepository.findBySrc_IdAndDst_Id(id, destId)) == null) {
+//                BlocksBetweenUsers blocksBetweenUsers = new BlocksBetweenUsers();
+//                blocksBetweenUsers.setDst(p);
+//                blocksBetweenUsers.setSrc(personToDetele);
+//                blocksBetweenUsersRepository.save(blocksBetweenUsers);
+//            }
+//
+//
+//        });
 
 
 
