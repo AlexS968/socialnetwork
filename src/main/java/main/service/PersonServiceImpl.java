@@ -84,19 +84,10 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
         Optional<Person> optionalPerson = personRepository.findByTelegramId(chatId);
         if (optionalPerson.isPresent()) {
             String phone = optionalPerson.get().getPhone();
-            if (!phone.isEmpty()) {
-                Authentication authentication
-                        = authenticationManager.authenticate(
-                        new UsernamePasswordAuthenticationToken(chatId, phone)
-                );
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            } else {
-                return false;
-            }
+            return !phone.isEmpty();
         } else {
             return false;
         }
-        return true;
     }
 
     @Override

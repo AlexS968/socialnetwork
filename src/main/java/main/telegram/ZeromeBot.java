@@ -16,7 +16,7 @@ import java.util.List;
 
 @Getter
 @Setter
-@Component
+//@Component
 @RequiredArgsConstructor
 @Slf4j
 public class ZeromeBot extends TelegramLongPollingBot {
