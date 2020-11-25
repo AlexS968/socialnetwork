@@ -75,7 +75,7 @@ backup_dev:
     - dev
   script:
     - cd ~/backups
-    - find ~/backups -name "network*.gz" -type f -mtime +15 -exec rm -f {} \;
+    - find ~/backups -name "network*.gz" -type f -mtime +10 -exec rm -f {} \;
     - mysqldump -u root network_dev -p$MYSQL_PASSWORD | gzip -c >  "network_dev_$(date +"%F_%T").sql.gz"
 
 sonar_dev:
