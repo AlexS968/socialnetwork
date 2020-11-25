@@ -1,5 +1,6 @@
 package main.controller;
 
+import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -13,6 +14,7 @@ import main.data.request.MeProfileRequest;
 import org.junit.Test;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.test.web.servlet.ResultActions;
 
 
 public class PersonControllerIt extends AbstractIntegrationIT {
@@ -64,9 +66,8 @@ public class PersonControllerIt extends AbstractIntegrationIT {
   @Test
   public void deleteMyProfile() throws Exception {
 
-    mockMvc.perform(delete("/api/v1/users/me"))
+    ResultActions resultActions = mockMvc.perform(delete("/api/v1/users/me"))
         .andDo(print())
-      //  .andExpect(unauthenticated())
         .andExpect(status().isOk());
   }
 

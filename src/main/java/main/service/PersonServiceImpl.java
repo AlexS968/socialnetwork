@@ -169,16 +169,9 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
 
         postRepository.deleteByAuthorId(id);
 
-        personToDetele.setBirthDate(null);
         personToDetele.setAbout(personToDetele.getFirstName() + " " + personToDetele.getLastName()
             + " решил удалить свою страницу");
 
-        // city country not null по этому добавлена страна и город с пустой срокой
-
-        personToDetele.setCountry(countryRepository.findById(239));
-        personToDetele.setCity(cityRepository.findById(5471206));
-
-        personToDetele.setPhone(" ");
         personToDetele.setDeleted(true);
 
         // изменить емейл и пароль чтобы пользователь не смог зайти в удаленную учетку
