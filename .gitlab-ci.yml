@@ -83,6 +83,6 @@ sonar_dev:
   only:
     - merge_requests
   script:
-    - mvn -Pprod clean package sonar:sonar -x test
+    - mvn -Pintegration-tests -DjdbcUrl=$TEST_DB_URL clean package sonar:sonar
   except:
     - schedules
