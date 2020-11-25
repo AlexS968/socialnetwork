@@ -8,7 +8,9 @@ stages:
 integration_tests:
   stage: test
   script:
+    - /home/javapro/sonarqube-8.5.1.38104/bin/linux-x86-64/sonar.sh stop
     - mvn clean verify -Pintegration-tests -DjdbcUrl=$TEST_DB_URL
+    - /home/javapro/sonarqube-8.5.1.38104/bin/linux-x86-64/sonar.sh start
   only:
     - merge_requests
   except:
