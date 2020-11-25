@@ -2,7 +2,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/network?serverTimezone=UTC
     username: root
-    password: 2f1720dbd0e1abfa
+    password: 1234567
   jpa:
     show-sql: false
 
