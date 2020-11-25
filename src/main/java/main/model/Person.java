@@ -77,6 +77,9 @@ public class Person {
     @Column(name = "telegram_id", columnDefinition = "UNSIGNED BIGINT(19)")
     private long telegramId;
 
+    @Column(name = "is_deleted", nullable = false, columnDefinition = "TINYINT")
+    private boolean isDeleted = false;
+
     @ElementCollection
     @LazyCollection(LazyCollectionOption.FALSE)
     @CollectionTable(name = "notification_settings",
