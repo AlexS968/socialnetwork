@@ -28,17 +28,4 @@ public class PostControllerIT extends AbstractIntegrationIT {
             .andExpect(jsonPath("$.data[1].title").value("Hello, Post Two"))
         ;
     }
-
-    @Test
-    public void tryToGetFeedsWithAnonimousUser() throws Exception {
-//        mockMvc.perform(get("/api/v1/feeds")
-//                .param("name", "")
-//                .param("offset", "0")
-//                .param("itemPerPage", "20")
-//                .accept("application/json"))
-//                .andDo(print())
-//                .andExpect(status().isForbidden())
-//                .andExpect(unauthenticated())
-//        ;
-    }
 }

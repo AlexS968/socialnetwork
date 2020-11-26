@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
+    private final static String INVALID_REQUEST = "invalid request";
 
     private final PostCommentRepository commentRepository;
     private final PostRepository postRepository;
@@ -36,7 +37,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentResponse createComment(Integer postId, CommentRequest request) {
         if (request.getCommentText().isBlank()) {
-            throw new BadRequestException(new ApiError("invalid_request", "текст комментария отсутствует"));
+            throw new BadRequestException(new ApiError(INVALID_REQUEST, "текст комментария отсутствует"));
         }
         CommentResponse response = new CommentResponse();
 
@@ -53,7 +54,7 @@ public class CommentServiceImpl implements CommentService {
         postComment.setBlocked(false);
         postComment.setPost(postRepository.findById(postId)
                 .orElseThrow(() -> new BadRequestException(
-                        new ApiError("invalid_request", "ссылка на несуществующий пост")
+                        new ApiError(INVALID_REQUEST, "ссылка на несуществующий пост")
                 )));
         commentRepository.save(postComment);
 
@@ -144,7 +145,7 @@ public class CommentServiceImpl implements CommentService {
         if (optionalPostComment.isPresent()) {
             return optionalPostComment.get();
         } else {
-            throw new BadRequestException(new ApiError("invalid_request", "Несуществующий коммент"));
+            throw new BadRequestException(new ApiError(INVALID_REQUEST, "Несуществующий коммент"));
         }
     }
 
