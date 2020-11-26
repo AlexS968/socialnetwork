@@ -14,7 +14,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import java.util.ArrayList;
 import java.util.List;
 
-@Component
+//@Component
 @RequiredArgsConstructor
 public class AuthHandler extends BaseHandler {
     private final PersonService personService;

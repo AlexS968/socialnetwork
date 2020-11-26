@@ -10,7 +10,7 @@ import org.telegram.telegrambots.meta.api.objects.User;
 import java.util.ArrayList;
 import java.util.List;
 
-@Component
+//@Component
 @RequiredArgsConstructor
 public class StartHandler extends BaseHandler {
 
