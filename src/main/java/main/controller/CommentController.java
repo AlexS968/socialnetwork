@@ -87,27 +87,27 @@ public class CommentController {
         return ResponseEntity.ok(commentService.editComment(id, commentId, request));
     }
 
-    @ApiOperation(value = "Восстановить комментарий для публикации")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Успешное восстановление комментария"),
-            @ApiResponse(code = 400, message = "Bad Request", response = ApiError.class),
-            @ApiResponse(code = 401, message = "unauthorized", response = ApiError.class)
-    })
-    @PutMapping(value = "/{id}/comments/{comment_id}/recover", produces = "application/json")
-    public ResponseEntity<CommentResponse> recoverPostComment(
-            @Parameter(in = ParameterIn.PATH, name = "id", description = "ID поста",
-                    schema = @Schema(
-                            type = "integer",
-                            format = "int64"
-                    )) @PathVariable Integer id,
-            @Parameter(in = ParameterIn.PATH, name = "comment_id", description = "ID комментария",
-                    schema = @Schema(
-                            type = "integer",
-                            format = "int64"
-                    )) @PathVariable(value = "comment_id") Integer commentId
-    ) {
-        return ResponseEntity.ok(commentService.recoverComment(id, commentId));
-    }
+//    @ApiOperation(value = "Восстановить комментарий для публикации")
+//    @ApiResponses(value = {
+//            @ApiResponse(code = 200, message = "Успешное восстановление комментария"),
+//            @ApiResponse(code = 400, message = "Bad Request", response = ApiError.class),
+//            @ApiResponse(code = 401, message = "unauthorized", response = ApiError.class)
+//    })
+//    @PutMapping(value = "/{id}/comments/{comment_id}/recover", produces = "application/json")
+//    public ResponseEntity<CommentResponse> recoverPostComment(
+//            @Parameter(in = ParameterIn.PATH, name = "id", description = "ID поста",
+//                    schema = @Schema(
+//                            type = "integer",
+//                            format = "int64"
+//                    )) @PathVariable Integer id,
+//            @Parameter(in = ParameterIn.PATH, name = "comment_id", description = "ID комментария",
+//                    schema = @Schema(
+//                            type = "integer",
+//                            format = "int64"
+//                    )) @PathVariable(value = "comment_id") Integer commentId
+//    ) {
+//        return ResponseEntity.ok(commentService.recoverComment(id, commentId));
+//    }
 
     @ApiOperation(value = "Удалить комментарий для публикации")
     @ApiResponses(value = {

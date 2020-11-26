@@ -115,15 +115,6 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public CommentResponse recoverComment(Integer postId, Integer commentId) {
-        CommentResponse response = new CommentResponse();
-
-        //TODO complete recoverComment
-
-        return response;
-    }
-
-    @Override
     public Response<ItemDelete> deleteComment(Integer postId, Integer commentId) {
         Response<ItemDelete> response = new Response<>();
         ItemDelete item = new ItemDelete();
