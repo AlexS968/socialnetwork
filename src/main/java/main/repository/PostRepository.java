@@ -38,7 +38,16 @@ public interface PostRepository extends CrudRepository<Post, Integer> {
           + "((:text is null) OR (post_text LIKE :text) OR (title LIKE :text)) AND "
           + "((:dateFrom is null AND :dateTo is null) or (time >= :dateFrom AND time <= :dateTo)) AND  "
           + "(COALESCE(:authorId) is null or (author_id IN (:authorId))) AND "
-          + "(COALESCE(:tagId) is null or (post2tag.tag_id IN (:tagId)))")
+          + "(COALESCE(:tagId) is null or (post2tag.tag_id IN (:tagId))) order by post.time",
+      countQuery = "SELECT DISTINCT post.* FROM post "
+          + "JOIN person ON person.id = post.author_id "
+          + "JOIN post2tag ON post2tag.post_id = post.id "
+          + "WHERE "
+          + "((:text is null) OR (post_text LIKE :text) OR (title LIKE :text)) AND "
+          + "((:dateFrom is null AND :dateTo is null) or (time >= :dateFrom AND time <= :dateTo)) AND  "
+          + "(COALESCE(:authorId) is null or (author_id IN (:authorId))) AND "
+          + "(COALESCE(:tagId) is null or (post2tag.tag_id IN (:tagId)))"
+  )
   Page<Post> findByTextPeriodAuthorTags(
       @Param("text") String text,
       @Param("dateFrom") Date dateFrom,
@@ -54,7 +63,14 @@ public interface PostRepository extends CrudRepository<Post, Integer> {
           + "WHERE "
           + "((:text is null) OR (post_text LIKE :text) OR (title LIKE :text)) AND "
           + "((:dateFrom is null AND :dateTo is null) or (time >= :dateFrom AND time <= :dateTo)) AND  "
-          + "(COALESCE(:authorId) is null or (author_id IN (:authorId)))")
+          + "(COALESCE(:authorId) is null or (author_id IN (:authorId))) order by post.time",  countQuery =
+      "SELECT count(*) FROM post "
+          + "JOIN person ON person.id = post.author_id "
+          + "WHERE "
+          + "((:text is null) OR (post_text LIKE :text) OR (title LIKE :text)) AND "
+          + "((:dateFrom is null AND :dateTo is null) or (time >= :dateFrom AND time <= :dateTo)) AND  "
+          + "(COALESCE(:authorId) is null or (author_id IN (:authorId)))"
+  )
   Page<Post> findByTextPeriodAuthorNoTags(
       @Param("text") String text,
       @Param("dateFrom") Date dateFrom,

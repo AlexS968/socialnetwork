@@ -11,7 +11,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import java.util.ArrayList;
 import java.util.List;
 
-@Component
+//@Component
 @RequiredArgsConstructor
 public class NotifHandler extends BaseHandler {
 
@@ -26,7 +26,6 @@ public class NotifHandler extends BaseHandler {
         SendMessage message = new SendMessage();
         message.setReplyMarkup(getKeyboard());
         try {
-//            ContextUtilities.getCurrentPerson();
             notificationService.list(0, 10, false)
                     .getData()
                     .forEach(n -> messages.add(new SendMessage(update.getMessage().getChatId(), n.getInfo())));

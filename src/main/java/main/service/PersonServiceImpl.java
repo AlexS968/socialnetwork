@@ -84,19 +84,10 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
         Optional<Person> optionalPerson = personRepository.findByTelegramId(chatId);
         if (optionalPerson.isPresent()) {
             String phone = optionalPerson.get().getPhone();
-            if (!phone.isEmpty()) {
-                Authentication authentication
-                        = authenticationManager.authenticate(
-                        new UsernamePasswordAuthenticationToken(chatId, phone)
-                );
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            } else {
-                return false;
-            }
+            return !phone.isEmpty();
         } else {
             return false;
         }
-        return true;
     }
 
     @Override
@@ -156,58 +147,30 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
     @Override
     public Response<InfoInResponse> deleteMe() {
 
-        // деактивировать кнопки 'сообщение/ добавить в друзья' если профиль удален
-        // переписать блокировку всех пользователей после добавления MessagesPermission
-
         int id = ContextUtilities.getCurrentUserId();
 
-        if(id == 0) {throw new BadRequestException(new ApiError(
-            "invalid_request",
-            "на авторизован"
-        ));}
+        if (id == 0) {
+            throw new BadRequestException(new ApiError(
+                "invalid_request",
+                "на авторизован"
+            ));
+        }
 
         Person personToDetele = personRepository.findById(id);
 
         postRepository.deleteByAuthorId(id);
 
-        personToDetele.setBirthDate(null);
-        personToDetele.setAbout(personToDetele.getFirstName() + " " + personToDetele.getLastName() +" решил удалить свою страницу");
+        personToDetele.setAbout(personToDetele.getFirstName() + " " + personToDetele.getLastName()
+            + " решил удалить свою страницу");
 
-        // city country not null по этому добавлена страна и город с пустой срокой
-
-        personToDetele.setCountry(countryRepository.findById(239));
-        personToDetele.setCity(cityRepository.findById(5471206));
-
-
-        personToDetele.setPhone(" ");
+        personToDetele.setDeleted(true);
 
         // изменить емейл и пароль чтобы пользователь не смог зайти в удаленную учетку
 
-        personToDetele.setEmail("deletedId" + id);
+        personToDetele.setEmail( id + "DeletedId"+ UUID.randomUUID().toString());
         personToDetele.setPasswordHash(UUID.randomUUID().toString());
 
         personToDetele.setPhotoURL("/static/img/page_deleted.jpg");
-        // personToDetele.setMessagesPermission(MessagesPermission.NONE); // 1) нет на фронте 2) нет проверк
-
-        //---- временное решение тк нет реализации MessagesPermission
-//        personRepository.findAll().forEach( p -> {
-//
-//         int destId = p.getId();
-//
-//            if ((blocksBetweenUsersRepository.findBySrc_IdAndDst_Id(id, destId)) == null) {
-//                BlocksBetweenUsers blocksBetweenUsers = new BlocksBetweenUsers();
-//                blocksBetweenUsers.setDst(p);
-//                blocksBetweenUsers.setSrc(personToDetele);
-//                blocksBetweenUsersRepository.save(blocksBetweenUsers);
-//            }
-//
-//
-//        });
-
-
-
-        // дружбу и сообщения не удалять тк у 2 хранинтся
-        // доделать - нельзя добавить в друзья и написать со стр польз и из диалогов если были
 
         personRepository.save(personToDetele);
 
@@ -249,6 +212,12 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
             person = personOpt.get();
         } else {
             throw new UsernameNotFoundException("invalid_request");
+        }
+        // проверка удален ли профиль
+        if (person.isDeleted() == true) {
+            throw new BadRequestException(
+                new ApiError("profile deleted", person.getFirstName() + " " + person.getLastName()
+                    + " решил удалить свой профиль"));
         }
         //Проверка на блокировку профиля
         BlocksBetweenUsers blocksBetweenUsers = blocksBetweenUsersRepository
