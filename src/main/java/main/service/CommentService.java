@@ -20,8 +20,6 @@ public interface CommentService {
 
     CommentResponse editComment(Integer id, Integer commentId, CommentRequest request);
 
-    CommentResponse recoverComment(Integer postId, Integer commentId);
-
     Response<ItemDelete> deleteComment(Integer postId, Integer commentId);
 
     void deleteAllComments(Integer postId);

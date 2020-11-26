@@ -31,6 +31,8 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
+    private static final String INVALID_REQUEST = "invalid_request";
+
     private final PostRepository postRepository;
     private final TagRepository tagRepository;
     private final PostTagRepository postTagRepository;
@@ -64,7 +66,7 @@ public class PostServiceImpl implements PostService {
 
             return new Response<>(new PostInResponse(post, new ArrayList<>(), personId));
         } catch (Exception ex) {
-            throw new BadRequestException(new ApiError("invalid_request", "Ошибка создания поста"));
+            throw new BadRequestException(new ApiError(INVALID_REQUEST, "Ошибка создания поста"));
         }
     }
 
@@ -90,7 +92,7 @@ public class PostServiceImpl implements PostService {
             postRepository.delete(post);
             return new Response<>(new PostDelete(id));
         } catch (BadRequestException ex) {
-            throw new BadRequestException(new ApiError("invalid_request", "Ошибка удаления поста"));
+            throw new BadRequestException(new ApiError(INVALID_REQUEST, "Ошибка удаления поста"));
         }
     }
 
@@ -107,8 +109,15 @@ public class PostServiceImpl implements PostService {
     //-----------------------
     private Post savePost(Post post, PostRequest postData, Person person, Long pubDate) {
         Post postToSave = (post == null) ? new Post() : post;
-        final Instant postTime = pubDate == null ? Instant.now() :
-                Instant.ofEpochMilli(pubDate).isBefore(Instant.now()) ? Instant.now() : Instant.ofEpochMilli(pubDate);
+
+        //sonar fixes change ternary operation into independent statement
+        final Instant postTime;
+        if (pubDate == null || Instant.ofEpochMilli(pubDate).isBefore(Instant.now())) {
+            postTime = Instant.now();
+        } else {
+            postTime = Instant.ofEpochMilli(pubDate);
+        }
+
         final List<PostTag> postTags = (post == null) ? new ArrayList<>() : postToSave.getTags();
         final List<Tag> tags = new ArrayList<>();
         for (String s : postData.getTags()) {
@@ -142,7 +151,7 @@ public class PostServiceImpl implements PostService {
     public Post getPost(int id) {
         Optional<Post> postOptional = postRepository.findById(id);
         if (postOptional.isEmpty()) {
-            throw new BadRequestException(new ApiError("invalid_request", "Пост не существует"));
+            throw new BadRequestException(new ApiError(INVALID_REQUEST, "Пост не существует"));
         }
         return postOptional.get();
     }
@@ -151,7 +160,7 @@ public class PostServiceImpl implements PostService {
     public Post findById(int id) {
         return postRepository.findById(id).orElseThrow(
                 () -> new BadRequestException(new ApiError(
-                        "invalid request",
+                        INVALID_REQUEST,
                         "Пост не существует")));
     }
 
@@ -163,23 +172,23 @@ public class PostServiceImpl implements PostService {
     private List<PostInResponse> extractPage(Page<Post> postPage, List<CommentInResponse> comments) {
         List<PostInResponse> posts = new ArrayList<>();
         for (Post item : postPage.getContent()) {
-            AddPostInResponseToPosts(comments, posts, item);
+            addPostInResponseToPosts(comments, posts, item);
         }
         return posts;
     }
 
-    private HashSet<Integer> getBlockedUsers(List<BlocksBetweenUsers> BlocksList) {
+    private HashSet<Integer> getBlockedUsers(List<BlocksBetweenUsers> blocksList) {
         HashSet<Integer> blockedUsers = new HashSet<>();
-        for (BlocksBetweenUsers block : BlocksList) {
+        for (BlocksBetweenUsers block : blocksList) {
             blockedUsers.add(block.getDst().getId());
         }
         return blockedUsers;
     }
 
-    private List<Post> cleanBlockedPosts(Page<Post> OriginPosts) {
+    private List<Post> cleanBlockedPosts(Page<Post> originPosts) {
         int currentUserId = ContextUtilities.getCurrentUserId();
         List<BlocksBetweenUsers> blocksBetweenUsers = blocksBetweenUsersRepository.findBySrc_Id(currentUserId);
-        List<Post> postsList = OriginPosts.getContent();
+        List<Post> postsList = originPosts.getContent();
         ArrayList<Post> cleanedPosts = new ArrayList<>();
         if (!(blocksBetweenUsers.isEmpty())) {
             HashSet<Integer> blockedUsers = getBlockedUsers(blocksBetweenUsers);
@@ -198,12 +207,12 @@ public class PostServiceImpl implements PostService {
     private List<PostInResponse> extractPostList(List<Post> postList, List<CommentInResponse> comments) {
         List<PostInResponse> posts = new ArrayList<>();
         for (Post item : postList) {
-            AddPostInResponseToPosts(comments, posts, item);
+            addPostInResponseToPosts(comments, posts, item);
         }
         return posts;
     }
 
-    private void AddPostInResponseToPosts(List<CommentInResponse> comments, List<PostInResponse> posts, Post item) {
+    private void addPostInResponseToPosts(List<CommentInResponse> comments, List<PostInResponse> posts, Post item) {
         PostInResponse postInResponse = new PostInResponse(item, comments, 0);
         if (item.getTime().isBefore(Instant.now())) {
             postInResponse.setType(PostType.POSTED);

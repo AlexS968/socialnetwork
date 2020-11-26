@@ -6,9 +6,9 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import main.model.Like;
 import main.model.Post;
 import main.model.PostType;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -45,15 +45,15 @@ public class PostInResponse {
         isBlocked = post.isBlocked();
         likes = post.getLikes() != null ? post.getLikes().size() : 0;
         comments = commentsList.stream()
-                .filter(commentInResponse -> commentInResponse.getPostId() == id)
+                .filter(commentInResponse -> commentInResponse.getPostId().equals(id))
                 .collect(Collectors.toList());
         tags = getTags(post);
         myLike = likes != 0 && post.getLikes().stream().anyMatch(l -> l.getPerson().getId() == currentUserId);
     }
 
     private List<String> getTags(Post post) {
-        List<String> tags = new ArrayList<>();
-        post.getTags().forEach(t -> tags.add(t.getTag().getTag()));
-        return tags;
+        List<String> postTags = new ArrayList<>();
+        post.getTags().forEach(t -> postTags.add(t.getTag().getTag()));
+        return postTags;
     }
 }

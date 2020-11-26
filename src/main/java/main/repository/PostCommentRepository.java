@@ -1,6 +1,5 @@
 package main.repository;
 
-import main.model.Post;
 import main.model.PostComment;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

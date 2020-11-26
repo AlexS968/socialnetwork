@@ -49,8 +49,7 @@ INSERT INTO notification_type (id, code, name) VALUES (1, "POST", "новый п
     (3, "COMMENT_COMMENT", "новый комментарий к комментарию");
 
 INSERT INTO `notification_settings` (
-    id, person_id, is_enabled, notification_type_id) VALUES (1, 1, 0, 1);
-INSERT INTO `notification_settings` (
-    id, person_id, is_enabled, notification_type_id) VALUES (2, 1, 1, 2);
-INSERT INTO `notification_settings` (
-    id, person_id, is_enabled, notification_type_id) VALUES (3, 1, 1, 3);
+    id, person_id, is_enabled, notification_type_id) VALUES
+    (1, 1, 0, 1),
+    (2, 1, 1, 2),
+    (3, 1, 1, 3);
