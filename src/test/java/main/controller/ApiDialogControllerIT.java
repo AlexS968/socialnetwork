@@ -16,7 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WithUserDetails("user@user.ru")
-public class ApiDialogControllerTest extends AbstractIntegrationIT {
+public class ApiDialogControllerIT extends AbstractIntegrationIT {
 
     @Test
     public void createDialogTest() throws Exception {
