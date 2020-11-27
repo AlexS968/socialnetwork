@@ -8,7 +8,10 @@ stages:
 integration_tests:
   stage: test
   script:
+    - /home/gitlab-runner/sonar/bin/linux-x86-64/sonar.sh stop
     - mvn clean verify -Pintegration-tests -DjdbcUrl=$TEST_DB_URL
+    - /home/gitlab-runner/sonar/bin/linux-x86-64/sonar.sh start
+    - sleep 45
   only:
     - merge_requests
   except:
@@ -73,7 +76,7 @@ backup_dev:
     - dev
   script:
     - cd ~/backups
-    - find ~/backups -name "network*.gz" -type f -mtime +15 -exec rm -f {} \;
+    - find ~/backups -name "network*.gz" -type f -mtime +10 -exec rm -f {} \;
     - mysqldump -u root network_dev -p$MYSQL_PASSWORD | gzip -c >  "network_dev_$(date +"%F_%T").sql.gz"
 
 sonar_dev:
@@ -81,6 +84,6 @@ sonar_dev:
   only:
     - merge_requests
   script:
-    - mvn -Pprod clean package sonar:sonar
+    - mvn -Pintegration-tests -DjdbcUrl=$TEST_DB_URL clean package sonar:sonar
   except:
     - schedules
