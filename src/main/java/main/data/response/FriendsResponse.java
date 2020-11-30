@@ -3,6 +3,7 @@ package main.data.response;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import main.data.response.base.ListResponse;
 import main.data.response.type.DataMessage;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -25,7 +27,7 @@ public class FriendsResponse extends ListResponse {
     private List<MeProfile> FriendsOrRecommendedList;
     private DataMessage dataMessage;
 
-    public FriendsResponse(Page<Friendship> friends){
+    public FriendsResponse(Page<Friendship> friends) {
         this.setOffset(friends.getNumber() * friends.getNumberOfElements());
         this.setPerPage(friends.getNumberOfElements());
         this.setError("");
@@ -38,7 +40,7 @@ public class FriendsResponse extends ListResponse {
         }
     }
 
-    public FriendsResponse(List<Optional<Person>> recommendedFriends, int offset, int itemPerPage){
+    public FriendsResponse(List<Optional<Person>> recommendedFriends, int offset, int itemPerPage) {
         this.setOffset(itemPerPage);
         this.setPerPage(itemPerPage);
         this.setError("");
@@ -46,7 +48,7 @@ public class FriendsResponse extends ListResponse {
         this.setTotal(recommendedFriends.size());
         FriendsOrRecommendedList = new ArrayList<>();
         for (Optional<Person> item : recommendedFriends) {
-            FriendsOrRecommendedList.add(new MeProfile(item.get()));
+            item.ifPresent(person -> FriendsOrRecommendedList.add(new MeProfile(person)));
         }
     }
 

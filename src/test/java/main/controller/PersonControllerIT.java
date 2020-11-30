@@ -63,7 +63,7 @@ public class PersonControllerIT extends AbstractIntegrationIT {
     @WithUserDetails("user@user.ru")
     @Test
     public void deleteMyProfile() throws Exception {
-        ResultActions resultActions = mockMvc.perform(delete("/api/v1/users/me"))
+        mockMvc.perform(delete("/api/v1/users/me"))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
