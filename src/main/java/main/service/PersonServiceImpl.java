@@ -80,14 +80,9 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
     }
 
     @Override
-    public boolean loginTelegram(long chatId) {
+    public Person loginTelegram(long chatId) {
         Optional<Person> optionalPerson = personRepository.findByTelegramId(chatId);
-        if (optionalPerson.isPresent()) {
-            String phone = optionalPerson.get().getPhone();
-            return !phone.isEmpty();
-        } else {
-            return false;
-        }
+        return optionalPerson.orElse(null);
     }
 
     @Override

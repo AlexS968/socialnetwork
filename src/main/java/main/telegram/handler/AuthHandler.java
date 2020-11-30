@@ -4,17 +4,16 @@ import lombok.RequiredArgsConstructor;
 import main.service.PersonService;
 import main.service.RegistrationService;
 import main.telegram.BotCommand;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
 import java.util.ArrayList;
 import java.util.List;
 
-//@Component
+@Profile("prod")
+@Component
 @RequiredArgsConstructor
 public class AuthHandler extends BaseHandler {
     private final PersonService personService;
@@ -24,12 +23,9 @@ public class AuthHandler extends BaseHandler {
     public List<SendMessage> handle(Update update) {
         List<SendMessage> messages = null;
         if (update.hasMessage()) {
-            if (update.getMessage().hasText() && update.getMessage().getText().equals(BotCommand.LOGIN.toString())) {
-                    messages = new ArrayList<>();
-                    messages.add(login(update));
-            } else if (update.getMessage().hasContact()) {
-             messages = new ArrayList<>();
-             messages.add(register(update));
+            if (update.getMessage().hasContact()) {
+                messages = new ArrayList<>();
+                messages.add(register(update));
             }
         }
         return messages;
@@ -39,11 +35,10 @@ public class AuthHandler extends BaseHandler {
         Long chatId = update.getMessage().getChatId();
         SendMessage message = new SendMessage();
         message.setChatId(chatId);
-        if (!personService.loginTelegram(chatId)) {
+        if (personService.loginTelegram(chatId) == null) {
             message.setReplyMarkup(getRegisterKeyboard());
-            message.setText("Телефона в профиле нет ? Тогда не смогу войти");
         } else {
-            message.setReplyMarkup(getKeyboard());
+            message.setReplyMarkup(getGeneralKeyboard());
             message.setText("Мы внутри, можно смотреть уведомления b('w')b");
         }
 
@@ -52,27 +47,17 @@ public class AuthHandler extends BaseHandler {
 
     private SendMessage register(Update update) {
         Long chatId = update.getMessage().getChatId();
-        String phone = update.getMessage().getContact().getPhoneNumber().substring(1);
+        String phone = update.getMessage().getContact().getPhoneNumber();
+        SendMessage message = new SendMessage();
+        message.setChatId(chatId);
 
-        registrationService.registerTelegram(phone, chatId);
-        SendMessage message = new SendMessage(chatId, "Теперь ты зареган! Можно входить b('w')b\nP.S. Да, отдельно");
-        message.setReplyMarkup(getKeyboard());
-        return message ;
-    }
+        if (registrationService.registerTelegram(phone, chatId)) {
+            message.setText("Мы внутри, можно смотреть уведомления b('w')b");
+        } else {
+            message.setText("Телефона в профиле нет ? Тогда не смогу войти");
+        }
+        message.setReplyMarkup(getGeneralKeyboard());
 
-    private ReplyKeyboardMarkup getRegisterKeyboard() {
-        ReplyKeyboardMarkup replyKeyboardMarkup = getKeyboardTemplate();
-        List<KeyboardRow> keyboard = new ArrayList<>();
-
-        KeyboardRow keyboardFirstRow = new KeyboardRow();
-        KeyboardButton btn = new KeyboardButton("Регистрация");
-        btn.setRequestContact(true);
-        keyboardFirstRow.add(btn);
-
-        keyboardFirstRow.add(new KeyboardButton("Помощь"));
-        keyboard.add(keyboardFirstRow);
-
-        replyKeyboardMarkup.setKeyboard(keyboard);
-        return replyKeyboardMarkup;
+        return message;
     }
 }
