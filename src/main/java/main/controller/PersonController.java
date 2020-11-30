@@ -16,7 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Api(tags = {"Profile"})
+@Api(description = "Работа с профилем", tags = {"Profile"})
 
 @RestController
 @AllArgsConstructor
@@ -26,7 +26,7 @@ public class PersonController {
     private final PersonServiceImpl personServiceImpl;
 
     @ApiOperation(value = "Получить текущего пользователя")
-    // класс ответа генерится автоматически, swager поддерживает дженерики
+
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Успешное получение текущего пользователя"),
             @ApiResponse(code = 401, message = "unauthorized", response = ApiError.class)
@@ -45,8 +45,8 @@ public class PersonController {
     })
     @PutMapping(value = "/me", produces = "application/json")
     public ResponseEntity<Response<MeProfile>> updateCurrentUser(
-            @ApiParam(name = "Request body")
-            @RequestBody MeProfileRequest updatedCurrentUser) {
+        @ApiParam(name = "Updated profile info")
+        @RequestBody MeProfileRequest updatedCurrentUser) {
 
         return ResponseEntity.ok(personServiceImpl.putMe(updatedCurrentUser));
 
