@@ -17,7 +17,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.ResultActions;
 
 
-public class PersonControllerIt extends AbstractIntegrationIT {
+public class PersonControllerIT extends AbstractIntegrationIT {
 
   @WithUserDetails("user@user.ru")
   @Test

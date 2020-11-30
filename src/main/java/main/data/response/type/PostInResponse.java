@@ -32,6 +32,7 @@ public class PostInResponse {
     private List<CommentInResponse> comments;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private PostType type;
+    @ApiModelProperty(name = "tags", dataType = "List", example = "[\"lol\", \"IT\", \"post\"]")
     private List<String> tags;
     @JsonProperty(value = "my_like")
     private boolean myLike;

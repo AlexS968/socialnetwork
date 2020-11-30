@@ -15,6 +15,8 @@ import main.data.response.base.ListResponse;
 import main.data.response.type.CommentInResponse;
 import main.data.response.type.MeProfile;
 import main.data.response.type.PostInResponse;
+import main.exception.BadRequestException;
+import main.exception.apierror.ApiError;
 import main.model.BlocksBetweenUsers;
 import main.model.City;
 import main.model.Country;
@@ -48,6 +50,12 @@ public class SearchService {
       Integer ageFrom,
       Integer ageTo, String country,
       String city, Integer offset, Integer itemPerPage) {
+
+    int id = ContextUtilities.getCurrentUserId();
+    if(id == 0) {throw new BadRequestException(new ApiError(
+        "invalid_request",
+        "на авторизован"
+    ));}
 
     Pageable pageable = new OffsetPageRequest(offset, itemPerPage, Sort.unsorted());
 
