@@ -14,6 +14,8 @@ public interface NotificationService {
 
     ListResponse<NotificationResponse> list(int offset, int itemPerPage, boolean needToRead);
 
+    ListResponse<NotificationResponse> list(int offset, int itemPerPage, boolean needToRead, Long telegramId);
+
     ListResponse<NotificationResponse> read(int id, boolean all);
 
     Response<InfoInResponse> set(NotificationSettingsRequest request);

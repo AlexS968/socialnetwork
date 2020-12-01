@@ -6,6 +6,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import main.telegram.handler.BaseHandler;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -16,7 +17,8 @@ import java.util.List;
 
 @Getter
 @Setter
-//@Component
+@Component
+@Profile("prod")
 @RequiredArgsConstructor
 @Slf4j
 public class ZeromeBot extends TelegramLongPollingBot {

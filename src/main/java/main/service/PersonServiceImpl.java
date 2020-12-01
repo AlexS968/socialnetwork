@@ -1,26 +1,37 @@
 package main.service;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
-import lombok.AllArgsConstructor;
+
+import lombok.RequiredArgsConstructor;
 import main.core.ContextUtilities;
 import main.core.auth.JwtUtils;
 import main.data.PersonPrincipal;
 import main.data.request.LoginRequest;
 import main.data.request.MeProfileRequest;
 import main.data.response.base.Response;
-import main.data.response.type.*;
+import main.data.response.type.DataMessage;
+import main.data.response.type.InfoInResponse;
+import main.data.response.type.MeProfile;
+import main.data.response.type.PersonInLogin;
+import main.data.response.type.ResponseMessage;
 import main.exception.BadRequestException;
 import main.exception.apierror.ApiError;
 import main.model.BlocksBetweenUsers;
 import main.model.City;
 import main.model.Country;
-import main.model.MessagesPermission;
 import main.model.Person;
+import main.model.Post;
 import main.repository.BlocksBetweenUsersRepository;
 import main.repository.CityRepository;
 import main.repository.CountryRepository;
 import main.repository.PersonRepository;
-import main.repository.PostRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -30,13 +41,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.Optional;
-
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class PersonServiceImpl implements UserDetailsService, PersonService {
 
     private final PersonRepository personRepository;
@@ -45,7 +51,12 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
     private final CityRepository cityRepository;
     private final CountryRepository countryRepository;
     private final BlocksBetweenUsersRepository blocksBetweenUsersRepository;
-    private final PostRepository postRepository;
+    private PostService postService;
+
+    @Autowired
+    public void setPostService(@Lazy PostService postService) {
+        this.postService = postService;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String email) {
@@ -80,14 +91,9 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
     }
 
     @Override
-    public boolean loginTelegram(long chatId) {
+    public Person loginTelegram(long chatId) {
         Optional<Person> optionalPerson = personRepository.findByTelegramId(chatId);
-        if (optionalPerson.isPresent()) {
-            String phone = optionalPerson.get().getPhone();
-            return !phone.isEmpty();
-        } else {
-            return false;
-        }
+        return optionalPerson.orElse(null);
     }
 
     @Override
@@ -98,15 +104,19 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
     @Override
     public Response<MeProfile> getMe() {
         int id = ContextUtilities.getCurrentUserId();
-        if(id == 0) {throw new BadRequestException(new ApiError(
-            "invalid_request",
-            "на авторизован"
-        ));}
+        if (id == 0) {
+            throw new BadRequestException(new ApiError(
+                    "invalid_request",
+                    "на авторизован"
+            ));
+        }
         Person person = getById(id);
-        if(person == null) {throw new BadRequestException(new ApiError(
-            "invalid_request",
-            "нет аккаунта с таким айди"
-        ));}
+        if (person == null) {
+            throw new BadRequestException(new ApiError(
+                    "invalid_request",
+                    "нет аккаунта с таким айди"
+            ));
+        }
 
         Response<MeProfile> response = new Response<>();
         MeProfile profile = new MeProfile(person);
@@ -118,11 +128,12 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
     public Response<MeProfile> putMe(MeProfileRequest updatedCurrentPerson) {
         Person personUpdated = personRepository.findById(ContextUtilities.getCurrentUserId());
 
-        if(personUpdated == null) {throw new BadRequestException(new ApiError(
-            "invalid_request",
-            "нет аккаунта с таким айди"
-        ));}
-
+        if (personUpdated == null) {
+            throw new BadRequestException(new ApiError(
+                    "invalid_request",
+                    "нет аккаунта с таким айди"
+            ));
+        }
 
         personUpdated.setLastName(updatedCurrentPerson.getLastName());
         personUpdated.setFirstName(updatedCurrentPerson.getFirstName());
@@ -151,23 +162,27 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
 
         if (id == 0) {
             throw new BadRequestException(new ApiError(
-                "invalid_request",
-                "на авторизован"
+                    "invalid_request",
+                    "на авторизован"
             ));
         }
 
         Person personToDetele = personRepository.findById(id);
 
-        postRepository.deleteByAuthorId(id);
+        List<Post> postsToDelete = postService.findByAuthor(personToDetele);
+
+        if (!postsToDelete.isEmpty()) {
+            postsToDelete.forEach(p -> postService.delPost(p.getId()));
+        }
 
         personToDetele.setAbout(personToDetele.getFirstName() + " " + personToDetele.getLastName()
-            + " решил удалить свою страницу");
+                + " решил удалить свою страницу");
 
         personToDetele.setDeleted(true);
 
         // изменить емейл и пароль чтобы пользователь не смог зайти в удаленную учетку
 
-        personToDetele.setEmail( id + "DeletedId"+ UUID.randomUUID().toString());
+        personToDetele.setEmail(id + "DeletedId" + UUID.randomUUID().toString());
         personToDetele.setPasswordHash(UUID.randomUUID().toString());
 
         personToDetele.setPhotoURL("/static/img/page_deleted.jpg");
@@ -216,14 +231,15 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
         // проверка удален ли профиль
         if (person.isDeleted() == true) {
             throw new BadRequestException(
-                new ApiError("profile deleted", person.getFirstName() + " " + person.getLastName()
-                    + " решил удалить свой профиль"));
+                    new ApiError("profile deleted", person.getFirstName() + " " + person.getLastName()
+                            + " решил удалить свой профиль"));
         }
         //Проверка на блокировку профиля
         BlocksBetweenUsers blocksBetweenUsers = blocksBetweenUsersRepository
                 .findBySrc_IdAndDst_Id(id, ContextUtilities.getCurrentUserId());
         if (!(blocksBetweenUsers == null)) {
-            throw new BadRequestException(new ApiError("Access blocked", "Доступ к профилю заблокирован"));
+            throw new BadRequestException(
+                    new ApiError("Access blocked", "Доступ к профилю заблокирован"));
             //setToBlocked(person);
         }
         //Проверка на блокировку от текущего профиля
@@ -247,7 +263,8 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
         Response<DataMessage> response = new Response<>();
         response.setTimestamp(LocalDateTime.now().toEpochSecond(ZoneOffset.UTC));
         response.setError("");
-        BlocksBetweenUsers blocksBetweenUsers = blocksBetweenUsersRepository.findBySrc_IdAndDst_Id(currentUserId, id);
+        BlocksBetweenUsers blocksBetweenUsers = blocksBetweenUsersRepository
+                .findBySrc_IdAndDst_Id(currentUserId, id);
         if (!(blocksBetweenUsers == null)) {
             blocksBetweenUsersRepository.delete(blocksBetweenUsers);
             response.setData(new DataMessage("ок"));
