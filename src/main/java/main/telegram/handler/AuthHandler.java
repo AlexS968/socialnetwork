@@ -31,23 +31,9 @@ public class AuthHandler extends BaseHandler {
         return messages;
     }
 
-    private SendMessage login(Update update) {
-        Long chatId = update.getMessage().getChatId();
-        SendMessage message = new SendMessage();
-        message.setChatId(chatId);
-        if (personService.loginTelegram(chatId) == null) {
-            message.setReplyMarkup(getRegisterKeyboard());
-        } else {
-            message.setReplyMarkup(getGeneralKeyboard());
-            message.setText("Мы внутри, можно смотреть уведомления b('w')b");
-        }
-
-        return message;
-    }
-
     private SendMessage register(Update update) {
         Long chatId = update.getMessage().getChatId();
-        String phone = update.getMessage().getContact().getPhoneNumber();
+        String phone = update.getMessage().getContact().getPhoneNumber().substring(1);
         SendMessage message = new SendMessage();
         message.setChatId(chatId);
 
