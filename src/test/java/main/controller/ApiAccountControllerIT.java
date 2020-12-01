@@ -53,7 +53,7 @@ public class ApiAccountControllerIT extends AbstractIntegrationIT {
                 .andExpect(jsonPath("$.data[1].enable").value("false"))
                 .andExpect(jsonPath("$.data[1].type").value("POST"))
                 .andExpect(jsonPath("$.data[2].enable").value("true"))
-                .andExpect(jsonPath("$.data[2].type").value("COMMENT_COMMENT"));
+                .andExpect(jsonPath("$.data[2].type").value("LIKE"));
     }
 
     @Test
