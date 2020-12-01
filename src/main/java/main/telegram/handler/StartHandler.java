@@ -2,6 +2,7 @@ package main.telegram.handler;
 
 import lombok.RequiredArgsConstructor;
 import main.telegram.BotCommand;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -10,7 +11,8 @@ import org.telegram.telegrambots.meta.api.objects.User;
 import java.util.ArrayList;
 import java.util.List;
 
-//@Component
+@Profile("prod")
+@Component
 @RequiredArgsConstructor
 public class StartHandler extends BaseHandler {
 
@@ -23,8 +25,9 @@ public class StartHandler extends BaseHandler {
         User user = update.getMessage().getFrom();
         List<SendMessage> messages = new ArrayList<>();
         SendMessage message = new SendMessage();
-        message.setText(String.format("Привет, %s! Для входа нажми 'Вход'", user.getUserName()));
-        message.setReplyMarkup(getKeyboard());
+        message.setText("Привет, " + user.getUserName() + "! Для получения увеомлений нажми 'Уведомления'" +
+                "\nP.S. Уведомления умею показывать только по запросу ;P");
+        message.setReplyMarkup(getGeneralKeyboard());
         messages.add(message);
         return messages;
     }

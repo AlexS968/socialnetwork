@@ -8,8 +8,7 @@ public enum BotCommand {
     HELP ("Помощь"),
     NOTIFICATIONS ("Уведомления"),
     SETTINGS ("Настройки"),
-    REGISTER("Регистрация"),
-    LOGIN("Вход");
+    REGISTER("Регистрация");
 
     private final String name;
 

@@ -20,20 +20,36 @@ public abstract class BaseHandler {
         return replyKeyboardMarkup;
     }
 
-    protected ReplyKeyboardMarkup getKeyboard() {
+    protected ReplyKeyboardMarkup getGeneralKeyboard() {
         ReplyKeyboardMarkup replyKeyboardMarkup = getKeyboardTemplate();
         List<KeyboardRow> keyboard = new ArrayList<>();
 
         KeyboardRow keyboardFirstRow = new KeyboardRow();
-        keyboardFirstRow.add(new KeyboardButton("Вход"));
-        keyboardFirstRow.add(new KeyboardButton("Помощь"));
+        keyboardFirstRow.add(new KeyboardButton("Уведомления"));
 
         KeyboardRow keyboardSecondRow = new KeyboardRow();
         keyboardSecondRow.add(new KeyboardButton("Настройки"));
-        keyboardSecondRow.add(new KeyboardButton("Уведомления"));
+        keyboardSecondRow.add(new KeyboardButton("Помощь"));
+
 
         keyboard.add(keyboardFirstRow);
         keyboard.add(keyboardSecondRow);
+        replyKeyboardMarkup.setKeyboard(keyboard);
+        return replyKeyboardMarkup;
+    }
+
+    protected ReplyKeyboardMarkup getRegisterKeyboard() {
+        ReplyKeyboardMarkup replyKeyboardMarkup = getKeyboardTemplate();
+        List<KeyboardRow> keyboard = new ArrayList<>();
+
+        KeyboardRow keyboardFirstRow = new KeyboardRow();
+        KeyboardButton btn = new KeyboardButton("Регистрация");
+        btn.setRequestContact(true);
+        keyboardFirstRow.add(btn);
+
+        keyboardFirstRow.add(new KeyboardButton("Помощь"));
+        keyboard.add(keyboardFirstRow);
+
         replyKeyboardMarkup.setKeyboard(keyboard);
         return replyKeyboardMarkup;
     }
