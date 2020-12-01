@@ -2,6 +2,7 @@ package main.telegram.handler;
 
 import lombok.RequiredArgsConstructor;
 import main.telegram.BotCommand;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -9,7 +10,8 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import java.util.ArrayList;
 import java.util.List;
 
-//@Component
+@Profile("prod")
+@Component
 @RequiredArgsConstructor
 public class ReplyHandler extends BaseHandler{
 
@@ -25,8 +27,8 @@ public class ReplyHandler extends BaseHandler{
             }
         }
         List<SendMessage> messages = new ArrayList<>();
-        SendMessage message = new SendMessage(update.getMessage().getChatId(), "Просто так не отвечаю, выбери команду");
-        message.setReplyMarkup(getKeyboard());
+        SendMessage message = new SendMessage(update.getMessage().getChatId(), "Просто так не отвечаю, выбери команду!");
+        message.setReplyMarkup(getGeneralKeyboard());
         messages.add(message);
         return messages;
     }

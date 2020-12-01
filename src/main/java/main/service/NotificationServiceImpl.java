@@ -75,7 +75,17 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public ListResponse<NotificationResponse> list(int offset, int itemPerPage, boolean needToRead) {
-        Person person = ContextUtilities.getCurrentPerson();
+        return list(offset, itemPerPage, needToRead, null);
+    }
+
+    @Override
+    public ListResponse<NotificationResponse> list(int offset, int itemPerPage, boolean needToRead, Long telegramId) {
+        Person person;
+        if (telegramId == null) {
+            person = ContextUtilities.getCurrentPerson();
+        } else {
+            person = personService.loginTelegram(telegramId);
+        }
 
         // получаем для текущего пользователя list с перечнем id типов уведомлений, которые он акцептовал
         List<Integer> types = person.getNotificationSettings().entrySet().stream()
