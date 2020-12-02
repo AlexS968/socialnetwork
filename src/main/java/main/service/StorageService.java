@@ -25,7 +25,9 @@ public class StorageService {
     public String uploadPath;
 
     public Response<Storage> store(MultipartFile file, String type) {
-        String originalFilename = (file.getOriginalFilename() != null) ? file.getOriginalFilename() : "";
+        String originalFilename = file.getOriginalFilename();
+        int originalFileLastDot = (originalFilename != null) ? originalFilename.lastIndexOf(".") : -1;
+        String fileFormat = (originalFilename != null) ? originalFilename.substring(originalFileLastDot + 1) : "";
         String uuidFile = UUID.randomUUID().toString();
         String resultName = uuidFile + "_" + originalFilename;
 
@@ -46,7 +48,7 @@ public class StorageService {
         storage.setFileName(resultName);
         storage.setRelativeFilePath("/" + resultName);
         storage.setRawFileURL("/img/" + resultName);
-        storage.setFileFormat(originalFilename.substring(originalFilename.lastIndexOf(".") + 1));
+        storage.setFileFormat(fileFormat);
         storage.setBytes(file.getSize());
         storage.setFileType(type);
         storage.setCreatedAt(new Date().getTime());
