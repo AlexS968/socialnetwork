@@ -18,12 +18,12 @@ public class StartHandler extends BaseHandler {
 
     @Override
     public List<SendMessage> handle(Update update) {
-        if (!update.hasMessage() || !update.getMessage().hasText() ||
-                !update.getMessage().getText().equals(BotCommand.START.toString())) {
-            return null;
+        List<SendMessage> messages = new ArrayList<>();
+        if (!(update.hasMessage() && update.getMessage().hasText() &&
+                update.getMessage().getText().equals(BotCommand.START.toString()))) {
+            return messages;
         }
         User user = update.getMessage().getFrom();
-        List<SendMessage> messages = new ArrayList<>();
         SendMessage message = new SendMessage();
         message.setText("Привет, " + user.getUserName() + "! Для получения увеомлений нажми 'Уведомления'" +
                 "\nP.S. Уведомления умею показывать только по запросу ;P");
