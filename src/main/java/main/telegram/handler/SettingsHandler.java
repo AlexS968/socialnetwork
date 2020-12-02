@@ -16,15 +16,14 @@ import java.util.List;
 public class SettingsHandler extends BaseHandler {
     @Override
     public List<SendMessage> handle(Update update) {
-        if (!update.hasMessage() || !update.getMessage().hasText() ||
-                !update.getMessage().getText().equals(BotCommand.SETTINGS.toString())) {
-            return null;
-        }
         List<SendMessage> messages = new ArrayList<>();
-        SendMessage message = new SendMessage();
-        message.setText("Эм... Тут пока ничего нет -\\_-");
-        message.setReplyMarkup(getGeneralKeyboard());
-        messages.add(message);
+        if (update.hasMessage() && update.getMessage().hasText() &&
+                update.getMessage().getText().equals(BotCommand.SETTINGS.toString())) {
+            SendMessage message = new SendMessage();
+            message.setText("Эм... Тут пока ничего нет -\\_-");
+            message.setReplyMarkup(getGeneralKeyboard());
+            messages.add(message);
+        }
         return messages;
     }
 }

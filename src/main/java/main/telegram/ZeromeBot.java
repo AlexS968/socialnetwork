@@ -36,9 +36,7 @@ public class ZeromeBot extends TelegramLongPollingBot {
         handlers.forEach(
                 handler -> {
                     List<SendMessage> messages = handler.handle(update);
-                    if (messages != null && !messages.isEmpty()) {
-                        messages.forEach(m -> sendTextMessage(chatId, m));
-                    }
+                    messages.forEach(m -> sendTextMessage(chatId, m));
                 }
         );
     }
@@ -50,7 +48,6 @@ public class ZeromeBot extends TelegramLongPollingBot {
         try {
             execute(message);
         } catch (TelegramApiException e) {
-            e.printStackTrace();
             log.error(e.getMessage());
         }
     }

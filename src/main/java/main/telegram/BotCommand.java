@@ -1,7 +1,9 @@
 package main.telegram;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+@Getter
 @RequiredArgsConstructor
 public enum BotCommand {
     START ("/start"),
@@ -11,8 +13,4 @@ public enum BotCommand {
     REGISTER("Регистрация");
 
     private final String name;
-
-    public String toString() {
-        return this.name;
-    }
 }

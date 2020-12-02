@@ -1,9 +1,7 @@
 package main.telegram.handler;
 
 import lombok.RequiredArgsConstructor;
-import main.service.PersonService;
 import main.service.RegistrationService;
-import main.telegram.BotCommand;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -16,7 +14,6 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class AuthHandler extends BaseHandler {
-    private final PersonService personService;
     private final RegistrationService registrationService;
 
     @Override
