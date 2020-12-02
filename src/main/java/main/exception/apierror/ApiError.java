@@ -5,9 +5,11 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.io.Serializable;
+
 @ApiModel(value = "ApiError")
 @Data
-public class ApiError {
+public class ApiError implements Serializable {
     @ApiModelProperty(value = "error", example = "invalid_request")
     String error;
     @ApiModelProperty(value = "error_description", example = "string")

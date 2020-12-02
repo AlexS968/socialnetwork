@@ -18,6 +18,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class StorageService {
+    private final static String IMG_DIR = "/img/";
 
     private final PersonRepository personRepository;
 
@@ -38,16 +39,16 @@ public class StorageService {
         }
 
         Person photoOwner = ContextUtilities.getCurrentPerson();
-        photoOwner.setPhotoURL("/img/" + resultName);
+        photoOwner.setPhotoURL(IMG_DIR + resultName);
         personRepository.save(photoOwner);
 
         Storage storage = new Storage();
 
-        storage.setId("/img/" + resultName);
+        storage.setId(IMG_DIR + resultName);
         storage.setOwnerId(photoOwner.getId());
         storage.setFileName(resultName);
         storage.setRelativeFilePath("/" + resultName);
-        storage.setRawFileURL("/img/" + resultName);
+        storage.setRawFileURL(IMG_DIR + resultName);
         storage.setFileFormat(fileFormat);
         storage.setBytes(file.getSize());
         storage.setFileType(type);
