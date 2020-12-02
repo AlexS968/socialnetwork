@@ -15,7 +15,8 @@ integration_tests:
   only:
     - merge_requests
   except:
-    - schedules
+    variables:
+      - $CI_MERGE_REQUEST_TARGET_BRANCH_NAME != "dev"
 
 # -------------------------- deploy ------------------------------
 
@@ -61,8 +62,8 @@ production_dev:
     - echo ARG1=--spring.datasource.url=$DEV_DB_URL > /opt/network/dev/.progconf
     - echo ARG2=--app.jwtSecret=$DEV_JWT_SECRET >> /opt/network/dev/.progconf
     - echo ARG3=--server.port=$DEV_PORT >> /opt/network/dev/.progconf
-    - echo ARG4=--bot.name=$BOT_NAME >> /opt/network/prod/.progconf
-    - echo ARG5=--bot.token=$BOT_TOKEN >> /opt/network/prod/.progconf
+    - echo ARG4=--bot.name=$BOT_NAME >> /opt/network/dev/.progconf
+    - echo ARG5=--bot.token=$BOT_TOKEN >> /opt/network/dev/.progconf
     - sudo systemctl start networkapp_dev
   only:
     - dev
@@ -82,7 +83,7 @@ backup_dev:
 sonar_dev:
   stage: sonar
   only:
-    - merge_requests
+    - dev
   script:
     - mvn -Pintegration-tests -DjdbcUrl=$TEST_DB_URL clean package sonar:sonar
   except:
