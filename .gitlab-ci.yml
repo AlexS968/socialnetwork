@@ -15,7 +15,8 @@ integration_tests:
   only:
     - merge_requests
   except:
-    - schedules
+    variables:
+      - $CI_MERGE_REQUEST_TARGET_BRANCH_NAME != "dev"
 
 # -------------------------- deploy ------------------------------
 
@@ -82,7 +83,7 @@ backup_dev:
 sonar_dev:
   stage: sonar
   only:
-    - merge_requests
+    - dev
   script:
     - mvn -Pintegration-tests -DjdbcUrl=$TEST_DB_URL clean package sonar:sonar
   except:
