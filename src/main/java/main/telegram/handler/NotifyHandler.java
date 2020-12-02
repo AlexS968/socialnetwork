@@ -21,32 +21,28 @@ public class NotifyHandler extends BaseHandler {
 
     @Override
     public List<SendMessage> handle(Update update) {
-        if (!update.hasMessage() || !update.getMessage().hasText() ||
-                !update.getMessage().getText().equals(BotCommand.NOTIFICATIONS.toString())) {
-            return null;
-        }
-        long chatId = update.getMessage().getChatId();
-
         List<SendMessage> messages = new ArrayList<>();
-        SendMessage message = new SendMessage();
-        message.setChatId(chatId);
-        try {
-            notificationService.list(0, 10, false, chatId)
-                    .getData()
-                    .forEach(n -> {
-                        messages.add(createMessage(chatId, n));
-                    });
-            message.setReplyMarkup(getGeneralKeyboard());
-            if (messages.isEmpty()) {
-                message.setText("Источники сообщили, что уведомлениий для тебя нет -\\_-, зайди попозже");
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            message.setText("Похоже, я не могу определить, кто ты... Так что для начала я бы зарегался)");
-            message.setReplyMarkup(getRegisterKeyboard());
-        }
+        if (update.hasMessage() && update.getMessage().hasText() &&
+                update.getMessage().getText().equals(BotCommand.NOTIFICATIONS.toString())) {
+            long chatId = update.getMessage().getChatId();
 
-        messages.add(message);
+            SendMessage message = new SendMessage();
+            message.setChatId(chatId);
+            try {
+                notificationService.list(0, 10, false, chatId)
+                        .getData()
+                        .forEach(n -> messages.add(createMessage(chatId, n)));
+                message.setReplyMarkup(getGeneralKeyboard());
+                if (messages.isEmpty()) {
+                    message.setText("Источники сообщили, что уведомлениий для тебя нет -\\_-, зайди попозже");
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                message.setText("Похоже, я не могу определить, кто ты... Так что для начала я бы зарегался)");
+                message.setReplyMarkup(getRegisterKeyboard());
+            }
+            messages.add(message);
+        }
         return messages;
     }
 
