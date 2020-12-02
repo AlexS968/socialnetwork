@@ -8,6 +8,7 @@ import main.data.response.type.LikesWithUsers;
 import main.service.LikesService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 @Api
 @RestController
 @RequiredArgsConstructor
@@ -16,7 +17,7 @@ public class LikesController {
     private final LikesService likesService;
 
     @GetMapping("/liked")
-    public ResponseEntity<?> isLiked(
+    public ResponseEntity<Response<LikesWithUsers>> isLiked(
             @RequestParam(name = "user_id", required = false) Integer userId,
             @RequestParam(name = "item_id") int itemId,
             @RequestParam String type
@@ -40,7 +41,7 @@ public class LikesController {
     }
 
     @DeleteMapping("/likes")
-    public ResponseEntity<?> deleteLike(
+    public ResponseEntity<Response<LikesWithUsers>> deleteLike(
             @RequestParam(name = "item_id") int itemId,
             @RequestParam String type
     ) {

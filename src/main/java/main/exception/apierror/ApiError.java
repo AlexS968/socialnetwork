@@ -8,7 +8,6 @@ import lombok.Data;
 @ApiModel(value = "ApiError")
 @Data
 public class ApiError {
-
     @ApiModelProperty(value = "error", example = "invalid_request")
     String error;
     @ApiModelProperty(value = "error_description", example = "string")
@@ -21,5 +20,13 @@ public class ApiError {
         this.error = error;
         this.errorDescription = errorDescription;
         statusText = errorDescription;
+    }
+
+    public ApiError(String errorDescription) {
+        this("invalid_request", errorDescription);
+    }
+
+    public ApiError() {
+        this("Bad request");
     }
 }
