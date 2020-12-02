@@ -19,13 +19,20 @@ public class LogServiceImpl implements LogService {
     @Value("${spring.profiles.active}")
     public String profile;
 
+    public static String lvlToString(String s) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[").append(s).insert(sb.length(), " ", 0, 5 - s.length()).append("]");
+        return sb.toString();
+    }
+
     @Override
     public Response<List<String>> getLogs(String logType, String logLevel, Integer lineCount) {
         List<String> logRecords = new ArrayList<>();
         if (!(logType.isEmpty() || logLevel.isEmpty() || lineCount == null)) {
-            try {
-                FileInputStream fs = new FileInputStream(String.format("%s/%s/%s/%s.log", logPath, profile, logType, logType));
-                BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+            try (
+                    FileInputStream fs = new FileInputStream(String.format("%s/%s/%s/%s.log", logPath, profile, logType, logType));
+                    BufferedReader br = new BufferedReader(new InputStreamReader(fs))
+            ) {
                 String line;
                 while ((line = br.readLine()) != null) {
                     String level = lvlToString(logLevel.toUpperCase());
@@ -33,17 +40,10 @@ public class LogServiceImpl implements LogService {
                         logRecords.add(line);
                     }
                 }
-                fs.close();
             } catch (Exception e) {
                 System.err.println("Error: " + e.getMessage());
             }
         }
         return new Response<>(logRecords);
-    }
-
-    public static String lvlToString(String s) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("[").append(s).insert(sb.length(), " ", 0, 5 - s.length()).append("]");
-        return sb.toString();
     }
 }
