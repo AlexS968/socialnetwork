@@ -11,7 +11,7 @@ integration_tests:
     - /home/gitlab-runner/sonar/bin/linux-x86-64/sonar.sh stop
     - mvn clean verify -Pintegration-tests -DjdbcUrl=$TEST_DB_URL
     - /home/gitlab-runner/sonar/bin/linux-x86-64/sonar.sh start
-    - sleep 45
+    - sleep 25
   only:
     - merge_requests
   except:
