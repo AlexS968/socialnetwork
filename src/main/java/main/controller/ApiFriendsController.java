@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 public class ApiFriendsController {
+    private static final String BAD_REQUEST = "Bad request";
+    private static final String INVALID_REQUEST = "invalid_request";
     private final FriendsServiceImpl friendsService;
-    private final String BAD_REQUEST = "Bad request";
-    private final String INVALID_REQEUST = "invalid_request";
 
     @GetMapping(value = "/api/v1/friends")
     public ResponseEntity<FriendsResponse> friends(
@@ -27,7 +27,7 @@ public class ApiFriendsController {
         try {
             response = friendsService.getFriends(name, offset, itemPerPage);
         } catch (BadRequestException ex) {
-            throw new BadRequestException(new ApiError(INVALID_REQEUST, BAD_REQUEST));
+            throw new BadRequestException(new ApiError(INVALID_REQUEST, BAD_REQUEST));
         }
 
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -40,7 +40,7 @@ public class ApiFriendsController {
         try {
             response = friendsService.deleteFriend(id);
         } catch (BadRequestException ex) {
-            throw new BadRequestException(new ApiError(INVALID_REQEUST, BAD_REQUEST));
+            throw new BadRequestException(new ApiError(INVALID_REQUEST, BAD_REQUEST));
         }
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -54,7 +54,7 @@ public class ApiFriendsController {
         try {
             response = friendsService.getRecommendations(offset, itemPerPage);
         } catch (BadRequestException ex) {
-            throw new BadRequestException(new ApiError(INVALID_REQEUST, BAD_REQUEST));
+            throw new BadRequestException(new ApiError(INVALID_REQUEST, BAD_REQUEST));
         }
         return new ResponseEntity<>(response, HttpStatus.OK);
 
@@ -75,7 +75,7 @@ public class ApiFriendsController {
         try {
             response = friendsService.getRequests(offset, itemPerPage);
         } catch (BadRequestException ex) {
-            throw new BadRequestException(new ApiError(INVALID_REQEUST, BAD_REQUEST));
+            throw new BadRequestException(new ApiError(INVALID_REQUEST, BAD_REQUEST));
         }
 
         return new ResponseEntity<>(response, HttpStatus.OK);
