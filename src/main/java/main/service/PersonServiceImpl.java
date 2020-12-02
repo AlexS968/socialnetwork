@@ -1,12 +1,5 @@
 package main.service;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
 import lombok.RequiredArgsConstructor;
 import main.core.ContextUtilities;
 import main.core.auth.JwtUtils;
@@ -14,18 +7,10 @@ import main.data.PersonPrincipal;
 import main.data.request.LoginRequest;
 import main.data.request.MeProfileRequest;
 import main.data.response.base.Response;
-import main.data.response.type.DataMessage;
-import main.data.response.type.InfoInResponse;
-import main.data.response.type.MeProfile;
-import main.data.response.type.PersonInLogin;
-import main.data.response.type.ResponseMessage;
+import main.data.response.type.*;
 import main.exception.BadRequestException;
 import main.exception.apierror.ApiError;
-import main.model.BlocksBetweenUsers;
-import main.model.City;
-import main.model.Country;
-import main.model.Person;
-import main.model.Post;
+import main.model.*;
 import main.repository.BlocksBetweenUsersRepository;
 import main.repository.CityRepository;
 import main.repository.CountryRepository;
@@ -40,6 +25,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -106,14 +98,12 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
         int id = ContextUtilities.getCurrentUserId();
         if (id == 0) {
             throw new BadRequestException(new ApiError(
-                    "invalid_request",
-                    "на авторизован"
+                    "не авторизован"
             ));
         }
         Person person = getById(id);
         if (person == null) {
             throw new BadRequestException(new ApiError(
-                    "invalid_request",
                     "нет аккаунта с таким айди"
             ));
         }
@@ -130,7 +120,6 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
 
         if (personUpdated == null) {
             throw new BadRequestException(new ApiError(
-                    "invalid_request",
                     "нет аккаунта с таким айди"
             ));
         }
@@ -162,8 +151,7 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
 
         if (id == 0) {
             throw new BadRequestException(new ApiError(
-                    "invalid_request",
-                    "на авторизован"
+                    "не авторизован"
             ));
         }
 
@@ -237,7 +225,7 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
         //Проверка на блокировку профиля
         BlocksBetweenUsers blocksBetweenUsers = blocksBetweenUsersRepository
                 .findBySrc_IdAndDst_Id(id, ContextUtilities.getCurrentUserId());
-        if (!(blocksBetweenUsers == null)) {
+        if (blocksBetweenUsers != null) {
             throw new BadRequestException(
                     new ApiError("Access blocked", "Доступ к профилю заблокирован"));
             //setToBlocked(person);
@@ -245,7 +233,7 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
         //Проверка на блокировку от текущего профиля
         blocksBetweenUsers = blocksBetweenUsersRepository
                 .findBySrc_IdAndDst_Id(ContextUtilities.getCurrentUserId(), id);
-        person.setBlocked(!(blocksBetweenUsers == null));
+        person.setBlocked(blocksBetweenUsers != null);
         Response<MeProfile> response = new Response<>();
 
         MeProfile profile = new MeProfile(person);
