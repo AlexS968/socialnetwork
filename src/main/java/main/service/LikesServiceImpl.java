@@ -22,6 +22,9 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class LikesServiceImpl implements LikesService {
+    private static final String COMMENT = "Comment";
+    private static final String ERROR_NOT_POST_OR_COMMENT = "Выбран не пост или комментарий";
+    private static final String ERROR_OBJECT_NOT_FOUND = "Объект не найден";
     private final LikesRepository likesRepository;
     private final PersonServiceImpl personService;
     private final CommentServiceImpl commentService;
@@ -29,12 +32,12 @@ public class LikesServiceImpl implements LikesService {
     private final NotificationService notificationService;
 
     public Response<LikesWithUsers> isLiked(Integer userId, int itemId, String type) {
-        Person person= userId == null ? personService.getAuthUser() : personService.getById(userId);
+        Person person = userId == null ? personService.getAuthUser() : personService.getById(userId);
         Optional<Like> likeOptional;
-        if (type.equals("Post") || type.equals("Comment")) {
+        if (type.equals("Post") || type.equals(COMMENT)) {
             likeOptional = likesRepository.findByItemIdAndPersonIdAndType(itemId, person.getId(), LikeType.valueOf(type.toUpperCase()));
         } else {
-            throw new BadRequestException(new ApiError("invalid_request", "Выбран не пост или комментарий"));
+            throw new BadRequestException(new ApiError(ERROR_NOT_POST_OR_COMMENT));
         }
         return new Response<>(new LikesWithUsers(likeOptional.isPresent() ? 1 : 0, Collections.emptyList()));
     }
@@ -55,12 +58,12 @@ public class LikesServiceImpl implements LikesService {
                 Post post = postService.findById(request.getItemId());
                 like.setItemId(post.getId());
                 like.setType(LikeType.POST);
-            } else if (request.getType().equals("Comment")) {
+            } else if (request.getType().equals(COMMENT)) {
                 PostComment comment = commentService.getComment(request.getItemId());
                 like.setItemId(comment.getId());
                 like.setType(LikeType.COMMENT);
             } else {
-                throw new BadRequestException(new ApiError("invalid_request", "Выбран не пост или комментарий"));
+                throw new BadRequestException(new ApiError(ERROR_NOT_POST_OR_COMMENT));
             }
             like.setPerson(person);
             like.setTime(Instant.now());
@@ -74,18 +77,18 @@ public class LikesServiceImpl implements LikesService {
     @Transactional
     public Response<LikesWithUsers> deleteLike(int itemId, String type) {
         Person person = personService.getAuthUser();
-        if (type.equals("Post") || type.equals("Comment")) {
+        if (type.equals("Post") || type.equals(COMMENT)) {
             Like like = likesRepository.findByItemIdAndPersonIdAndType(itemId, person.getId(), LikeType.valueOf(type.toUpperCase()))
-                    .orElseThrow(()->new BadRequestException(new ApiError("invalid_request", "Объект не найден")));
+                    .orElseThrow(() -> new BadRequestException(new ApiError(ERROR_OBJECT_NOT_FOUND)));
             notificationService.deleteNotification(like);
 
             try {
                 likesRepository.deleteByItemIdAndPersonIdAndType(itemId, person.getId(), LikeType.valueOf(type.toUpperCase()));
             } catch (Exception ex) {
-                throw new BadRequestException(new ApiError("invalid_request", "Объект не найден"));
+                throw new BadRequestException(new ApiError(ERROR_OBJECT_NOT_FOUND));
             }
         } else {
-            throw new BadRequestException(new ApiError("invalid_request", "Выбран не пост или комментарий"));
+            throw new BadRequestException(new ApiError(ERROR_NOT_POST_OR_COMMENT));
         }
         return getLikes(itemId, type);
     }
@@ -97,15 +100,15 @@ public class LikesServiceImpl implements LikesService {
             if (likeOptional.isPresent()) {
                 return likeOptional.get();
             } else {
-                throw new BadRequestException(new ApiError("invalid_request", "Объект не найден"));
+                throw new BadRequestException(new ApiError(ERROR_OBJECT_NOT_FOUND));
             }
         } else {
-            throw new BadRequestException(new ApiError("invalid_request", "Выбран не пост или комментарий"));
+            throw new BadRequestException(new ApiError(ERROR_NOT_POST_OR_COMMENT));
         }
     }
 
     @Override
-    public Like findById(int id){
+    public Like findById(int id) {
         return likesRepository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
     }
