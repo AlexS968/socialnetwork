@@ -100,8 +100,9 @@ public class RegistrationService {
                     City cityToSet = cityRepository.findFirstCityFromCountry(countryId);
                     person.setCity(cityToSet);
                 } else {
-                    if(cityOptional.get(0).isPresent()) {
-                      person.setCity(cityOptional.get(0).get());
+                    Optional<City> targetCity = cityOptional.get(0);
+                    if (targetCity.isPresent()) {
+                        person.setCity(targetCity.get());
                     }
                 }
             }
