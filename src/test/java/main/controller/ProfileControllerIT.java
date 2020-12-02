@@ -86,19 +86,6 @@ public class ProfileControllerIT extends AbstractIntegrationIT {
         ;
     }
 
-    @Test
-    @WithAnonymousUser
-    public void addPostToWall_withAnonymousUser() throws Exception {
-//        request.setTags(new ArrayList<>());
-//        String jsonRequest = mapper.writer().withDefaultPrettyPrinter().writeValueAsString(request);
-//
-//        mockMvc.perform(post("/api/v1/users/{id}/wall", "1")
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(jsonRequest)).andDo(print())
-//                .andExpect(status().isForbidden())
-//        ;
-    }
-
     @Test(expected = IllegalArgumentException.class)
     public void addPostToWall_withoutPathVarId() throws Exception {
         request.setTags(new ArrayList<>());
