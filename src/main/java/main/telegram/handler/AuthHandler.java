@@ -18,13 +18,12 @@ public class AuthHandler extends BaseHandler {
 
     @Override
     public List<SendMessage> handle(Update update) {
-        List<SendMessage> messages = null;
-        if (update.hasMessage()) {
-            if (update.getMessage().hasContact()) {
-                messages = new ArrayList<>();
-                messages.add(register(update));
-            }
+        List<SendMessage> messages = new ArrayList<>();
+        if (!(update.hasMessage() && update.getMessage().hasContact())) {
+            return messages;
         }
+        messages = new ArrayList<>();
+        messages.add(register(update));
         return messages;
     }
 

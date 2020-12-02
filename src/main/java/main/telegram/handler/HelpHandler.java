@@ -17,15 +17,16 @@ public class HelpHandler extends BaseHandler {
 
     @Override
     public List<SendMessage> handle(Update update) {
-        List<SendMessage> messages =  new ArrayList<>();
-        if (update.hasMessage() && update.getMessage().hasText() &&
-                update.getMessage().getText().equals(BotCommand.HELP.toString())) {
-            String text = "Получить уведомления можно по кнопке 'Уведомления', если я тебя при этом узнаю)" +
-                    " Если нет, то придется дать номерок :D";
-            SendMessage message = new SendMessage(update.getMessage().getChatId(), text);
-            message.setReplyMarkup(getGeneralKeyboard());
-            messages.add(message);
+        List<SendMessage> messages = new ArrayList<>();
+        if (!(update.hasMessage() && update.getMessage().hasText() &&
+                update.getMessage().getText().equals(BotCommand.HELP.toString()))) {
+            return messages;
         }
+        String text = "Получить уведомления можно по кнопке 'Уведомления', если я тебя при этом узнаю)" +
+                " Если нет, то придется дать номерок :D";
+        SendMessage message = new SendMessage(update.getMessage().getChatId(), text);
+        message.setReplyMarkup(getGeneralKeyboard());
+        messages.add(message);
         return messages;
     }
 }
