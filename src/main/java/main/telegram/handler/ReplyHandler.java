@@ -18,7 +18,7 @@ public class ReplyHandler extends BaseHandler {
     @Override
     public List<SendMessage> handle(Update update) {
         List<SendMessage> messages = new ArrayList<>();
-        if (!(update.hasMessage() && update.getMessage().hasText())) {
+        if (!update.hasMessage() || !update.getMessage().hasText()) {
             return messages;
         }
         String text = update.getMessage().getText();

@@ -19,7 +19,7 @@ public class AuthHandler extends BaseHandler {
     @Override
     public List<SendMessage> handle(Update update) {
         List<SendMessage> messages = new ArrayList<>();
-        if (!(update.hasMessage() && update.getMessage().hasContact())) {
+        if (!update.hasMessage() || !update.getMessage().hasContact()) {
             return messages;
         }
         messages = new ArrayList<>();

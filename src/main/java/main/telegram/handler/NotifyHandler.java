@@ -22,8 +22,8 @@ public class NotifyHandler extends BaseHandler {
     @Override
     public List<SendMessage> handle(Update update) {
         List<SendMessage> messages = new ArrayList<>();
-        if (!(update.hasMessage() && update.getMessage().hasText() &&
-                update.getMessage().getText().equals(BotCommand.NOTIFICATIONS.toString()))) {
+        if (!update.hasMessage() || !update.getMessage().hasText() ||
+                !update.getMessage().getText().equals(BotCommand.NOTIFICATIONS.toString())) {
             return messages;
         }
         long chatId = update.getMessage().getChatId();
