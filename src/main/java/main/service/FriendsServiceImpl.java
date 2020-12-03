@@ -61,7 +61,6 @@ public class FriendsServiceImpl implements FriendsService {
                 .findBySrc_IdAndDst_Id(id, currentUserId);
         if (blocksBetweenUsers != null) {
             throw new BadRequestException(new ApiError("Access blocked", "Добавление в друзья заблокировано"));
-            //setToBlocked(person);
         }
         if (friendsRepository.findBySrc_idAndDst_IdAndStatusId(currentUserId, id, 1) == null
                 && (id != currentUserId)) {
@@ -132,7 +131,6 @@ public class FriendsServiceImpl implements FriendsService {
     public FriendsResponse getRequests(int offset, int limit) {
         int currentUserId = ContextUtilities.getCurrentUserId();
         Page<Friendship> requests;
-        System.out.println(111111);
         requests = friendsRepository.findByDst_IdAndStatusId(currentUserId, getPage(offset, limit), 1);
         return new FriendsResponse(requests);
     }
