@@ -2,6 +2,7 @@ package main.controller;
 
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
+import main.config.SpringFoxConfig;
 import main.data.response.FriendsResponse;
 import main.exception.BadRequestException;
 import main.exception.apierror.ApiError;
@@ -10,7 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Api
+@Api(tags = { SpringFoxConfig.FRIEND_TAG })
 @RestController
 @RequiredArgsConstructor
 public class ApiFriendsController {

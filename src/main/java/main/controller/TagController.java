@@ -2,6 +2,7 @@ package main.controller;
 
 import io.swagger.annotations.Api;
 import lombok.AllArgsConstructor;
+import main.config.SpringFoxConfig;
 import main.data.request.TagRequest;
 import main.data.response.base.ListResponse;
 import main.data.response.base.Response;
@@ -10,7 +11,7 @@ import main.data.response.type.SingleTag;
 import main.service.TagService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-@Api
+@Api(tags = { SpringFoxConfig.TAG_TAG })
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/tags")

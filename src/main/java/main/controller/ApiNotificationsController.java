@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.RequiredArgsConstructor;
+import main.config.SpringFoxConfig;
 import main.data.response.base.ListResponse;
 import main.data.response.type.NotificationResponse;
 import main.exception.apierror.ApiError;
@@ -14,7 +15,7 @@ import main.service.NotificationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Api
+@Api(tags = { SpringFoxConfig.NOTIFICATION_TAG })
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")

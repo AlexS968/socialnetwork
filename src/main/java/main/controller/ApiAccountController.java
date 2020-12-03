@@ -2,6 +2,7 @@ package main.controller;
 
 import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
+import main.config.SpringFoxConfig;
 import main.data.request.NotificationSettingsRequest;
 import main.data.request.PasswordRecoveryRequest;
 import main.data.request.PasswordSetRequest;
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
 
-@Api
+@Api(tags = {SpringFoxConfig.ACCOUNT_TAG})
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/account")

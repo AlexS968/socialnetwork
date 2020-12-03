@@ -19,6 +19,7 @@ import main.exception.apierror.ApiError;
 import main.service.DialogServiceImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 @Api(tags = { SpringFoxConfig.DIALOG_TAG })
 @RestController
 @AllArgsConstructor

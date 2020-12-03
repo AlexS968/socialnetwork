@@ -20,6 +20,12 @@ public class SpringFoxConfig {
     public static final String STORAGE_TAG = "Storage";
     public static final String SEARCH_TAG = "Search";
     public static final String PROFILE_TAG = "Profile";
+    public static final String ACCOUNT_TAG = "Account";
+    public static final String FRIEND_TAG = "Friend";
+    public static final String NOTIFICATION_TAG = "Notification";
+    public static final String TAG_TAG = "Tag";
+    public static final String LIKE_TAG = "Like";
+    public static final String LOG_TAG = "Log";
 
     @Bean
     public Docket api() {
@@ -31,7 +37,13 @@ public class SpringFoxConfig {
                         new Tag(POST_TAG, "Работа с публикациями"),
                         new Tag(STORAGE_TAG, "Работа с хранилищем сервиса"),
                         new Tag(SEARCH_TAG, "Работа с поиском"),
-                        new Tag(PROFILE_TAG, "Работа с профилем")
+                        new Tag(PROFILE_TAG, "Работа с профилем"),
+                        new Tag(ACCOUNT_TAG, "Работа с учетной записью пользователя"),
+                        new Tag(FRIEND_TAG, "Работа с друзьями"),
+                        new Tag(NOTIFICATION_TAG, "Работа с уведомлениями"),
+                        new Tag(TAG_TAG, "Работа с тегами"),
+                        new Tag(LIKE_TAG, "Работа с лайками"),
+                        new Tag(LOG_TAG, "Работа с логами")
                 )
                 .apiInfo(new ApiInfoBuilder()
                         .title("Zerone Network API")

@@ -17,7 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-@Api(tags = { SpringFoxConfig.POST_TAG })
+@Api(tags = {SpringFoxConfig.POST_TAG})
 @Controller
 @AllArgsConstructor
 @RequestMapping("/api/v1")

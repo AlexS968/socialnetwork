@@ -2,6 +2,7 @@ package main.controller;
 
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
+import main.config.SpringFoxConfig;
 import main.data.request.LikeRequest;
 import main.data.response.base.Response;
 import main.data.response.type.LikesWithUsers;
@@ -9,7 +10,7 @@ import main.service.LikesService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Api
+@Api(tags = {SpringFoxConfig.LIKE_TAG})
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
