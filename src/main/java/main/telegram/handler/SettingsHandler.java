@@ -17,8 +17,8 @@ public class SettingsHandler extends BaseHandler {
     @Override
     public List<SendMessage> handle(Update update) {
         List<SendMessage> messages = new ArrayList<>();
-        if (!(update.hasMessage() && update.getMessage().hasText() &&
-                update.getMessage().getText().equals(BotCommand.SETTINGS.toString()))) {
+        if (!update.hasMessage() || !update.getMessage().hasText() ||
+                !update.getMessage().getText().equals(BotCommand.SETTINGS.toString())) {
             return messages;
         }
         SendMessage message = new SendMessage();

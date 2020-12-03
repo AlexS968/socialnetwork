@@ -19,8 +19,8 @@ public class StartHandler extends BaseHandler {
     @Override
     public List<SendMessage> handle(Update update) {
         List<SendMessage> messages = new ArrayList<>();
-        if (!(update.hasMessage() && update.getMessage().hasText() &&
-                update.getMessage().getText().equals(BotCommand.START.toString()))) {
+        if (!update.hasMessage() || !update.getMessage().hasText() ||
+                !update.getMessage().getText().equals(BotCommand.START.toString())) {
             return messages;
         }
         User user = update.getMessage().getFrom();
