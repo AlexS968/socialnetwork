@@ -7,6 +7,7 @@ import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
@@ -16,7 +17,7 @@ import java.util.Map;
 @Table(name = "person")
 @Data
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class Person {
+public class Person implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;

@@ -190,7 +190,7 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
 
     public boolean isAuthenticated() {
         if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
-            throw new UsernameNotFoundException("invalid_request");
+            throw new UsernameNotFoundException(ApiError.INVALID_REQUEST);
         }
         return true;
     }
@@ -203,7 +203,7 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
     public Person checkAuthUser(int id) {
         Person person = getAuthUser();
         if (person.getId() != id) {
-            throw new UsernameNotFoundException("invalid_request");
+            throw new UsernameNotFoundException(ApiError.INVALID_REQUEST);
         }
         return person;
     }
@@ -214,7 +214,7 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
         if (personOpt.isPresent()) {
             person = personOpt.get();
         } else {
-            throw new UsernameNotFoundException("invalid_request");
+            throw new UsernameNotFoundException(ApiError.INVALID_REQUEST);
         }
         // проверка удален ли профиль
         if (person.isDeleted()) {

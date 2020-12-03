@@ -10,6 +10,8 @@ import java.io.Serializable;
 @ApiModel(value = "ApiError")
 @Data
 public class ApiError implements Serializable {
+    public static final String INVALID_REQUEST = "invalid_request";
+
     @ApiModelProperty(value = "error", example = "invalid_request")
     String error;
     @ApiModelProperty(value = "error_description", example = "string")
@@ -25,7 +27,7 @@ public class ApiError implements Serializable {
     }
 
     public ApiError(String errorDescription) {
-        this("invalid_request", errorDescription);
+        this(INVALID_REQUEST, errorDescription);
     }
 
     public ApiError() {
