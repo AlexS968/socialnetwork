@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
+import main.config.SpringFoxConfig;
 import main.data.response.base.Response;
 import main.data.response.type.Storage;
 import main.service.StorageService;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-@Api(description = "Работа с хранилищем сервиса", tags = {"Storage"})
+@Api(tags = { SpringFoxConfig.STORAGE_TAG })
 @RestController
 @AllArgsConstructor
 public class StorageController {

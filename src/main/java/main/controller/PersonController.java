@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
+import main.config.SpringFoxConfig;
 import main.data.request.MeProfileRequest;
 import main.data.response.base.Response;
 import main.data.response.type.InfoInResponse;
@@ -16,8 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Api(description = "Работа с профилем", tags = {"Profile"})
-
+@Api(tags = {SpringFoxConfig.PROFILE_TAG})
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/users")
@@ -45,8 +45,8 @@ public class PersonController {
     })
     @PutMapping(value = "/me", produces = "application/json")
     public ResponseEntity<Response<MeProfile>> updateCurrentUser(
-        @ApiParam(name = "Updated profile info")
-        @RequestBody MeProfileRequest updatedCurrentUser) {
+            @ApiParam(name = "Updated profile info")
+            @RequestBody MeProfileRequest updatedCurrentUser) {
 
         return ResponseEntity.ok(personServiceImpl.putMe(updatedCurrentUser));
 

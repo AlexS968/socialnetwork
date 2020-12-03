@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
+import main.config.SpringFoxConfig;
 import main.data.request.CommentRequest;
 import main.data.response.CommentResponse;
 import main.data.response.base.ListResponse;
@@ -17,8 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-@Api(description = "Работа с комментариями", tags = {"Comment"})
-
+@Api(tags = { SpringFoxConfig.COMMENT_TAG })
 @AllArgsConstructor
 @Controller
 @RequestMapping("/api/v1/post")

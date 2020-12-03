@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
+import main.config.SpringFoxConfig;
 import main.data.request.DialogAddRequest;
 import main.data.request.DialogMessageRequest;
 import main.data.request.ListRequest;
@@ -18,7 +19,7 @@ import main.exception.apierror.ApiError;
 import main.service.DialogServiceImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-@Api(description = "Работа с диалогами", tags = {"Dialog"})
+@Api(tags = { SpringFoxConfig.DIALOG_TAG })
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/dialogs")

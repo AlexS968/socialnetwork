@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import lombok.RequiredArgsConstructor;
+import main.config.SpringFoxConfig;
 import main.data.request.LoginRequest;
 import main.data.response.CaptchaResponse;
 import main.data.response.base.Response;
@@ -22,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Api(description = "Работа аутентификацией", tags = {"Auth"})
+@Api(tags = { SpringFoxConfig.AUTH_TAG })
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/auth")

@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
+import main.config.SpringFoxConfig;
 import main.data.request.PostRequest;
 import main.data.response.base.ListResponse;
 import main.data.response.base.Response;
@@ -16,8 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-@Api(description = "Работа с публикациями", tags = {"Post"})
-
+@Api(tags = { SpringFoxConfig.POST_TAG })
 @Controller
 @AllArgsConstructor
 @RequestMapping("/api/v1")
