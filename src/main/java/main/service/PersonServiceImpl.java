@@ -217,7 +217,7 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
             throw new UsernameNotFoundException("invalid_request");
         }
         // проверка удален ли профиль
-        if (person.isDeleted() == true) {
+        if (person.isDeleted()) {
             throw new BadRequestException(
                     new ApiError("profile deleted", person.getFirstName() + " " + person.getLastName()
                             + " решил удалить свой профиль"));
@@ -253,7 +253,7 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
         response.setError("");
         BlocksBetweenUsers blocksBetweenUsers = blocksBetweenUsersRepository
                 .findBySrc_IdAndDst_Id(currentUserId, id);
-        if (!(blocksBetweenUsers == null)) {
+        if (blocksBetweenUsers != null) {
             blocksBetweenUsersRepository.delete(blocksBetweenUsers);
             response.setData(new DataMessage("ок"));
             return response;

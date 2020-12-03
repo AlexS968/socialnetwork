@@ -3,7 +3,6 @@ package main.service;
 import main.data.response.FriendsResponse;
 import main.model.Friendship;
 import main.model.FriendshipStatus;
-import main.model.Person;
 
 import java.util.List;
 

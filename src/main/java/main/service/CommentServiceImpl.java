@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
-    private final static String INVALID_REQUEST = "invalid request";
+    private static final String INVALID_REQUEST = "invalid request";
 
     private final PostCommentRepository commentRepository;
     private final PostRepository postRepository;

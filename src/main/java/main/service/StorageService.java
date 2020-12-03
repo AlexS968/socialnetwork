@@ -18,7 +18,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class StorageService {
-    private final static String IMG_DIR = "/img/";
+    private static final String IMG_DIR = "/img/";
 
     private final PersonRepository personRepository;
 

@@ -49,7 +49,7 @@ public class FriendsServiceImpl implements FriendsService {
         friends.forEach(friendship -> {
             BlocksBetweenUsers blocksBetweenUsers = blocksBetweenUsersRepository
                     .findBySrc_IdAndDst_Id(currentUserId, friendship.getSrc().getId());
-            friendship.getSrc().setBlocked(!(blocksBetweenUsers == null));
+            friendship.getSrc().setBlocked(blocksBetweenUsers != null);
         });
         return new FriendsResponse(friends);
     }
@@ -59,12 +59,12 @@ public class FriendsServiceImpl implements FriendsService {
         int currentUserId = ContextUtilities.getCurrentUserId();
         BlocksBetweenUsers blocksBetweenUsers = blocksBetweenUsersRepository
                 .findBySrc_IdAndDst_Id(id, currentUserId);
-        if (!(blocksBetweenUsers == null)) {
+        if (blocksBetweenUsers != null) {
             throw new BadRequestException(new ApiError("Access blocked", "Добавление в друзья заблокировано"));
             //setToBlocked(person);
         }
         if (friendsRepository.findBySrc_idAndDst_IdAndStatusId(currentUserId, id, 1) == null
-                && !(id == currentUserId)) {
+                && (id != currentUserId)) {
             Friendship friendship = friendsRepository.findByDst_IdAndSrc_IdAndStatusId(currentUserId, id, 1);
             if (friendship == null) {
                 friendship = new Friendship();
