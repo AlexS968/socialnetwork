@@ -31,6 +31,9 @@ public class StorageControllerIT extends AbstractIntegrationIT {
   @Test
   public void shouldStore() throws Exception {
 
+    File imgs = new File("imgs");
+    imgs.mkdir();
+
     BufferedImage bufferedImage = new BufferedImage(600, 600,
         BufferedImage.TYPE_INT_RGB);
 
@@ -59,6 +62,7 @@ public class StorageControllerIT extends AbstractIntegrationIT {
 
     f.delete();
     f1.delete();
+    imgs.delete();
 
 
   }
