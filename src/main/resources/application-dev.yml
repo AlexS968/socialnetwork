@@ -11,7 +11,7 @@ linkToChange:
   email: "http://localhost:8080/shift-email"
 
 upload:
-  path: "src\main\resources\static\static\img"
+  path: "/home/jvmapps/photos"
 
 log:
   path: "log/javapro"
