@@ -1,9 +1,6 @@
 package main.telegram.handler;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import main.config.SpringFoxConfig;
 import main.data.response.type.NotificationResponse;
 import main.service.NotificationService;
 import main.telegram.BotCommand;
@@ -26,8 +23,7 @@ public class NotifyHandler extends BaseHandler {
     public List<SendMessage> handle(Update update) {
         List<SendMessage> messages = new ArrayList<>();
         if (!update.hasMessage() || !update.getMessage().hasText() ||
-                !update.getMessage().getText().equals(BotCommand.NOTIFICATIONS.getName()) ||
-                !update.getMessage().getText().equals(BotCommand.NOTIFICATIONS.getCommand())) {
+                !update.getMessage().getText().equals(BotCommand.NOTIFICATIONS.getName())) {
             return messages;
         }
         long chatId = update.getMessage().getChatId();

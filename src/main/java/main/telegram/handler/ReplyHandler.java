@@ -1,9 +1,6 @@
 package main.telegram.handler;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import main.config.SpringFoxConfig;
 import main.telegram.BotCommand;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -26,7 +23,7 @@ public class ReplyHandler extends BaseHandler {
         }
         String text = update.getMessage().getText();
         for (BotCommand command : BotCommand.values()) {
-            if (text.equals(command.getName()) || text.equals(command.getCommand())) {
+            if (text.startsWith(command.getName())) {
                 return messages;
             }
         }
