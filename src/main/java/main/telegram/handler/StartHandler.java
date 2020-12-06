@@ -20,7 +20,7 @@ public class StartHandler extends BaseHandler {
     public List<SendMessage> handle(Update update) {
         List<SendMessage> messages = new ArrayList<>();
         if (!update.hasMessage() || !update.getMessage().hasText() ||
-                !update.getMessage().getText().equals(BotCommand.START.toString())) {
+                !update.getMessage().getText().equals(BotCommand.START.getName())) {
             return messages;
         }
         User user = update.getMessage().getFrom();

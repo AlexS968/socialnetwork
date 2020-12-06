@@ -23,7 +23,7 @@ public class ReplyHandler extends BaseHandler {
         }
         String text = update.getMessage().getText();
         for (BotCommand command : BotCommand.values()) {
-            if (text.startsWith(command.toString())) {
+            if (text.startsWith(command.getName())) {
                 return messages;
             }
         }
