@@ -30,7 +30,7 @@ public interface PersonRepository extends JpaRepository<Person, Integer> {
     List<Optional<Person>> findByLastNameLikeOrFirstNameLike(String lastName, String firstName);
 
     @Query(nativeQuery = true, value = "SELECT * FROM person "
-        + "WHERE (is_deleted != 1) and(:firstName is null or first_name = :firstName) and (:lastName is null or last_name = :lastName) and "
+        + "WHERE (is_deleted != 1) and (:firstName is null or first_name = :firstName) and (:lastName is null or last_name = :lastName) and "
         + "(:ageFrom is null or birth_date <= :ageFrom) and (:ageTo is null or birth_date >= :ageTo) and "
         + "(:countryId is null or country_id = :countryId) and "
         + "(COALESCE(:cityIds) is null or (city_id IN (:cityIds))) order by person.id",
