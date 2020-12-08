@@ -16,10 +16,8 @@ import java.util.List;
 @Profile("prod")
 @Component
 @RequiredArgsConstructor
-@Api(tags = {SpringFoxConfig.BOT_TAG})
 public class ReplyHandler extends BaseHandler {
 
-    @ApiOperation("Работа с общими сообщениями")
     @Override
     public List<SendMessage> handle(Update update) {
         List<SendMessage> messages = new ArrayList<>();

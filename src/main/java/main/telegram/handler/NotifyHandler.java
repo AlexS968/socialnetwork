@@ -18,12 +18,10 @@ import java.util.List;
 @Profile("prod")
 @Component
 @RequiredArgsConstructor
-@Api(tags = {SpringFoxConfig.BOT_TAG})
 public class NotifyHandler extends BaseHandler {
 
     private final NotificationService notificationService;
 
-    @ApiOperation("Работа с запросом уведомлений")
     @Override
     public List<SendMessage> handle(Update update) {
         List<SendMessage> messages = new ArrayList<>();
