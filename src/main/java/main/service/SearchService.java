@@ -134,7 +134,9 @@ public class SearchService {
         Date from = null;
         Date to = null;
         Set<Integer> authorsIds = new HashSet<>();
-        String textUpdated = "%" + text + "%";
+        String textUpdated=null;
+        if (text != null ) { textUpdated= "%" + text + "%";}
+
         Set<Integer> tagsIds = new HashSet<>();
 
         if (dateFrom != null && dateTo != null) {
