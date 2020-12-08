@@ -14,16 +14,18 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class SettingsHandler extends BaseHandler {
+
     @Override
     public List<SendMessage> handle(Update update) {
         List<SendMessage> messages = new ArrayList<>();
         if (!update.hasMessage() || !update.getMessage().hasText() ||
-                !update.getMessage().getText().equals(BotCommand.SETTINGS.getName())) {
+                !update.getMessage().getText().equals(BotCommand.SETTINGS.getName()) ||
+                !update.getMessage().getText().equals(BotCommand.SETTINGS.getCommand())) {
             return messages;
         }
         SendMessage message = new SendMessage();
         message.setText("Эм... Тут пока ничего нет -\\_-");
-        message.setReplyMarkup(getGeneralKeyboard());
+        message.setReplyMarkup(getInlineKeyboard());
         messages.add(message);
         return messages;
     }

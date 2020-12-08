@@ -2,6 +2,7 @@ package main.telegram.handler;
 
 import lombok.RequiredArgsConstructor;
 import main.service.RegistrationService;
+import main.telegram.BotCommand;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -19,6 +20,11 @@ public class AuthHandler extends BaseHandler {
     @Override
     public List<SendMessage> handle(Update update) {
         List<SendMessage> messages = new ArrayList<>();
+        if (update.hasMessage() && update.getMessage().getText().equals(BotCommand.REGISTER.getCommand())) {
+            SendMessage message = new SendMessage(update.getMessage().getChatId(), "Теперь дай доступ к контакту, пожалуйста)");
+            message.setReplyMarkup(getRegisterKeyboard());
+            messages.add(message);
+        }
         if (!update.hasMessage() || !update.getMessage().hasContact()) {
             return messages;
         }
@@ -29,7 +35,7 @@ public class AuthHandler extends BaseHandler {
 
     private SendMessage register(Update update) {
         Long chatId = update.getMessage().getChatId();
-        String phone = update.getMessage().getContact().getPhoneNumber().substring(1);
+        String phone = update.getMessage().getContact().getPhoneNumber().replaceAll("[+(\\-)]","");
         SendMessage message = new SendMessage();
         message.setChatId(chatId);
 
@@ -38,7 +44,7 @@ public class AuthHandler extends BaseHandler {
         } else {
             message.setText("Телефона в профиле нет ? Тогда не смогу войти");
         }
-        message.setReplyMarkup(getGeneralKeyboard());
+        message.setReplyMarkup(getInlineKeyboard());
 
         return message;
     }

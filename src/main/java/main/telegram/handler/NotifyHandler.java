@@ -1,6 +1,9 @@
 package main.telegram.handler;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import main.config.SpringFoxConfig;
 import main.data.response.type.NotificationResponse;
 import main.service.NotificationService;
 import main.telegram.BotCommand;
@@ -15,15 +18,18 @@ import java.util.List;
 @Profile("prod")
 @Component
 @RequiredArgsConstructor
+@Api(tags = {SpringFoxConfig.BOT_TAG})
 public class NotifyHandler extends BaseHandler {
 
     private final NotificationService notificationService;
 
+    @ApiOperation("Работа с запросом уведомлений")
     @Override
     public List<SendMessage> handle(Update update) {
         List<SendMessage> messages = new ArrayList<>();
         if (!update.hasMessage() || !update.getMessage().hasText() ||
-                !update.getMessage().getText().equals(BotCommand.NOTIFICATIONS.getName())) {
+                !update.getMessage().getText().equals(BotCommand.NOTIFICATIONS.getName()) ||
+                !update.getMessage().getText().equals(BotCommand.NOTIFICATIONS.getCommand())) {
             return messages;
         }
         long chatId = update.getMessage().getChatId();
@@ -34,7 +40,7 @@ public class NotifyHandler extends BaseHandler {
             notificationService.list(0, 10, false, chatId)
                     .getData()
                     .forEach(n -> messages.add(createMessage(chatId, n)));
-            message.setReplyMarkup(getGeneralKeyboard());
+            message.setReplyMarkup(getInlineKeyboard());
             if (messages.isEmpty()) {
                 message.setText("Источники сообщили, что уведомлениий для тебя нет -\\_-, зайди попозже");
             }
