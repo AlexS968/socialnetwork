@@ -166,6 +166,7 @@ public class PersonServiceImpl implements UserDetailsService, PersonService {
         personToDetele.setAbout(personToDetele.getFirstName() + " " + personToDetele.getLastName()
                 + " решил удалить свою страницу");
 
+        personToDetele.setPhone("");
         personToDetele.setDeleted(true);
 
         // изменить емейл и пароль чтобы пользователь не смог зайти в удаленную учетку
