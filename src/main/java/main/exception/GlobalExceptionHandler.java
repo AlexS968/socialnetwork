@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import main.exception.apierror.ApiError;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -20,6 +21,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<ApiError> handleBadRequestException(
             BadRequestException ex, WebRequest req) {
         return handleExceptionInternal(ex, ex.getError(), HttpStatus.BAD_REQUEST, req);
+    }
+
+    @ExceptionHandler(value = {BadCredentialsException.class})
+    protected ResponseEntity<ApiError> handleUserNotAuthorizedException(
+            BadCredentialsException ex, WebRequest req) {
+        return handleExceptionInternal(ex, new ApiError(ex.getMessage(), "Пользователь не найден"), HttpStatus.UNAUTHORIZED, req);
     }
 
     @ExceptionHandler(value = {UsernameNotFoundException.class})

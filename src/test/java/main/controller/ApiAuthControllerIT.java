@@ -35,7 +35,7 @@ public class ApiAuthControllerIT extends AbstractIntegrationIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestJson))
                 .andDo(print())
-                .andExpect(status().isForbidden());
+                .andExpect(status().isUnauthorized());
     }
 
 
