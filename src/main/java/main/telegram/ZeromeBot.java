@@ -29,7 +29,7 @@ public class ZeromeBot extends TelegramLongPollingBot {
     private String botToken;
 
     private final List<BaseHandler> handlers;
-
+    
     @Override
     public void onUpdateReceived(Update update) {
         long chatId = update.getMessage().getChatId();

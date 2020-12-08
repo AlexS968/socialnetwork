@@ -20,14 +20,15 @@ public class StartHandler extends BaseHandler {
     public List<SendMessage> handle(Update update) {
         List<SendMessage> messages = new ArrayList<>();
         if (!update.hasMessage() || !update.getMessage().hasText() ||
-                !update.getMessage().getText().equals(BotCommand.START.getName())) {
+                !update.getMessage().getText().equals(BotCommand.START.getName()) ||
+                !update.getMessage().getText().equals(BotCommand.START.getCommand())) {
             return messages;
         }
         User user = update.getMessage().getFrom();
         SendMessage message = new SendMessage();
         message.setText("Привет, " + user.getUserName() + "! Для получения увеомлений нажми 'Уведомления'" +
                 "\nP.S. Уведомления умею показывать только по запросу ;P");
-        message.setReplyMarkup(getGeneralKeyboard());
+        message.setReplyMarkup(getReplyKeyboard());
         messages.add(message);
         return messages;
     }
