@@ -1,6 +1,7 @@
 package main.service;
 
 import lombok.RequiredArgsConstructor;
+import main.core.ContextUtilities;
 import main.data.request.CommentRequest;
 import main.data.response.CommentResponse;
 import main.data.response.base.ListResponse;
@@ -9,9 +10,11 @@ import main.data.response.type.CommentInResponse;
 import main.data.response.type.ItemDelete;
 import main.exception.BadRequestException;
 import main.exception.apierror.ApiError;
+import main.model.BlocksBetweenUsers;
 import main.model.Person;
 import main.model.Post;
 import main.model.PostComment;
+import main.repository.BlocksBetweenUsersRepository;
 import main.repository.PostCommentRepository;
 import main.repository.PostRepository;
 import org.springframework.stereotype.Service;
@@ -32,10 +35,19 @@ public class CommentServiceImpl implements CommentService {
     private final PostCommentRepository commentRepository;
     private final PostRepository postRepository;
     private final PersonService personService;
+    private final BlocksBetweenUsersRepository blocksBetweenUsersRepository;
     private final NotificationService notificationService;
 
     @Override
     public CommentResponse createComment(Integer postId, CommentRequest request) {
+
+
+        BlocksBetweenUsers blocksBetweenUsers = blocksBetweenUsersRepository
+                .findBySrc_IdAndDst_Id(getUserIdByPostId(postId), ContextUtilities.getCurrentUserId());
+        if (!(blocksBetweenUsers == null)) {
+            throw new BadRequestException(new ApiError("Access blocked", "Написание комментария заблокировано"));
+        }
+
         if (request.getCommentText().isBlank()) {
             throw new BadRequestException(new ApiError(INVALID_REQUEST, "текст комментария отсутствует"));
         }
@@ -163,6 +175,11 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public List<PostComment> subComments(PostComment comment){
         return new ArrayList<>(commentRepository.subCommentsG(comment.getId()));
+    }
+
+
+    private int getUserIdByPostId(int postId){
+        return postRepository.findById(postId).get().getAuthor().getId();
     }
 }
 
