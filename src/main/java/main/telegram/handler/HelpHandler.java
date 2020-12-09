@@ -19,8 +19,7 @@ public class HelpHandler extends BaseHandler {
     public List<SendMessage> handle(Update update) {
         List<SendMessage> messages = new ArrayList<>();
         if (!update.hasMessage() || !update.getMessage().hasText() ||
-                !update.getMessage().getText().equals(BotCommand.HELP.getName()) ||
-                !update.getMessage().getText().equals(BotCommand.HELP.getCommand())) {
+                !update.getMessage().getText().equals(BotCommand.HELP.getName())) {
             return messages;
         }
         String text = "Получить уведомления можно по кнопке 'Уведомления', если я тебя при этом узнаю)" +

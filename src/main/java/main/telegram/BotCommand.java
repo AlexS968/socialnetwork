@@ -6,12 +6,11 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum BotCommand {
-    START("Старт", "/start"),
-    HELP("Помощь", "/help"),
-    NOTIFICATIONS("Уведомления", "/notifications"),
-    SETTINGS("Настройки", "/settings"),
-    REGISTER("Регистрация", "/register");
+    START("/start"),
+    HELP("Помощь"),
+    NOTIFICATIONS("Уведомления"),
+    SETTINGS("Настройки"),
+    REGISTER("Регистрация");
 
     private final String name;
-    private final String command;
 }
