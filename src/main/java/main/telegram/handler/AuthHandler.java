@@ -39,7 +39,7 @@ public class AuthHandler extends BaseHandler {
         } else {
             message.setText("Телефона в профиле нет ? Тогда не смогу войти");
         }
-        message.setReplyMarkup(getInlineKeyboard());
+        message.setReplyMarkup(getRegisterKeyboard());
 
         return message;
     }
