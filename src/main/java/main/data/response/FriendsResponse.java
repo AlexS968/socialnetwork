@@ -1,6 +1,7 @@
 package main.data.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.inject.internal.cglib.core.$MethodInfoTransformer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -10,6 +11,8 @@ import main.data.response.type.DataMessage;
 import main.data.response.type.MeProfile;
 import main.model.Friendship;
 import main.model.Person;
+import main.service.PersonService;
+import main.service.PersonServiceImpl;
 import org.springframework.data.domain.Page;
 
 import java.time.Instant;
@@ -48,9 +51,20 @@ public class FriendsResponse extends ListResponse {
         this.setTotal(recommendedFriends.size());
         FriendsOrRecommendedList = new ArrayList<>();
         for (Optional<Person> item : recommendedFriends) {
-            item.ifPresent(person -> FriendsOrRecommendedList.add(new MeProfile(person)));
+            item.ifPresent(person -> {
+                if (IsThisPersonAllowed(item)) {
+                    FriendsOrRecommendedList.add(new MeProfile(person));
+                }
+            });
         }
     }
 
 
+    private boolean IsThisPersonAllowed(Optional<Person> item){
+        if (!item.get().isDeleted()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
