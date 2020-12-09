@@ -23,7 +23,7 @@ public class SettingsHandler extends BaseHandler {
         }
         SendMessage message = new SendMessage();
         message.setText("Эм... Тут пока ничего нет -\\_-");
-        message.setReplyMarkup(getInlineKeyboard());
+        message.setReplyMarkup(getReplyKeyboard());
         messages.add(message);
         return messages;
     }

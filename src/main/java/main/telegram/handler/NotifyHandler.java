@@ -34,7 +34,7 @@ public class NotifyHandler extends BaseHandler {
             notificationService.list(0, 10, false, chatId)
                     .getData()
                     .forEach(n -> messages.add(createMessage(chatId, n)));
-            message.setReplyMarkup(getInlineKeyboard());
+            message.setReplyMarkup(getReplyKeyboard());
             if (messages.isEmpty()) {
                 message.setText("Источники сообщили, что уведомлениий для тебя нет -\\_-, зайди попозже");
             }
