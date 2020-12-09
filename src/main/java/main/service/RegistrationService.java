@@ -60,7 +60,7 @@ public class RegistrationService {
             ));
         }
 
-        if(!request.equals("testCaptcha")) {
+        if(!request.getData().equals("testCaptcha")) {
             CaptchaResponse captchaResponse = captchaService.checkCaptcha(request.getData(), secretCode, captchaUrl);
         }
 
