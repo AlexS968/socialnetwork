@@ -29,13 +29,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/auth")
 public class ApiAuthController {
     private final PersonServiceImpl userService;
-    private final CaptchaServiceImpl captchaService;
-
-    @Value("${reCaptcha.secretCode}")
-    public String secretCode;
-
-    @Value("${reCaptcha.url}")
-    public String captchaUrl;
 
     @ApiOperation(value = "Авторизация в системе")
     @ApiResponses(value = {
@@ -60,10 +53,5 @@ public class ApiAuthController {
     @PostMapping("/logout")
     public ResponseEntity<Response<ResponseMessage>> logout() {
         return ResponseEntity.ok(userService.logout());
-    }
-
-    @PostMapping(value = "/captcha")
-    public ResponseEntity<CaptchaResponse> confirmCaptcha(@RequestBody String token) {
-        return ResponseEntity.ok(captchaService.checkCaptcha(token, secretCode, captchaUrl));
     }
 }

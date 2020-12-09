@@ -3,6 +3,7 @@ package main.service;
 
 import lombok.AllArgsConstructor;
 import main.data.request.RegistrationRequest;
+import main.data.response.CaptchaResponse;
 import main.data.response.RegistrationResponse;
 import main.data.response.type.DataMessage;
 import main.data.response.type.GeoLocationResponseShort;
@@ -41,8 +42,11 @@ public class RegistrationService {
     private final CityRepository cityRepository;
     private final JavaMailSender emailSender;
     private final RestTemplate restTemplate;
+    private final CaptchaService captchaService;
 
-    public RegistrationResponse registrationNewPerson(RegistrationRequest request) {
+    public RegistrationResponse registrationNewPerson(RegistrationRequest request, String secretCode, String captchaUrl) {
+
+
         if (personRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new BadRequestException(new ApiError(
                     "invalid_request",
@@ -54,6 +58,10 @@ public class RegistrationService {
                     "invalid_request",
                     "пароли не совпадают"
             ));
+        }
+
+        if(!request.getData().equals("testCaptcha")) {
+            CaptchaResponse captchaResponse = captchaService.checkCaptcha(request.getData(), secretCode, captchaUrl);
         }
 
         String ip = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
