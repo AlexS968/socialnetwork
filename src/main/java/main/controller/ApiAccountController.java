@@ -36,6 +36,11 @@ public class ApiAccountController {
     @Value("${linkToChange.email}")
     public String emailChangeLink;
 
+    @Value("${reCaptcha.secretCode}")
+    public String secretCode;
+    @Value("${reCaptcha.url}")
+    public String captchaUrl;
+
     @ApiOperation(value = "Получение настроек оповещения", notes = "Получает настройки оповещения")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = ""),
@@ -136,6 +141,6 @@ public class ApiAccountController {
     public ResponseEntity<RegistrationResponse> registration(
             @ApiParam(name = "Request body")
             @RequestBody RegistrationRequest request) {
-        return ResponseEntity.ok(registrationService.registrationNewPerson(request));
+        return ResponseEntity.ok(registrationService.registrationNewPerson(request, secretCode, captchaUrl));
     }
 }

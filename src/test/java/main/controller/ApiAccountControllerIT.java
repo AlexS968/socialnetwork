@@ -40,6 +40,11 @@ public class ApiAccountControllerIT extends AbstractIntegrationIT {
     @Value("${linkToChange.password}")
     public String passwordChangeLink;
 
+    @Value("${reCaptcha.secretCode}")
+    public String secretCode;
+    @Value("${reCaptcha.url}")
+    public String captchaUrl;
+
     @Test
     @WithUserDetails(value = "user@user.ru")
     public void shouldGetSettings() throws Exception {
@@ -239,7 +244,7 @@ public class ApiAccountControllerIT extends AbstractIntegrationIT {
     public void shouldRegisterNewPerson() throws Exception {
         RegistrationRequest request = new RegistrationRequest(
                 "email@mail.ru", "password", "password",
-                "Danny", "Wilds", "");
+                "Danny", "Wilds", "", "");
 
         String requestJson = mapper.writer().withDefaultPrettyPrinter().writeValueAsString(request);
 
@@ -265,7 +270,7 @@ public class ApiAccountControllerIT extends AbstractIntegrationIT {
     public void shouldNotRegisterNewPersonWhenEmailAlreadyInDB() throws Exception {
         RegistrationRequest request = new RegistrationRequest(
                 "user@user.ru", "password", "password",
-                "Danny", "Wilds", "");
+                "Danny", "Wilds", "", "");
         String requestJson = mapper.writer().withDefaultPrettyPrinter().writeValueAsString(request);
 
         mockMvc.perform(post("/api/v1/account/register")
@@ -282,7 +287,7 @@ public class ApiAccountControllerIT extends AbstractIntegrationIT {
     public void shouldNotRegisterNewPersonWhenPasswordsNotMatchWithEachOther() throws Exception {
         RegistrationRequest request = new RegistrationRequest(
                 "email@mail.ru", "pass1", "pass2",
-                "Danny", "Wilds", "");
+                "Danny", "Wilds", "","");
         String requestJson = mapper.writer().withDefaultPrettyPrinter().writeValueAsString(request);
 
         mockMvc.perform(post("/api/v1/account/register")
