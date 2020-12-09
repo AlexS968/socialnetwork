@@ -46,49 +46,54 @@ public class FriendsServiceImpl implements FriendsService {
         int currentUserId = ContextUtilities.getCurrentUserId();
         Page<Friendship> friends;
         friends = friendsRepository.findByDst_IdAndStatusId(currentUserId, getPage(offset, limit), 2);
-        friends.forEach(friendship -> {
-            BlocksBetweenUsers blocksBetweenUsers = blocksBetweenUsersRepository
-                    .findBySrc_IdAndDst_Id(currentUserId, friendship.getSrc().getId());
-            friendship.getSrc().setBlocked(blocksBetweenUsers != null);
-        });
         return new FriendsResponse(friends);
     }
 
     @Override
     public FriendsResponse addFriend(int id) {
         int currentUserId = ContextUtilities.getCurrentUserId();
+        //Проверка на блокировку со стороны получателя заявки
         BlocksBetweenUsers blocksBetweenUsers = blocksBetweenUsersRepository
                 .findBySrc_IdAndDst_Id(id, currentUserId);
         if (blocksBetweenUsers != null) {
             throw new BadRequestException(new ApiError("Access blocked", "Добавление в друзья заблокировано"));
         }
-        if (friendsRepository.findBySrc_idAndDst_IdAndStatusId(currentUserId, id, 1) == null
-                && (id != currentUserId)) {
-            Friendship friendship = friendsRepository.findByDst_IdAndSrc_IdAndStatusId(currentUserId, id, 1);
-            if (friendship == null) {
-                friendship = new Friendship();
-                friendship.setDst(personRepository.findById(id));
-                friendship.setSrc(personRepository.findById(currentUserId));
-                friendship.setStatus(friendshipStatusRepository.findById(1));
-            } else {
-                friendship.setStatus(friendshipStatusRepository.findById(2));
-                friendsRepository.save(friendship);
-                friendship = new Friendship();
-                friendship.setDst(personRepository.findById(id));
-                friendship.setSrc(personRepository.findById(currentUserId));
-                friendship.setStatus(friendshipStatusRepository.findById(2));
-            }
-            friendsRepository.save(friendship);
-            notificationService.setNotification(friendship);
-            FriendsResponse friendsResponse = new FriendsResponse();
-            friendsResponse.setError("");
-            friendsResponse.setDataMessage(new DataMessage("ok"));
-            return friendsResponse;
+
+        //Проверка на блокировку со стороны отпровителя заявки
+        blocksBetweenUsers = blocksBetweenUsersRepository
+                .findBySrc_IdAndDst_Id(currentUserId, id);
+        if (blocksBetweenUsers != null) {
+            throw new BadRequestException(new ApiError("Access blocked", "Добавление в друзья заблокировано"));
         }
-        FriendsResponse friendsResponse = new FriendsResponse();
-        friendsResponse.setError("");
-        friendsResponse.setDataMessage(new DataMessage("Заявка уже отправлена"));
-        return friendsResponse;
+
+        if (friendsRepository.findBySrc_idAndDst_IdAndStatusId(currentUserId, id, 2) == null) {
+            if (friendsRepository.findBySrc_idAndDst_IdAndStatusId(currentUserId, id, 1) == null
+                    && (id != currentUserId)) {
+                Friendship friendship = friendsRepository.findByDst_IdAndSrc_IdAndStatusId(currentUserId, id, 1);
+                if (friendship == null) {
+                    friendship = new Friendship();
+                    friendship.setDst(personRepository.findById(id));
+                    friendship.setSrc(personRepository.findById(currentUserId));
+                    friendship.setStatus(friendshipStatusRepository.findById(1));
+                } else {
+                    friendship.setStatus(friendshipStatusRepository.findById(2));
+                    friendsRepository.save(friendship);
+                    friendship = new Friendship();
+                    friendship.setDst(personRepository.findById(id));
+                    friendship.setSrc(personRepository.findById(currentUserId));
+                    friendship.setStatus(friendshipStatusRepository.findById(2));
+                }
+                friendsRepository.save(friendship);
+                notificationService.setNotification(friendship);
+                FriendsResponse friendsResponse = new FriendsResponse();
+                friendsResponse.setError("");
+                friendsResponse.setDataMessage(new DataMessage("ok"));
+                return friendsResponse;
+            }
+            throw new BadRequestException(new ApiError("Friends error", "Заявка в друзья уже отправлена"));
+        }else {
+            throw new BadRequestException(new ApiError("Friends error", "Вы уже друзья"));
+        }
     }
 
     @Override
