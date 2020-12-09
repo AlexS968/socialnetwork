@@ -23,11 +23,11 @@ public class HelpHandler extends BaseHandler {
             return messages;
         }
         String text = "Получить уведомления можно по кнопке 'Уведомления', если я тебя при этом узнаю)" +
-                " Если нет, то придется дать номерок :D\n" +
-                "Или можешь писать мне коммандами:\n" +
-                "/help - это же сообщение(Помощь)\n" +
-                "/notifications - получить уведомления\n" +
-                "/register - зарегистрироваться(чтобы я мог искать именно твои уведомления)";
+                " Если нет, то придется дать номерок :D\n";
+//                "Или можешь писать мне коммандами:\n" +
+//                "/help - это же сообщение(Помощь)\n" +
+//                "/notifications - получить уведомления\n" +
+//                "/register - зарегистрироваться(чтобы я мог искать именно твои уведомления)";
         SendMessage message = new SendMessage(update.getMessage().getChatId(), text);
         message.setReplyMarkup(getReplyKeyboard());
         messages.add(message);

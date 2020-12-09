@@ -20,13 +20,7 @@ public class AuthHandler extends BaseHandler {
     @Override
     public List<SendMessage> handle(Update update) {
         List<SendMessage> messages = new ArrayList<>();
-        if (!update.hasMessage()) {
-            return messages;
-        } else if (update.getMessage().getText().equals(BotCommand.REGISTER.getName())) {
-            SendMessage message = new SendMessage(update.getMessage().getChatId(), "Теперь дай доступ к контакту, пожалуйста)");
-            message.setReplyMarkup(getRegisterKeyboard());
-            messages.add(message);
-        } else if (!update.getMessage().hasContact()){
+        if (!update.hasMessage() || !update.getMessage().hasContact()) {
             return messages;
         }
         messages = new ArrayList<>();
@@ -36,7 +30,7 @@ public class AuthHandler extends BaseHandler {
 
     private SendMessage register(Update update) {
         Long chatId = update.getMessage().getChatId();
-        String phone = update.getMessage().getContact().getPhoneNumber().replaceAll("[+(\\-)]", "");
+        String phone = update.getMessage().getContact().getPhoneNumber().replaceAll("[+(\\-)]","");
         SendMessage message = new SendMessage();
         message.setChatId(chatId);
 
