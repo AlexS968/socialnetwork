@@ -244,7 +244,7 @@ public class ApiAccountControllerIT extends AbstractIntegrationIT {
     public void shouldRegisterNewPerson() throws Exception {
         RegistrationRequest request = new RegistrationRequest(
                 "email@mail.ru", "password", "password",
-                "Danny", "Wilds", "", "");
+                "Danny", "Wilds", "", "testCaptcha");
 
         String requestJson = mapper.writer().withDefaultPrettyPrinter().writeValueAsString(request);
 

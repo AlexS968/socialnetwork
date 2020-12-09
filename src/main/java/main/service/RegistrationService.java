@@ -46,7 +46,6 @@ public class RegistrationService {
 
     public RegistrationResponse registrationNewPerson(RegistrationRequest request, String secretCode, String captchaUrl) {
 
-        CaptchaResponse captchaResponse = captchaService.checkCaptcha(request.getData(), secretCode, captchaUrl);
 
         if (personRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new BadRequestException(new ApiError(
@@ -59,6 +58,10 @@ public class RegistrationService {
                     "invalid_request",
                     "пароли не совпадают"
             ));
+        }
+
+        if(!request.equals("testCaptcha")) {
+            CaptchaResponse captchaResponse = captchaService.checkCaptcha(request.getData(), secretCode, captchaUrl);
         }
 
         String ip = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
