@@ -2,12 +2,14 @@ package main.service;
 
 
 import lombok.RequiredArgsConstructor;
+import main.core.ContextUtilities;
 import main.data.request.LikeRequest;
 import main.data.response.base.Response;
 import main.data.response.type.LikesWithUsers;
 import main.exception.BadRequestException;
 import main.exception.apierror.ApiError;
 import main.model.*;
+import main.repository.BlocksBetweenUsersRepository;
 import main.repository.LikesRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +31,7 @@ public class LikesServiceImpl implements LikesService {
     private final PersonServiceImpl personService;
     private final CommentServiceImpl commentService;
     private final PostService postService;
+    private final BlocksBetweenUsersRepository blocksBetweenUsersRepository;
     private final NotificationService notificationService;
 
     public Response<LikesWithUsers> isLiked(Integer userId, int itemId, String type) {
@@ -51,6 +54,14 @@ public class LikesServiceImpl implements LikesService {
     }
 
     public Response<LikesWithUsers> setLike(LikeRequest request) {
+
+
+        BlocksBetweenUsers blocksBetweenUsers = blocksBetweenUsersRepository
+                .findBySrc_IdAndDst_Id(getUserIdByPostId(request.getItemId()), ContextUtilities.getCurrentUserId());
+        if (!(blocksBetweenUsers == null)) {
+            throw new BadRequestException(new ApiError("Access blocked", "Постановка лайка заблокирована"));
+        }
+
         Person person = personService.getAuthUser();
         if (isLiked(person.getId(), request.getItemId(), request.getType()).getData().getLikes() == 0) {
             Like like = new Like();
@@ -111,5 +122,9 @@ public class LikesServiceImpl implements LikesService {
     public Like findById(int id) {
         return likesRepository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
+    }
+
+    private int getUserIdByPostId(int postId){
+        return postService.findById(postId).getAuthor().getId();
     }
 }
